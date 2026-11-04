@@ -4,12 +4,12 @@
 
 ## Website
 
-- Spanish: https://windytech.studio/
-- English: https://windytech.studio/en/
-- Services: https://windytech.studio/#servicios
-- Contact: https://windytech.studio/#contacto
-- Privacy: https://windytech.studio/legal/privacidad/
-- Terms: https://windytech.studio/legal/terminos/
+- Spanish: https://www.windytech.studio/
+- English: https://www.windytech.studio/en/
+- Services: https://www.windytech.studio/#servicios
+- Contact: https://www.windytech.studio/#contacto
+- Privacy: https://www.windytech.studio/legal/privacidad/
+- Terms: https://www.windytech.studio/legal/terminos/
 
 ## Services
 
@@ -22,7 +22,7 @@
 
 ## Contact
 
-- Website: https://windytech.studio/
+- Website: https://www.windytech.studio/
 - WhatsApp: https://wa.me/584127723148
 - Email: windytechestudio@gmail.com
 

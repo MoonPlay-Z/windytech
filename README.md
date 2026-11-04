@@ -58,7 +58,7 @@ Web3Forms, Resend o un endpoint propio.
 2. Crea un proyecto en Cloudflare Pages.
 3. Build command: `npm run build`
 4. Output directory: `dist`
-5. Conecta el dominio `windytech.studio` y configura DNS.
+5. Conecta el dominio `www.windytech.studio` y configura DNS.
 6. Añade el dominio a Google Search Console y envía `/sitemap.xml`.
 
 El sitio incluye metadatos estructurados bilingües, preguntas frecuentes visibles,
@@ -71,7 +71,7 @@ También funciona en Vercel o Netlify con la misma configuración.
 
 - [ ] Revisar el número de WhatsApp y el correo en `src/data/site.ts`.
 - [ ] Revisar los textos legales con un abogado/contador.
-- [ ] Confirmar que el dominio `windytech.studio` apunta al deploy.
+- [ ] Confirmar que el dominio `www.windytech.studio` apunta al deploy.
 - [ ] Configurar correo profesional (`hola@windytech.studio`) y redirigirlo si hace falta.
 - [ ] Añadir analítica (GA4 o Plausible) cuando exista una cuenta.
 - [ ] Añadir Google Business Profile y redes sociales.

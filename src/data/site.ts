@@ -2,7 +2,7 @@ export type Lang = 'es' | 'en';
 
 export const site = {
   name: 'Windy Tech',
-  url: 'https://windytech.studio',
+  url: 'https://www.windytech.studio',
   domain: 'www.windytech.studio',
   whatsappNumber: '584127723148',
   whatsappDisplay: '+58 412-7723148',
@@ -51,8 +51,8 @@ export const content = {
     },
     hero: {
       badge: 'Windy Tech · Desarrollo & Automatización',
-      titleBefore: 'Tu negocio,',
-      titleHighlight: 'conectado y automatizado',
+      titleBefore: 'Desarrollo de software,',
+      titleHighlight: 'WhatsApp y páginas web',
       description:
         'Desarrollamos software a medida, automatizamos tu WhatsApp y creamos webs que convierten visitas en clientes. Marketing, SEO y equipos informáticos para empresas que quieren crecer.',
       bullets: [
@@ -357,8 +357,8 @@ export const content = {
     },
     hero: {
       badge: 'Windy Tech · Development & Automation',
-      titleBefore: 'Your business,',
-      titleHighlight: 'connected and automated',
+      titleBefore: 'Custom software,',
+      titleHighlight: 'WhatsApp automation & web design',
       description:
         'We build custom software, automate your WhatsApp and create websites that convert visits into customers. Marketing, SEO and IT equipment for businesses ready to grow.',
       bullets: [

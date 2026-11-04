@@ -9,6 +9,10 @@ const { lang } = Astro.props;
 const t = content[lang];
 const homeHref = lang === 'es' ? '/' : '/en/';
 const navAria = lang === 'es' ? 'Navegación del pie de página' : 'Footer navigation';
+const wordmarkAlt =
+  lang === 'es'
+    ? 'Windy Tech — desarrollo de software y automatización'
+    : 'Windy Tech — software development and automation';
 ---
 
 <footer class="site-footer">
@@ -17,7 +21,7 @@ const navAria = lang === 'es' ? 'Navegación del pie de página' : 'Footer navig
       <img
         class="footer-wordmark"
         src="/assets/logo-wordmark-light.png"
-        alt={site.name}
+        alt={wordmarkAlt}
         width="488"
         height="68"
         loading="lazy"

@@ -14,6 +14,7 @@ const altPath = lang === 'es' ? '/en/' : '/';
 const path = lang === 'es' ? '/' : '/en/';
 const title = t.meta.homeTitle;
 const description = t.meta.homeDescription;
+const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech graphic symbol';
 ---
 
 <BaseLayout
@@ -29,8 +30,7 @@ const description = t.meta.homeDescription;
     <img
       class="hero-watermark"
       src="/assets/logo-mark-large.png"
-      alt=""
-      aria-hidden="true"
+      alt={markAlt}
       width="250"
       height="254"
     />
@@ -70,7 +70,12 @@ const description = t.meta.homeDescription;
 
       <aside class="hero-panel" aria-label={t.hero.panelTitle}>
         <span class="hero-panel-icon">
-          <img src="/assets/logo-mark-large.png" alt="" width="56" height="56" />
+          <img
+            src="/assets/logo-mark-large.png"
+            alt={markAlt}
+            width="56"
+            height="56"
+          />
         </span>
         <div class="hero-panel-head">
           <h2>{t.hero.panelTitle}</h2>
