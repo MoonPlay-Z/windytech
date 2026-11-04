@@ -278,6 +278,24 @@ const description = t.meta.homeDescription;
     </div>
   </section>
 
+  <section class="section section--soft" id="preguntas">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t.faqs.eyebrow}</span>
+        <h2>{t.faqs.title}</h2>
+        <p>{t.faqs.subtitle}</p>
+      </div>
+      <div class="faq-list">
+        {t.faqs.items.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <section class="section section--white" id="contacto">
     <div class="container">
       <div class="section-head">

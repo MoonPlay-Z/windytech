@@ -221,6 +221,62 @@ article[id] {
   color: var(--ice);
 }
 
+.faq-list {
+  display: grid;
+  gap: 12px;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  padding: 0 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 68px;
+  color: var(--navy);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "+";
+  color: var(--teal-dark);
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.faq-item[open] summary::after {
+  content: "−";
+}
+
+.faq-item summary:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid var(--teal);
+  outline-offset: 4px;
+}
+
+.faq-item p {
+  max-width: 760px;
+  padding: 0 0 22px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 .contact-head-icon {
   display: grid;
   place-items: center;

@@ -18,9 +18,9 @@ export function whatsappLink(message: string) {
 export const content = {
   es: {
     meta: {
-      homeTitle: 'Windy Tech | Desarrollo de software, automatización y marketing',
+      homeTitle: 'Software, WhatsApp y páginas web en Venezuela | Windy Tech',
       homeDescription:
-        'Desarrollamos software a medida, automatizamos tu WhatsApp y creamos webs que venden. Marketing, SEO y equipos informáticos para empresas en Venezuela y el mundo.',
+        'Software a medida, automatización de WhatsApp Business, diseño web y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
       homeOgAlt: 'Windy Tech — Desarrollo de software, automatización y marketing',
     },
     nav: {
@@ -238,6 +238,43 @@ export const content = {
       text: 'Escríbenos y recibe tu cotización por WhatsApp. Aceptamos Binance y PayPal.',
       button: 'Solicita tu cotización',
     },
+    faqs: {
+      eyebrow: 'PREGUNTAS FRECUENTES',
+      title: 'Respuestas sobre nuestros servicios',
+      subtitle: 'Conoce qué hacemos, cómo trabajamos y cómo pedir una cotización.',
+      items: [
+        {
+          question: '¿Qué servicios digitales ofrece Windy Tech?',
+          answer:
+            'Desarrollamos software a medida y aplicaciones web, automatizamos WhatsApp Business, diseñamos páginas web y landing pages, y ofrecemos SEO, marketing digital, publicidad, redes e infraestructura y equipos informáticos.',
+        },
+        {
+          question: '¿Cuánto cuesta una página web o un software a medida?',
+          answer:
+            'El precio depende del alcance, las funciones y las integraciones que necesite tu negocio. Cuéntanos tu objetivo y te enviaremos una cotización antes de comenzar.',
+        },
+        {
+          question: '¿Pueden automatizar WhatsApp Business para pedidos o citas?',
+          answer:
+            'Sí. Podemos ayudarte a automatizar respuestas y flujos de atención para consultas, pedidos o citas. Revisamos tu proceso y definimos el alcance contigo antes de cotizar.',
+        },
+        {
+          question: '¿Ofrecen posicionamiento SEO y marketing digital?',
+          answer:
+            'Sí. Trabajamos en optimización para buscadores, contenido y campañas publicitarias según los objetivos del negocio. El posicionamiento depende de factores como la competencia, el sitio y la demanda; no prometemos posiciones ni resultados garantizados.',
+        },
+        {
+          question: '¿Trabajan con empresas fuera de Venezuela?',
+          answer:
+            'Podemos atender proyectos digitales de forma remota para clientes en otros países. Los servicios de instalación de redes e infraestructura están disponibles únicamente en Venezuela.',
+        },
+        {
+          question: '¿Cómo solicito una cotización?',
+          answer:
+            'Escríbenos por WhatsApp o usa el formulario de contacto. Indica el servicio, qué necesitas resolver y cómo podemos contactarte para preparar una cotización.',
+        },
+      ],
+    },
     contact: {
       eyebrow: 'CONTACTO',
       title: 'Hablemos de tu proyecto',
@@ -287,9 +324,9 @@ export const content = {
   },
   en: {
     meta: {
-      homeTitle: 'Windy Tech | Software development, automation and marketing',
+      homeTitle: 'Custom Software, WhatsApp & Web Design | Windy Tech',
       homeDescription:
-        'Custom software, WhatsApp automation and high-converting websites. Marketing, SEO and IT equipment for businesses in Venezuela and worldwide.',
+        'Custom software, WhatsApp Business automation, web design and SEO for businesses. Remote digital services and network support in Venezuela.',
       homeOgAlt: 'Windy Tech — Software development, automation and marketing',
     },
     nav: {
@@ -496,6 +533,43 @@ export const content = {
       title: 'Ready to automate your business?',
       text: 'Write to us and get a quote on WhatsApp. We accept Binance and PayPal.',
       button: 'Request a quote',
+    },
+    faqs: {
+      eyebrow: 'FREQUENTLY ASKED QUESTIONS',
+      title: 'Answers about our services',
+      subtitle: 'Learn what we do, how we work and how to request a quote.',
+      items: [
+        {
+          question: 'What digital services does Windy Tech offer?',
+          answer:
+            'We build custom software and web applications, automate WhatsApp Business, design websites and landing pages, and offer SEO, digital marketing, advertising, network infrastructure and IT equipment.',
+        },
+        {
+          question: 'How much does a website or custom software cost?',
+          answer:
+            'Pricing depends on your project scope, required features and integrations. Tell us what you want to achieve and we will send a quote before work begins.',
+        },
+        {
+          question: 'Can you automate WhatsApp Business for orders or appointments?',
+          answer:
+            'Yes. We can help automate replies and customer-service flows for inquiries, orders or appointments. We review your process and agree on the scope before quoting.',
+        },
+        {
+          question: 'Do you provide SEO and digital marketing?',
+          answer:
+            'Yes. We work on search optimization, content and advertising campaigns based on your business goals. Rankings depend on factors such as competition, the website and demand; we do not promise specific positions or guaranteed results.',
+        },
+        {
+          question: 'Do you work with businesses outside Venezuela?',
+          answer:
+            'We can deliver digital projects remotely for clients in other countries. On-site network and infrastructure services are available in Venezuela only.',
+        },
+        {
+          question: 'How can I request a quote?',
+          answer:
+            'Message us on WhatsApp or use the contact form. Tell us which service you need, what you want to solve and how we can reach you so we can prepare a quote.',
+        },
+      ],
     },
     contact: {
       eyebrow: 'CONTACT',

@@ -30,6 +30,7 @@ src/
 public/
   assets/         logos, favicon, imagen Open Graph
   robots.txt
+  llms.txt        resumen de servicios para sistemas de IA
   sitemap.xml
 ```
 
@@ -58,6 +59,11 @@ Web3Forms, Resend o un endpoint propio.
 3. Build command: `npm run build`
 4. Output directory: `dist`
 5. Conecta el dominio `windytech.studio` y configura DNS.
+6. Añade el dominio a Google Search Console y envía `/sitemap.xml`.
+
+El sitio incluye metadatos estructurados bilingües, preguntas frecuentes visibles,
+directivas para rastreadores y `/llms.txt`. Estas mejoras ayudan a interpretar el contenido,
+pero no garantizan posiciones en buscadores ni menciones de asistentes de IA.
 
 También funciona en Vercel o Netlify con la misma configuración.
 

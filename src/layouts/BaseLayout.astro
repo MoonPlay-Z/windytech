@@ -38,32 +38,82 @@ const skipLabel = lang === 'es' ? 'Saltar al contenido' : 'Skip to content';
 const locale = lang === 'es' ? 'es_VE' : 'en_US';
 const altLocale = lang === 'es' ? 'en_US' : 'es_VE';
 
-const organizationSchema = {
+const isHomePage = path === '/' || path === '/en/';
+const schemaGraph = {
   '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: site.name,
-  url: site.url,
-  logo: new URL('/assets/logo-mark.png', site.url).toString(),
-  image: ogImageUrl,
-  email: site.email,
-  telephone: `+${site.whatsappNumber}`,
-  description,
-  areaServed: ['Venezuela', 'Worldwide'],
-  knowsAbout: [
-    'Software development',
-    'WhatsApp automation',
-    'Web development',
-    'SEO',
-    'Digital marketing',
-    'IT equipment',
-    'Network infrastructure',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      name: site.name,
+      url: site.url,
+      inLanguage: ['es', 'en'],
+      publisher: { '@id': `${site.url}/#business` },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      name: title,
+      description,
+      url: canonical,
+      inLanguage: lang,
+      isPartOf: { '@id': `${site.url}/#website` },
+      about: { '@id': `${site.url}/#business` },
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${site.url}/#business`,
+      name: site.name,
+      url: site.url,
+      logo: new URL('/assets/logo-mark.png', site.url).toString(),
+      image: ogImageUrl,
+      email: site.email,
+      telephone: `+${site.whatsappNumber}`,
+      description: t.meta.homeDescription,
+      areaServed: ['Venezuela', 'Worldwide'],
+      knowsAbout: [
+        ...t.services.cards.map(({ title: serviceTitle }) => serviceTitle),
+        ...(lang === 'es'
+          ? ['SEO local en Venezuela', 'Desarrollo web para empresas', 'Automatización de atención al cliente']
+          : ['SEO services in Venezuela', 'business website development', 'customer support automation']),
+      ],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: `+${site.whatsappNumber}`,
+        contactType: 'sales',
+        availableLanguage: ['Spanish', 'English'],
+      },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: t.services.title,
+        itemListElement: t.services.cards.map((service, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Service',
+            name: service.title,
+            description: service.text,
+            provider: { '@id': `${site.url}/#business` },
+          },
+        })),
+      },
+    },
+    ...(isHomePage
+      ? [
+          {
+            '@type': 'FAQPage',
+            mainEntity: t.faqs.items.map(({ question, answer }) => ({
+              '@type': 'Question',
+              name: question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: answer,
+              },
+            })),
+          },
+        ]
+      : []),
   ],
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: `+${site.whatsappNumber}`,
-    contactType: 'sales',
-    availableLanguage: ['Spanish', 'English'],
-  },
 };
 ---
 
@@ -76,7 +126,12 @@ const organizationSchema = {
     <meta name="description" content={description} />
     <meta name="author" content={site.name} />
     <meta name="theme-color" content="#0e2234" />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta
+      name="robots"
+      content={noindex
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="es" href={esUrl} />
     <link rel="alternate" hreflang="en" href={enUrl} />
@@ -111,7 +166,7 @@ const organizationSchema = {
       rel="stylesheet"
     />
 
-    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />
   </head>
   <body>
     <a class="skip-link" href="#main">{skipLabel}</a>
