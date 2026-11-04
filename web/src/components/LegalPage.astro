@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { legalContent, type LegalSection } from '../data/legal';
+import { site, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  docType: 'privacy' | 'terms';
+  path: string;
+  altPath: string;
+}
+
+const { lang, docType, path, altPath } = Astro.props;
+const doc = legalContent[lang][docType];
+const sections = doc.sections as readonly LegalSection[];
+const homeHref = lang === 'es' ? '/' : '/en/';
+const backLabel = lang === 'es' ? 'Volver al inicio' : 'Back to home';
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${doc.title} | ${site.name}`}
+  description={doc.intro}
+  path={path}
+  altPath={altPath}
+  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImageAlt={`${doc.title} — ${site.name}`}
+>
+  <div class="legal-page">
+    <section class="legal-hero">
+      <div class="container">
+        <span class="eyebrow">{site.name}</span>
+        <h1>{doc.title}</h1>
+        <p>{doc.updated}</p>
+      </div>
+    </section>
+
+    <section class="legal-content">
+      <div class="container">
+        <p class="legal-intro">{doc.intro}</p>
+
+        {sections.map((section) => (
+          <div class="legal-section">
+            <h2>{section.heading}</h2>
+            {section.paragraphs?.map((paragraph) => <p>{paragraph}</p>)}
+            {section.bullets && (
+              <ul>
+                {section.bullets.map((bullet) => <li>{bullet}</li>)}
+              </ul>
+            )}
+          </div>
+        ))}
+
+        <a class="legal-back" href={homeHref}>← {backLabel}</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

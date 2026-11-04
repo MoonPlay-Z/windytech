@@ -1,0 +1,322 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from './Icon.astro';
+import ContactForm from './ContactForm.astro';
+import { content, whatsappLink, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = content[lang];
+const altPath = lang === 'es' ? '/en/' : '/';
+const path = lang === 'es' ? '/' : '/en/';
+const title = t.meta.homeTitle;
+const description = t.meta.homeDescription;
+---
+
+<BaseLayout
+  lang={lang}
+  title={title}
+  description={description}
+  path={path}
+  altPath={altPath}
+  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImageAlt={t.meta.homeOgAlt}
+>
+  <section class="hero" id="inicio">
+    <img
+      class="hero-watermark"
+      src="/assets/logo-mark-large.png"
+      alt=""
+      aria-hidden="true"
+      width="250"
+      height="254"
+    />
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <span class="hero-badge">
+          <Icon name="zap" size={16} />
+          {t.hero.badge}
+        </span>
+        <h1>
+          {t.hero.titleBefore}
+          <span>{t.hero.titleHighlight}</span>
+        </h1>
+        <p class="hero-description">{t.hero.description}</p>
+        <ul class="hero-list">
+          {t.hero.bullets.map((bullet) => (
+            <li>
+              <Icon name="check" size={20} />
+              <span>{bullet}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="hero-actions">
+          <a
+            class="btn btn-primary"
+            href={whatsappLink(t.whatsapp.general)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            {t.hero.primaryCta}
+            <Icon name="whatsapp" size={18} />
+          </a>
+          <a class="btn btn-light" href="#servicios">{t.hero.secondaryCta}</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label={t.hero.panelTitle}>
+        <span class="hero-panel-icon">
+          <img src="/assets/logo-mark-large.png" alt="" width="56" height="56" />
+        </span>
+        <div class="hero-panel-head">
+          <h2>{t.hero.panelTitle}</h2>
+          <p>{t.hero.panelSubtitle}</p>
+        </div>
+        <div class="quick-list">
+          {t.hero.quickLinks.map((link, index) =>
+            'href' in link ? (
+              <a class={`quick-link${index === 0 ? ' is-primary' : ''}`} href={link.href}>
+                <span>
+                  <span class={`quick-icon quick-icon--${link.icon}`}>
+                    <Icon name={link.icon} size={18} />
+                  </span>
+                  {link.label}
+                </span>
+                <Icon name="arrow-right" size={18} />
+              </a>
+            ) : (
+              <a
+                class={`quick-link${index === 0 ? ' is-primary' : ''}`}
+                href={whatsappLink(link.message)}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="whatsapp"
+              >
+                <span>
+                  <span class={`quick-icon quick-icon--${link.icon}`}>
+                    <Icon name={link.icon} size={18} />
+                  </span>
+                  {link.label}
+                </span>
+                <Icon name="whatsapp" size={18} class="quick-wa" />
+              </a>
+            ),
+          )}
+        </div>
+        <div class="panel-footer">
+          {t.hero.panelFooter.map((chip) => (
+            <span class="panel-chip">
+              <span class={`panel-chip-icon panel-chip-icon--${chip.icon}`}>
+                <Icon name={chip.icon} size={24} />
+              </span>
+              {chip.label}
+            </span>
+          ))}
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--white" id="campanas">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t.campaigns.eyebrow}</span>
+        <h2>{t.campaigns.title}</h2>
+        <p>{t.campaigns.subtitle}</p>
+      </div>
+      <div class="campaign-grid">
+        {t.campaigns.cards.map((card) => (
+          <article class="card card--soft">
+            <div class="card-top">
+              <span class={`icon-badge icon-badge--${card.icon}`}>
+                <Icon name={card.icon} size={26} />
+              </span>
+              <span class="tag">{card.tag}</span>
+            </div>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+            <a
+              class="btn btn-primary"
+              href={whatsappLink(card.message)}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="whatsapp"
+            >
+              {card.cta}
+              <Icon name="whatsapp" size={18} />
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="servicios">
+    <div class="container">
+      <div class="section-head">
+        <h2>{t.services.title}</h2>
+        <p>{t.services.subtitle}</p>
+      </div>
+      <div class="service-grid">
+        {t.services.cards.map((service) => (
+          <article class="card">
+            <span class={`icon-badge icon-badge--${service.icon}`}>
+              <Icon name={service.icon} size={28} />
+            </span>
+            <h3>{service.title}</h3>
+            <p>{service.text}</p>
+            <a
+              class="text-link"
+              href={whatsappLink(service.message)}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="whatsapp"
+            >
+              {t.services.cta}
+              <Icon name="whatsapp" size={16} />
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark" id="clientes">
+    <div class="container clients-inner">
+      <div class="clients-copy">
+        <h2>{t.clients.title}</h2>
+        <p>{t.clients.text}</p>
+        <ul class="check-list">
+          {t.clients.bullets.map((bullet) => (
+            <li>
+              <Icon name="check" size={22} />
+              <span>
+                <strong>{bullet.title}</strong>
+                {bullet.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="segment-card">
+        {t.clients.segments.map((segment) => (
+          <div class="segment">
+            <span class="eyebrow">{segment.label}</span>
+            <p>{segment.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="equipos">
+    <div class="container split-grid">
+      <article class="equipment-card">
+        <span class="tag">{t.equipment.eyebrow}</span>
+        <h2>{t.equipment.title}</h2>
+        <p>{t.equipment.text}</p>
+        <ul class="equipment-list">
+          {t.equipment.bullets.map((bullet) => (
+            <li>
+              <Icon name="check-simple" size={18} />
+              <span>{bullet}</span>
+            </li>
+          ))}
+        </ul>
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(t.equipment.message)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {t.equipment.cta}
+          <Icon name="whatsapp" size={18} />
+        </a>
+        <p class="note">{t.equipment.note}</p>
+      </article>
+
+      <article class="payments-card" id="pagos">
+        <span class="icon-badge icon-badge--light">
+          <Icon name="card" size={28} />
+        </span>
+        <h2>{t.payments.title}</h2>
+        <p>{t.payments.text}</p>
+        <div class="payment-pills">
+          {t.payments.methods.map((method) => (
+            <span class={`payment-pill payment-pill--${method.toLowerCase()}`}>
+              <Icon name={method.toLowerCase()} size={22} />
+              {method}
+            </span>
+          ))}
+        </div>
+        <p class="note">{t.payments.note}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <div class="cta-copy">
+        <h2>{t.cta.title}</h2>
+        <p>{t.cta.text}</p>
+      </div>
+      <a
+        class="btn btn-dark"
+        href={whatsappLink(t.whatsapp.general)}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="whatsapp"
+      >
+        {t.cta.button}
+        <Icon name="whatsapp" size={18} />
+      </a>
+    </div>
+  </section>
+
+  <section class="section section--white" id="contacto">
+    <div class="container">
+      <div class="section-head">
+        <span class="contact-head-icon">
+          <Icon name="chat" size={30} />
+        </span>
+        <span class="eyebrow">{t.contact.eyebrow}</span>
+        <h2>{t.contact.title}</h2>
+        <p>{t.contact.text}</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-cards">
+          {t.contact.cards.map((card) =>
+            'href' in card ? (
+              <a class="contact-card" href={card.href}>
+                <span class={`contact-card-icon contact-card-icon--${card.icon}`}>
+                  <Icon name={card.icon} size={22} />
+                </span>
+                <span class="contact-card-body">
+                  <span class="contact-card-label">{card.label}</span>
+                  <span class="contact-card-value">{card.value}</span>
+                </span>
+              </a>
+            ) : (
+              <div class="contact-card">
+                <span class={`contact-card-icon contact-card-icon--${card.icon}`}>
+                  <Icon name={card.icon} size={22} />
+                </span>
+                <span class="contact-card-body">
+                  <span class="contact-card-label">{card.label}</span>
+                  <span class="contact-card-value">{card.value}</span>
+                </span>
+              </div>
+            ),
+          )}
+        </div>
+        <ContactForm lang={lang} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

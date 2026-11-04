@@ -1,0 +1,110 @@
+---
+import Icon from './Icon.astro';
+import { content, site, whatsappLink, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = content[lang];
+const f = t.contact.form;
+---
+
+<form
+  class="contact-form"
+  data-contact-form
+  data-lang={lang}
+  data-wa-number={site.whatsappNumber}
+>
+  <div class="form-row">
+    <div class="field">
+      <label for={`name-${lang}`}>{f.name}</label>
+      <input
+        id={`name-${lang}`}
+        name="name"
+        type="text"
+        placeholder={f.namePlaceholder}
+        autocomplete="name"
+        required
+      />
+    </div>
+    <div class="field">
+      <label for={`business-${lang}`}>{f.business}</label>
+      <input
+        id={`business-${lang}`}
+        name="business"
+        type="text"
+        placeholder={f.businessPlaceholder}
+        autocomplete="organization"
+      />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for={`service-${lang}`}>{f.service}</label>
+    <select id={`service-${lang}`} name="service" required>
+      {f.options.map((option) => <option value={option}>{option}</option>)}
+    </select>
+  </div>
+
+  <div class="field">
+    <label for={`message-${lang}`}>{f.message}</label>
+    <textarea
+      id={`message-${lang}`}
+      name="message"
+      placeholder={f.messagePlaceholder}
+      rows="4"
+      required
+    ></textarea>
+  </div>
+
+  <button class="btn btn-primary" type="submit" data-track="whatsapp-form">
+    {f.submit}
+    <Icon name="whatsapp" size={18} />
+  </button>
+
+  <p class="form-note">
+    {f.note}
+    <br />
+    {f.emailFallback}
+    <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <noscript>
+    <p class="form-note">
+      {lang === 'es'
+        ? 'Para enviar el formulario, activa JavaScript o escríbenos directamente por '
+        : 'To submit the form, enable JavaScript or message us directly on '}
+      <a href={whatsappLink(t.whatsapp.general)}>WhatsApp</a>.
+    </p>
+  </noscript>
+</form>
+
+<script>
+  const forms = document.querySelectorAll<HTMLFormElement>('[data-contact-form]');
+
+  forms.forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const business = String(data.get('business') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
+      const message = String(data.get('message') ?? '').trim();
+      const lang = form.dataset.lang ?? 'es';
+      const number = form.dataset.waNumber ?? '584127723148';
+
+      const intro =
+        lang === 'en'
+          ? `Hello Windy Tech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
+          : `Hola Windy Tech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
+
+      const text = `${intro}${message ? `\n\n${message}` : ''}`;
+      const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  });
+</script>

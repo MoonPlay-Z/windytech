@@ -1,0 +1,40 @@
+---
+import { content, site, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = content[lang];
+const homeHref = lang === 'es' ? '/' : '/en/';
+const navAria = lang === 'es' ? 'Navegación del pie de página' : 'Footer navigation';
+---
+
+<footer class="site-footer">
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <img
+        class="footer-wordmark"
+        src="/assets/logo-wordmark-light.png"
+        alt={site.name}
+        width="488"
+        height="68"
+        loading="lazy"
+      />
+      <span class="footer-tagline">{t.footer.tagline}</span>
+    </div>
+
+    <nav class="footer-nav" aria-label={navAria}>
+      {t.nav.items.map((item) => <a href={`${homeHref}${item.href}`}>{item.label}</a>)}
+    </nav>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>© {site.year} {site.name}. {t.footer.rights}</span>
+    <div class="footer-legal">
+      <a href={t.footer.legalPaths.privacy}>{t.footer.privacy}</a>
+      <a href={t.footer.legalPaths.terms}>{t.footer.terms}</a>
+    </div>
+  </div>
+</footer>

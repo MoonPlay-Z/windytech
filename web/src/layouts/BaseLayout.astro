@@ -1,0 +1,134 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { content, site, whatsappLink, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+  altPath: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  noindex?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description,
+  path,
+  altPath,
+  ogImage = site.ogImage,
+  ogImageAlt = content[lang].meta.homeOgAlt,
+  noindex = false,
+} = Astro.props;
+
+const t = content[lang];
+const esPath = lang === 'es' ? path : altPath;
+const enPath = lang === 'en' ? path : altPath;
+const canonical = new URL(path, site.url).toString();
+const esUrl = new URL(esPath, site.url).toString();
+const enUrl = new URL(enPath, site.url).toString();
+const ogImageUrl = new URL(ogImage, site.url).toString();
+const skipLabel = lang === 'es' ? 'Saltar al contenido' : 'Skip to content';
+const locale = lang === 'es' ? 'es_VE' : 'en_US';
+const altLocale = lang === 'es' ? 'en_US' : 'es_VE';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.name,
+  url: site.url,
+  logo: new URL('/assets/logo-mark.png', site.url).toString(),
+  image: ogImageUrl,
+  email: site.email,
+  telephone: `+${site.whatsappNumber}`,
+  description,
+  areaServed: ['Venezuela', 'Worldwide'],
+  knowsAbout: [
+    'Software development',
+    'WhatsApp automation',
+    'Web development',
+    'SEO',
+    'Digital marketing',
+    'IT equipment',
+    'Network infrastructure',
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: `+${site.whatsappNumber}`,
+    contactType: 'sales',
+    availableLanguage: ['Spanish', 'English'],
+  },
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content="#0e2234" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={locale} />
+    <meta property="og:locale:alternate" content={altLocale} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{skipLabel}</a>
+    <Header lang={lang} altHref={altPath} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <a
+      class="wa-float"
+      href={whatsappLink(t.whatsapp.general)}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t.whatsapp.floatLabel}
+      data-track="whatsapp"
+    >
+      <Icon name="whatsapp" size={26} />
+    </a>
+  </body>
+</html>

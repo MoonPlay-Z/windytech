@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout
+  lang="es"
+  title="Página no encontrada | Windy Tech"
+  description="La página que buscas no existe o cambió de lugar."
+  path="/404/"
+  altPath="/en/"
+  ogImageAlt="Windy Tech — Página no encontrada"
+  noindex
+>
+  <section class="not-found">
+    <div class="container">
+      <span class="eyebrow">404</span>
+      <h1>Página no encontrada</h1>
+      <p>La página que buscas no existe o cambió de lugar.</p>
+      <p class="not-found-en">The page you are looking for does not exist or has moved.</p>
+      <div class="not-found-actions">
+        <a class="btn btn-primary" href="/">
+          Volver al inicio
+          <Icon name="arrow-right" size={18} />
+        </a>
+        <a class="btn btn-outline" href="/en/">Go to English site</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
