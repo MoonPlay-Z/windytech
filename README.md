@@ -64,6 +64,8 @@ Web3Forms, Resend o un endpoint propio.
 El sitio incluye metadatos estructurados bilingües, preguntas frecuentes visibles,
 directivas para rastreadores y `/llms.txt`. Estas mejoras ayudan a interpretar el contenido,
 pero no garantizan posiciones en buscadores ni menciones de asistentes de IA.
+La portada también incluye enlaces de compartir en WhatsApp, Facebook y LinkedIn, más una
+acción para copiar el enlace; son enlaces directos y no cargan widgets externos de seguimiento.
 
 También funciona en Vercel o Netlify con la misma configuración.
 

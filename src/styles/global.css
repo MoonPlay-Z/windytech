@@ -221,6 +221,74 @@ article[id] {
   color: var(--ice);
 }
 
+.share-strip {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.share-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px 24px;
+  min-height: 82px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.share-strip-inner > p {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.share-actions a,
+.share-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.share-actions a:hover,
+.share-actions button:hover {
+  border-color: var(--teal);
+  background: var(--bg-soft);
+}
+
+.share-actions a:focus-visible,
+.share-actions button:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+
+.share-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .faq-list {
   display: grid;
   gap: 12px;

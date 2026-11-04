@@ -30,7 +30,11 @@ const wordmarkAlt =
     </div>
 
     <nav class="footer-nav" aria-label={navAria}>
-      {t.nav.items.map((item) => <a href={`${homeHref}${item.href}`}>{item.label}</a>)}
+      {t.nav.items.map((item) => (
+        <a href={`${homeHref}${item.href}`}>
+          {lang === 'es' ? `Ir a ${item.label}` : `Go to ${item.label}`}
+        </a>
+      ))}
     </nav>
   </div>
 

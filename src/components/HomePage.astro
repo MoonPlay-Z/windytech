@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import ContactForm from './ContactForm.astro';
-import { content, whatsappLink, type Lang } from '../data/site';
+import { content, site, whatsappLink, type Lang } from '../data/site';
 
 interface Props {
   lang: Lang;
@@ -15,6 +15,8 @@ const path = lang === 'es' ? '/' : '/en/';
 const title = t.meta.homeTitle;
 const description = t.meta.homeDescription;
 const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech graphic symbol';
+const shareUrl = new URL(path, site.url).toString();
+const shareText = `${title} — ${shareUrl}`;
 ---
 
 <BaseLayout
@@ -126,6 +128,46 @@ const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech 
     </div>
   </section>
 
+  <section class="share-strip" aria-label={t.share.navLabel}>
+    <div class="container share-strip-inner">
+      <p>{t.share.label}</p>
+      <nav class="share-actions" aria-label={t.share.navLabel}>
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.whatsapp}
+        >
+          <Icon name="whatsapp" size={18} />
+          <span>{t.share.whatsapp}</span>
+        </a>
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.facebook}
+        >
+          <Icon name="facebook" size={18} />
+          <span>{t.share.facebook}</span>
+        </a>
+        <a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.linkedin}
+        >
+          <Icon name="linkedin" size={18} />
+          <span>{t.share.linkedin}</span>
+        </a>
+        <button type="button" data-copy-share data-copy-label={t.share.copy} data-copied-label={t.share.copied} data-error-label={t.share.copyError}>
+          <Icon name="copy" size={18} />
+          <span>{t.share.copy}</span>
+        </button>
+      </nav>
+      <span class="share-status" data-share-status aria-live="polite"></span>
+    </div>
+  </section>
+
   <section class="section section--white" id="campanas">
     <div class="container">
       <div class="section-head">
@@ -181,7 +223,7 @@ const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech 
               rel="noopener noreferrer"
               data-track="whatsapp"
             >
-              {t.services.cta}
+              {t.services.cta}: {service.title}
               <Icon name="whatsapp" size={16} />
             </a>
           </article>
@@ -343,3 +385,28 @@ const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech 
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-share]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const label = button.querySelector('span');
+      const status = document.querySelector<HTMLElement>('[data-share-status]');
+      if (!label || !status) return;
+
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        label.textContent = button.dataset.copiedLabel ?? label.textContent;
+        status.textContent = button.dataset.copiedLabel ?? '';
+      } catch {
+        const errorMessage = button.dataset.errorLabel ?? '';
+        status.textContent = errorMessage;
+        label.textContent = errorMessage;
+      }
+
+      window.setTimeout(() => {
+        label.textContent = button.dataset.copyLabel ?? '';
+        status.textContent = '';
+      }, 3000);
+    });
+  });
+</script>

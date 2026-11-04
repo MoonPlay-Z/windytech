@@ -33,7 +33,8 @@ export const content = {
         { label: 'Pagos', href: '#pagos' },
         { label: 'Contacto', href: '#contacto' },
       ],
-      cta: 'Solicita tu cotización',
+      cta: 'Pedir cotización por WhatsApp',
+      headerCta: 'Cuéntanos sobre tu proyecto',
       menu: 'Abrir menú',
       closeMenu: 'Cerrar menú',
       switchLang: 'Ver sitio en inglés',
@@ -181,6 +182,16 @@ export const content = {
         },
       ],
     },
+    share: {
+      label: '¿Te resultó útil? Comparte Windy Tech',
+      navLabel: 'Compartir esta página',
+      whatsapp: 'Compartir por WhatsApp',
+      facebook: 'Compartir en Facebook',
+      linkedin: 'Compartir en LinkedIn',
+      copy: 'Copiar enlace',
+      copied: 'Enlace copiado',
+      copyError: 'No se pudo copiar. Copia la dirección desde el navegador.',
+    },
     clients: {
       title: 'Trabajamos con negocios de todos los tamaños',
       text: 'Desde un emprendimiento que arranca hasta una empresa con varias sedes. Ajustamos el servicio a tu etapa y a tu presupuesto.',
@@ -236,7 +247,7 @@ export const content = {
     cta: {
       title: '¿Listo para automatizar tu negocio?',
       text: 'Escríbenos y recibe tu cotización por WhatsApp. Aceptamos Binance y PayPal.',
-      button: 'Solicita tu cotización',
+      button: 'Inicia tu proyecto por WhatsApp',
     },
     faqs: {
       eyebrow: 'PREGUNTAS FRECUENTES',
@@ -339,7 +350,8 @@ export const content = {
         { label: 'Payments', href: '#pagos' },
         { label: 'Contact', href: '#contacto' },
       ],
-      cta: 'Request a quote',
+      cta: 'Request a quote on WhatsApp',
+      headerCta: 'Tell us about your project',
       menu: 'Open menu',
       closeMenu: 'Close menu',
       switchLang: 'Ver sitio en español',
@@ -486,6 +498,16 @@ export const content = {
         },
       ],
     },
+    share: {
+      label: 'Find this useful? Share Windy Tech',
+      navLabel: 'Share this page',
+      whatsapp: 'Share on WhatsApp',
+      facebook: 'Share on Facebook',
+      linkedin: 'Share on LinkedIn',
+      copy: 'Copy link',
+      copied: 'Link copied',
+      copyError: 'Could not copy. Copy the address from your browser.',
+    },
     clients: {
       title: 'We work with businesses of all sizes',
       text: 'From a startup getting off the ground to a company with multiple locations. We adapt the service to your stage and budget.',
@@ -532,7 +554,7 @@ export const content = {
     cta: {
       title: 'Ready to automate your business?',
       text: 'Write to us and get a quote on WhatsApp. We accept Binance and PayPal.',
-      button: 'Request a quote',
+      button: 'Start your project on WhatsApp',
     },
     faqs: {
       eyebrow: 'FREQUENTLY ASKED QUESTIONS',
