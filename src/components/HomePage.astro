@@ -34,10 +34,13 @@ const shareText = `${title} — ${shareUrl}`;
   <section class="hero" id="inicio">
     <img
       class="hero-watermark"
-      src="/assets/logo-mark-large.png"
+      src="/assets/logo-mark-large-640.png"
       alt={markAlt}
-      width="250"
-      height="254"
+      width="640"
+      height="650"
+      loading="lazy"
+      decoding="async"
+      fetchpriority="low"
     />
     <div class="container hero-inner">
       <div class="hero-copy">
@@ -76,7 +79,7 @@ const shareText = `${title} — ${shareUrl}`;
       <aside class="hero-panel" aria-label={t.hero.panelTitle}>
         <span class="hero-panel-icon">
           <img
-            src="/assets/logo-mark-large.png"
+            src="/assets/logo-mark-large-112.webp"
             alt={markAlt}
             width="56"
             height="56"

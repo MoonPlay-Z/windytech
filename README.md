@@ -30,7 +30,7 @@ src/
   pages/          /, /en/, /nosotros/, /en/about/, /legal/*, /en/legal/*
   styles/         global.css
 public/
-  assets/         logos, favicons 48–512, imagen Open Graph
+  assets/         logos WebP/PNG, fuentes WOFF2, favicons 48–512, imagen Open Graph
   robots.txt
   llms.txt        perfil de empresa y servicios para sistemas de IA
   sitemap.xml

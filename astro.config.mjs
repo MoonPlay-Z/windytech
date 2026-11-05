@@ -6,5 +6,6 @@ export default defineConfig({
   integrations: [icon()],
   build: {
     format: 'directory',
+    inlineStylesheets: 'always',
   },
 });
