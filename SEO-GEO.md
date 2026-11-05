@@ -13,6 +13,7 @@ panel de empresa: los buscadores lo construyen cuando verifican la entidad.
 - `public/favicon.ico` con tamaños 16, 32, 48, 64, 128 y 256 px.
 - `public/assets/favicon-48.png`, `favicon-96.png`, `favicon-192.png` y `favicon-512.png`.
 - `apple-touch-icon.png` de 180 px y `site.webmanifest` con iconos 192/512 y `maskable`.
+- El favicon muestra el isotipo turquesa sobre un fondo circular azul marino.
 - Etiquetas `<link rel="icon">` y `msapplication-TileImage` en `BaseLayout.astro`.
 - `robots.txt` permite explícitamente a Googlebot, Bingbot, Bravebot, DuckDuckBot,
   Applebot, YandexBot y a los rastreadores de IA.
