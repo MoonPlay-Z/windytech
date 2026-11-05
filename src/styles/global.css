@@ -1999,7 +1999,7 @@ a.contact-card:hover {
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1180px) {
   .nav {
     position: absolute;
     top: 100%;
