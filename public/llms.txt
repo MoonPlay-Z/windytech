@@ -1,29 +1,72 @@
 # Windy Tech
 
-> Bilingual digital services for businesses: custom software, WhatsApp automation, websites, SEO and digital marketing. Digital projects are available remotely; network and infrastructure work is available in Venezuela.
+> Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
 
-## Website
+- Sitio web: https://www.windytech.studio/
+- Inglés: https://www.windytech.studio/en/
+- Acerca de la empresa: https://www.windytech.studio/nosotros/
+- Contacto: https://www.windytech.studio/#contacto
+- Última actualización: 2026-11-05
 
-- Spanish: https://www.windytech.studio/
-- English: https://www.windytech.studio/en/
-- Services: https://www.windytech.studio/#servicios
-- Contact: https://www.windytech.studio/#contacto
-- Privacy: https://www.windytech.studio/legal/privacidad/
-- Terms: https://www.windytech.studio/legal/terminos/
+## Perfil de la empresa
 
-## Services
+- **Nombre:** Windy Tech
+- **Actividad:** desarrollo de software a medida, automatización de WhatsApp Business, diseño y desarrollo web, SEO, marketing digital, redes e infraestructura, y equipos informáticos.
+- **Base:** Venezuela.
+- **Cobertura:** servicios digitales de forma remota en cualquier país; redes, infraestructura y entrega física de equipos solo en Venezuela.
+- **Idiomas:** español e inglés.
+- **Medios de pago:** Binance y PayPal. Los proyectos inician con el 50% de anticipo.
+- **Modelo de trabajo:** diagnóstico, propuesta con alcance y precio por escrito, anticipo, ejecución por hitos, entrega y seguimiento.
+- **Clientes:** emprendimientos, pequeñas y medianas empresas, y compañías con varias sedes.
 
-- Custom software and web applications
-- WhatsApp Business automation for customer inquiries, orders and appointments
-- Website and landing page design and development
-- Search engine optimization, digital marketing and advertising
-- Network and IT infrastructure services in Venezuela
-- Business computers and IT equipment
+## Servicios
 
-## Contact
+- **Desarrollo de software a medida:** paneles, aplicaciones web, integraciones y herramientas internas.
+- **Automatización de WhatsApp Business:** respuestas automáticas, toma de pedidos, agenda de citas y seguimiento.
+- **Landing pages y sitios web:** páginas rápidas, claras y optimizadas para móvil, enfocadas en generar contactos y ventas.
+- **Marketing, SEO y publicidad:** posicionamiento en buscadores, contenido, campañas y medición de resultados.
+- **Redes e infraestructura:** configuración de redes, conectividad y equipos para oficinas y locales (Venezuela).
+- **Equipos informáticos:** venta y asesoría de computadoras, monitores, impresoras y accesorios.
 
-- Website: https://www.windytech.studio/
+## Preguntas frecuentes
+
+### ¿Qué es Windy Tech y a qué se dedica?
+
+Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
+
+### ¿Dónde está ubicada Windy Tech?
+
+Windy Tech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.
+
+### ¿Qué servicios digitales ofrece Windy Tech?
+
+Desarrollo de software a medida y aplicaciones web, automatización de WhatsApp Business, diseño de páginas web y landing pages, SEO, marketing digital, publicidad, redes e infraestructura, y equipos informáticos.
+
+### ¿Trabajan con empresas fuera de Venezuela?
+
+Sí. Los servicios digitales se prestan de forma remota para clientes de otros países. Los servicios de instalación de redes e infraestructura están disponibles únicamente en Venezuela.
+
+### ¿Cómo solicito una cotización?
+
+Escríbenos por WhatsApp o usa el formulario de contacto del sitio. Indica el servicio, qué necesitas resolver y cómo podemos contactarte para preparar una cotización.
+
+### ¿Cómo se paga un proyecto?
+
+Los proyectos inician con el 50% de anticipo y el saldo se paga contra avance y entrega, según la cotización. Se aceptan Binance y PayPal.
+
+## Contacto
+
 - WhatsApp: https://wa.me/584127723148
-- Email: windytechestudio@gmail.com
+- Teléfono: +58 412-7723148
+- Correo: windytechestudio@gmail.com
+- Formulario: https://www.windytech.studio/#contacto
 
-The website's Spanish and English pages are the source of truth for service scope, availability and current details.
+## English summary
+
+Windy Tech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It builds custom software, automates WhatsApp Business support, creates websites and landing pages, and supports businesses with SEO, advertising, networks and IT equipment. Digital services are delivered remotely worldwide; on-site network and equipment work is available in Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal.
+
+- Services: https://www.windytech.studio/en/#servicios
+- About: https://www.windytech.studio/en/about/
+- Contact: https://www.windytech.studio/en/#contacto
+
+Las páginas en español e inglés son la fuente de verdad sobre alcance, disponibilidad y condiciones de los servicios.

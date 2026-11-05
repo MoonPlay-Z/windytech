@@ -4,6 +4,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import { content, site, whatsappLink, type Lang } from '../data/site';
+import { aboutContent } from '../data/about';
+
+interface BreadcrumbItem {
+  name: string;
+  path: string;
+}
 
 interface Props {
   lang: Lang;
@@ -14,6 +20,10 @@ interface Props {
   ogImage?: string;
   ogImageAlt?: string;
   noindex?: boolean;
+  /** Tipo schema.org de la página: WebPage, AboutPage, ContactPage... */
+  pageType?: string;
+  /** Migas de pan visibles en buscadores. La primera debe ser el inicio. */
+  breadcrumb?: BreadcrumbItem[];
 }
 
 const {
@@ -25,6 +35,8 @@ const {
   ogImage = site.ogImage,
   ogImageAlt = content[lang].meta.homeOgAlt,
   noindex = false,
+  pageType = 'WebPage',
+  breadcrumb = [],
 } = Astro.props;
 
 const t = content[lang];
@@ -34,74 +46,169 @@ const canonical = new URL(path, site.url).toString();
 const esUrl = new URL(esPath, site.url).toString();
 const enUrl = new URL(enPath, site.url).toString();
 const ogImageUrl = new URL(ogImage, site.url).toString();
+const logoUrl = new URL(site.logo, site.url).toString();
 const skipLabel = lang === 'es' ? 'Saltar al contenido' : 'Skip to content';
 const locale = lang === 'es' ? 'es_VE' : 'en_US';
 const altLocale = lang === 'es' ? 'en_US' : 'es_VE';
+const organisationId = `${site.url}/#organization`;
+const websiteId = `${site.url}/#website`;
+const logoId = `${site.url}/#logo`;
 
 const isHomePage = path === '/' || path === '/en/';
+
+const breadcrumbSchema =
+  breadcrumb.length > 0
+    ? {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonical}#breadcrumb`,
+        itemListElement: breadcrumb.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.name,
+          item: new URL(item.path, site.url).toString(),
+        })),
+      }
+    : null;
+
 const schemaGraph = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'WebSite',
-      '@id': `${site.url}/#website`,
+      '@id': websiteId,
       name: site.name,
+      alternateName: site.alternateName,
       url: site.url,
+      description: site.slogan,
       inLanguage: ['es', 'en'],
-      publisher: { '@id': `${site.url}/#business` },
+      publisher: { '@id': organisationId },
     },
     {
-      '@type': 'WebPage',
+      '@type': pageType,
       '@id': `${canonical}#webpage`,
       name: title,
       description,
       url: canonical,
       inLanguage: lang,
-      isPartOf: { '@id': `${site.url}/#website` },
-      about: { '@id': `${site.url}/#business` },
+      isPartOf: { '@id': websiteId },
+      about: { '@id': organisationId },
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        caption: ogImageAlt,
+      },
+      datePublished: site.contentUpdated,
+      dateModified: site.contentUpdated,
+      ...(isHomePage || pageType === 'AboutPage'
+        ? { mainEntity: { '@id': organisationId } }
+        : {}),
+      ...(breadcrumbSchema ? { breadcrumb: { '@id': `${canonical}#breadcrumb` } } : {}),
     },
     {
-      '@type': 'ProfessionalService',
-      '@id': `${site.url}/#business`,
+      '@type': ['Organization', 'ProfessionalService'],
+      '@id': organisationId,
       name: site.name,
+      legalName: site.legalName,
+      alternateName: site.alternateName,
       url: site.url,
-      logo: new URL('/assets/logo-mark.png', site.url).toString(),
-      image: ogImageUrl,
+      slogan: site.slogan,
+      description: aboutContent[lang].homeText,
+      foundingDate: site.foundingDate,
+      logo: {
+        '@type': 'ImageObject',
+        '@id': logoId,
+        url: logoUrl,
+        contentUrl: logoUrl,
+        width: 512,
+        height: 512,
+        caption: `${site.name} logo`,
+      },
+      image: {
+        '@type': 'ImageObject',
+        '@id': `${site.url}/#primaryimage`,
+        url: ogImageUrl,
+        contentUrl: ogImageUrl,
+        width: 1200,
+        height: 630,
+        caption: ogImageAlt,
+      },
       email: site.email,
       telephone: `+${site.whatsappNumber}`,
-      description: t.meta.homeDescription,
-      areaServed: ['Venezuela', 'Worldwide'],
-      knowsAbout: [
-        ...t.services.cards.map(({ title: serviceTitle }) => serviceTitle),
-        ...(lang === 'es'
-          ? ['SEO local en Venezuela', 'Desarrollo web para empresas', 'Automatización de atención al cliente']
-          : ['SEO services in Venezuela', 'business website development', 'customer support automation']),
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: site.address.country,
+      },
+      areaServed: [
+        { '@type': 'Country', name: site.address.countryName },
+        { '@type': 'Place', name: 'Worldwide' },
       ],
+      knowsAbout: [
+        ...new Set([
+          ...t.services.cards.map(({ title: serviceTitle }) => serviceTitle),
+          ...(lang === 'es'
+            ? [
+                'Desarrollo de software a medida',
+                'Automatización de WhatsApp Business',
+                'SEO local en Venezuela',
+                'Desarrollo web para empresas',
+                'Automatización de atención al cliente',
+              ]
+            : [
+                'custom software development',
+                'WhatsApp Business automation',
+                'SEO services in Venezuela',
+                'business website development',
+                'customer support automation',
+              ]),
+        ]),
+      ],
+      knowsLanguage: ['es', 'en'],
+      currenciesAccepted: site.currenciesAccepted,
+      paymentAccepted: site.paymentAccepted,
+      priceRange: '$$',
+      ...(site.sameAs.length > 0 ? { sameAs: site.sameAs } : {}),
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: `+${site.whatsappNumber}`,
+        email: site.email,
         contactType: 'sales',
         availableLanguage: ['Spanish', 'English'],
+        url: `https://wa.me/${site.whatsappNumber}`,
       },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
         name: t.services.title,
-        itemListElement: t.services.cards.map((service, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          item: {
-            '@type': 'Service',
-            name: service.title,
-            description: service.text,
-            provider: { '@id': `${site.url}/#business` },
-          },
-        })),
+        itemListElement: t.services.cards.map((service, index) => {
+          const localOnly = /redes|infraestructura|equipos|network|equipment/i.test(
+            service.title,
+          );
+
+          return {
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@type': 'Service',
+              name: service.title,
+              description: service.text,
+              provider: { '@id': organisationId },
+              areaServed: localOnly
+                ? [{ '@type': 'Country', name: site.address.countryName }]
+                : [
+                    { '@type': 'Country', name: site.address.countryName },
+                    { '@type': 'Place', name: 'Worldwide' },
+                  ],
+            },
+          };
+        }),
       },
     },
     ...(isHomePage
       ? [
           {
             '@type': 'FAQPage',
+            '@id': `${canonical}#faq`,
             mainEntity: t.faqs.items.map(({ question, answer }) => ({
               '@type': 'Question',
               name: question,
@@ -113,6 +220,7 @@ const schemaGraph = {
           },
         ]
       : []),
+    ...(breadcrumbSchema ? [breadcrumbSchema] : []),
   ],
 };
 ---
@@ -126,6 +234,7 @@ const schemaGraph = {
     <meta name="description" content={description} />
     <meta name="author" content={site.name} />
     <meta name="theme-color" content="#0e2234" />
+    <meta name="color-scheme" content="light" />
     <meta
       name="robots"
       content={noindex
@@ -137,9 +246,17 @@ const schemaGraph = {
     {!noindex && <link rel="alternate" hreflang="en" href={enUrl} />}
     {!noindex && <link rel="alternate" hreflang="x-default" href={esUrl} />}
 
+    <!-- Iconos: Google pide al menos 48x48 y Bing reutiliza el favicon del sitio. -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="msapplication-TileColor" content="#0e2234" />
+    <meta name="msapplication-TileImage" content="/assets/favicon-192.png" />
+
+    <meta name="format-detection" content="telephone=no" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -147,9 +264,11 @@ const schemaGraph = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image:secure_url" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content={locale} />
     <meta property="og:locale:alternate" content={altLocale} />
 
@@ -158,6 +277,15 @@ const schemaGraph = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
+    <meta name="twitter:url" content={canonical} />
+
+    {site.verification.google && (
+      <meta name="google-site-verification" content={site.verification.google} />
+    )}
+    {site.verification.bing && <meta name="msvalidate.01" content={site.verification.bing} />}
+    {site.verification.yandex && (
+      <meta name="yandex-verification" content={site.verification.yandex} />
+    )}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

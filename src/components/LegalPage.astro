@@ -25,6 +25,10 @@ const backLabel = lang === 'es' ? 'Volver al inicio' : 'Back to home';
   altPath={altPath}
   ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
   ogImageAlt={`${doc.title} — ${site.name}`}
+  breadcrumb={[
+    { name: lang === 'es' ? 'Inicio' : 'Home', path: homeHref },
+    { name: doc.title, path },
+  ]}
 >
   <div class="legal-page">
     <section class="legal-hero">

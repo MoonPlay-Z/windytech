@@ -2,6 +2,9 @@ export type Lang = 'es' | 'en';
 
 export const site = {
   name: 'Windy Tech',
+  legalName: 'Windy Tech',
+  alternateName: 'Windytech.studio',
+  slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
   url: 'https://www.windytech.studio',
   domain: 'www.windytech.studio',
   whatsappNumber: '584127723148',
@@ -9,6 +12,32 @@ export const site = {
   email: 'windytechestudio@gmail.com',
   year: 2026,
   ogImage: '/assets/og.png',
+  logo: '/assets/logo-square.png',
+  // Fecha de referencia para datos estructurados. Ajusta si la empresa existe desde antes.
+  foundingDate: '2026',
+  contentUpdated: '2026-11-05',
+  address: {
+    country: 'VE',
+    countryName: 'Venezuela',
+  },
+  areaServed: ['Venezuela', 'Worldwide'],
+  currenciesAccepted: 'USD',
+  paymentAccepted: 'Binance, PayPal',
+  /*
+   * Enlaces oficiales de la empresa (Instagram, LinkedIn, Facebook, Google Business
+   * Profile, Bing Places, GitHub...). Añadirlos aquí refuerza la entidad de marca
+   * que Google y Bing usan para mostrar el panel "Acerca de".
+   */
+  sameAs: [] as string[],
+  /*
+   * Códigos de verificación de los buscadores. Se pegan tal cual los entrega cada
+   * consola y la etiqueta <meta> solo se renderiza cuando el valor no está vacío.
+   */
+  verification: {
+    google: '',
+    bing: '',
+    yandex: '',
+  },
 };
 
 export function whatsappLink(message: string) {
@@ -18,9 +47,9 @@ export function whatsappLink(message: string) {
 export const content = {
   es: {
     meta: {
-      homeTitle: 'Software, WhatsApp y páginas web en Venezuela | Windy Tech',
+      homeTitle: 'Windy Tech | Software a medida, WhatsApp y páginas web',
       homeDescription:
-        'Software a medida, automatización de WhatsApp Business, diseño web y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
+        'Desarrollo de software a medida, automatización de WhatsApp, webs y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
       homeOgAlt: 'Windy Tech — Desarrollo de software, automatización y marketing',
     },
     nav: {
@@ -39,6 +68,8 @@ export const content = {
       closeMenu: 'Cerrar menú',
       switchLang: 'Ver sitio en inglés',
       switchLangShort: 'EN',
+      about: 'Acerca de Windy Tech',
+      aboutHref: '/nosotros/',
     },
     campaignBar: {
       label: 'CAMPAÑA ACTIVA',
@@ -255,6 +286,16 @@ export const content = {
       subtitle: 'Conoce qué hacemos, cómo trabajamos y cómo pedir una cotización.',
       items: [
         {
+          question: '¿Qué es Windy Tech y a qué se dedica?',
+          answer:
+            'Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.',
+        },
+        {
+          question: '¿Dónde está ubicada Windy Tech?',
+          answer:
+            'Windy Tech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.',
+        },
+        {
           question: '¿Qué servicios digitales ofrece Windy Tech?',
           answer:
             'Desarrollamos software a medida y aplicaciones web, automatizamos WhatsApp Business, diseñamos páginas web y landing pages, y ofrecemos SEO, marketing digital, publicidad, redes e infraestructura y equipos informáticos.',
@@ -335,9 +376,9 @@ export const content = {
   },
   en: {
     meta: {
-      homeTitle: 'Custom Software, WhatsApp & Web Design | Windy Tech',
+      homeTitle: 'Windy Tech | Custom Software, WhatsApp & Web Design',
       homeDescription:
-        'Custom software, WhatsApp Business automation, web design and SEO for businesses. Remote digital services and network support in Venezuela.',
+        'Custom software, WhatsApp automation, web design and SEO for businesses. Remote digital services and network support in Venezuela.',
       homeOgAlt: 'Windy Tech — Software development, automation and marketing',
     },
     nav: {
@@ -356,6 +397,8 @@ export const content = {
       closeMenu: 'Close menu',
       switchLang: 'Ver sitio en español',
       switchLangShort: 'ES',
+      about: 'About Windy Tech',
+      aboutHref: '/en/about/',
     },
     campaignBar: {
       label: 'ACTIVE CAMPAIGN',
@@ -561,6 +604,16 @@ export const content = {
       title: 'Answers about our services',
       subtitle: 'Learn what we do, how we work and how to request a quote.',
       items: [
+        {
+          question: 'What is Windy Tech and what does it do?',
+          answer:
+            'Windy Tech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It helps businesses in any country sell more and work better with custom digital solutions.',
+        },
+        {
+          question: 'Where is Windy Tech located?',
+          answer:
+            'Windy Tech is based in Venezuela and delivers digital projects remotely to clients in any country. Network setup, infrastructure and physical equipment delivery are coordinated in Venezuela only.',
+        },
         {
           question: 'What digital services does Windy Tech offer?',
           answer:

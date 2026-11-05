@@ -16,22 +16,29 @@ npm install
 npm run dev       # servidor local en http://localhost:4321
 npm run build     # genera dist/
 npm run preview   # previsualiza dist/
+npm run indexnow  # avisa a Bing/Brave/Yandex de las URLs del sitemap
+npm run check     # revisión de tipos y plantillas Astro
 ```
 
 ## Estructura
 
 ```
 src/
-  components/     Header, Footer, Icon, ContactForm, HomePage, LegalPage
-  data/           site.ts (contenido bilingüe), legal.ts (privacidad y términos)
-  layouts/        BaseLayout.astro (SEO, fuentes, schema)
-  pages/          /, /en/, /legal/*, /en/legal/*
+  components/     Header, Footer, Icon, ContactForm, HomePage, AboutPage, LegalPage
+  data/           site.ts (contenido bilingüe), about.ts, legal.ts
+  layouts/        BaseLayout.astro (SEO, iconos, Open Graph, schema)
+  pages/          /, /en/, /nosotros/, /en/about/, /legal/*, /en/legal/*
   styles/         global.css
 public/
-  assets/         logos, favicon, imagen Open Graph
+  assets/         logos, favicons 48–512, imagen Open Graph
   robots.txt
-  llms.txt        resumen de servicios para sistemas de IA
+  llms.txt        perfil de empresa y servicios para sistemas de IA
   sitemap.xml
+  site.webmanifest
+  <clave>.txt     verificación de IndexNow
+scripts/
+  indexnow.mjs    aviso de cambios a Bing, Brave, Yandex y otros
+SEO-GEO.md        guía de SEO, GEO y presencia en buscadores
 ```
 
 ## Dónde editar
@@ -49,6 +56,8 @@ Web3Forms, Resend o un endpoint propio.
 
 - `/` — español
 - `/en/` — inglés
+- `/nosotros/` — acerca de la empresa (español)
+- `/en/about/` — acerca de la empresa (inglés)
 - `/legal/privacidad/` y `/legal/terminos/`
 - `/en/legal/privacy/` y `/en/legal/terms/`
 
@@ -61,9 +70,11 @@ Web3Forms, Resend o un endpoint propio.
 5. Conecta el dominio `www.windytech.studio` y configura DNS.
 6. Añade el dominio a Google Search Console y envía `/sitemap.xml`.
 
-El sitio incluye metadatos estructurados bilingües, preguntas frecuentes visibles,
-directivas para rastreadores y `/llms.txt`. Estas mejoras ayudan a interpretar el contenido,
-pero no garantizan posiciones en buscadores ni menciones de asistentes de IA.
+El sitio incluye metadatos estructurados bilingües, una página `/nosotros/`, preguntas
+frecuentes visibles, iconos para resultados de búsqueda, Open Graph para vistas previas,
+directivas para rastreadores y `/llms.txt`. Estas mejoras ayudan a interpretar el contenido
+y a construir la entidad de la empresa, pero no garantizan posiciones ni un panel de
+conocimiento automático. La guía completa está en [`SEO-GEO.md`](SEO-GEO.md).
 La portada también incluye enlaces de compartir en WhatsApp, Facebook y LinkedIn, más una
 acción para copiar el enlace; son enlaces directos y no cargan widgets externos de seguimiento.
 
@@ -76,7 +87,11 @@ También funciona en Vercel o Netlify con la misma configuración.
 - [ ] Confirmar que el dominio `www.windytech.studio` apunta al deploy.
 - [ ] Configurar correo profesional (`hola@windytech.studio`) y redirigirlo si hace falta.
 - [ ] Añadir analítica (GA4 o Plausible) cuando exista una cuenta.
-- [ ] Añadir Google Business Profile y redes sociales.
+- [ ] Verificar el sitio en Google Search Console y Bing Webmaster Tools y pegar los códigos en `site.verification`.
+- [ ] Enviar el sitemap y ejecutar `npm run indexnow` después de cada despliegue.
+- [ ] Crear Google Business Profile y Bing Places, y añadir sus URLs a `site.sameAs`.
+- [ ] Crear/reclamar Instagram, LinkedIn y Facebook, y añadirlos a `site.sameAs`.
+- [ ] Revisar `foundingDate` en `site.ts` si la empresa existe desde antes de 2026.
 - [ ] Reemplazar la página de equipos por el catálogo cuando haya precios, stock y garantía.
 
 ## Fase 2: catálogo

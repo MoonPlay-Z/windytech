@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from './Icon.astro';
+import { aboutContent } from '../data/about';
+import { site, whatsappLink, type Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  path: string;
+  altPath: string;
+}
+
+const { lang, path, altPath } = Astro.props;
+const a = aboutContent[lang];
+const homeHref = lang === 'es' ? '/' : '/en/';
+const homeLabel = lang === 'es' ? 'Inicio' : 'Home';
+const whatsappMessage =
+  lang === 'es'
+    ? 'Hola Windy Tech, quiero una cotización para mi negocio.'
+    : 'Hello Windy Tech, I would like a quote for my business.';
+---
+
+<BaseLayout
+  lang={lang}
+  title={a.pageTitle}
+  description={a.pageDescription}
+  path={path}
+  altPath={altPath}
+  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImageAlt={`${a.pageH1} — ${site.name}`}
+  pageType="AboutPage"
+  breadcrumb={[
+    { name: homeLabel, path: homeHref },
+    { name: a.pageH1, path },
+  ]}
+>
+  <section class="about-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label={lang === 'es' ? 'Ruta de navegación' : 'Breadcrumb'}>
+        <a href={homeHref}>{homeLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span>{a.pageH1}</span>
+      </nav>
+      <span class="eyebrow">{a.eyebrow}</span>
+      <h1>{a.pageH1}</h1>
+      <p class="about-intro">{a.intro}</p>
+      <div class="about-hero-actions">
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(whatsappMessage)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {a.ctaButton}
+          <Icon name="whatsapp" size={18} />
+        </a>
+        <a class="btn btn-light" href={`${homeHref}#servicios`}>
+          {lang === 'es' ? 'Ver servicios' : 'See services'}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container about-page-grid">
+      <article class="about-page-main">
+        <h2>{a.definitionTitle}</h2>
+        {a.definition.map((paragraph) => <p>{paragraph}</p>)}
+
+        <h2>{a.servicesTitle}</h2>
+        <ul class="about-service-list">
+          {a.services.map((service) => (
+            <li>
+              <Icon name="check" size={20} />
+              <span>{service}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h2>{a.processTitle}</h2>
+        <ol class="about-steps">
+          {a.process.map((step, index) => (
+            <li>
+              <span class="about-step-number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span>
+                <strong>{step.title}</strong>
+                {step.text}
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <h2>{a.coverageTitle}</h2>
+        {a.coverage.map((paragraph) => <p>{paragraph}</p>)}
+      </article>
+
+      <aside class="about-page-aside">
+        <div class="about-facts-card">
+          <h2>{a.factsTitle}</h2>
+          <dl class="about-page-facts">
+            {a.facts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div class="about-contact-card">
+          <h2>{a.ctaTitle}</h2>
+          <p>{a.ctaText}</p>
+          <a
+            class="btn btn-primary"
+            href={whatsappLink(whatsappMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            {a.ctaButton}
+            <Icon name="whatsapp" size={18} />
+          </a>
+          <a class="text-link" href={homeHref}>
+            {a.backHome}
+            <Icon name="arrow-right" size={16} />
+          </a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
