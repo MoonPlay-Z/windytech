@@ -17,7 +17,7 @@ const altPath = lang === 'es' ? '/en/' : '/';
 const path = lang === 'es' ? '/' : '/en/';
 const title = t.meta.homeTitle;
 const description = t.meta.homeDescription;
-const markAlt = lang === 'es' ? 'Símbolo gráfico de Windy Tech' : 'Windy Tech graphic symbol';
+const markAlt = lang === 'es' ? 'Símbolo gráfico de Windytech' : 'Windytech graphic symbol';
 const shareUrl = new URL(path, site.url).toString();
 const shareText = `${title} — ${shareUrl}`;
 ---
@@ -32,16 +32,26 @@ const shareText = `${title} — ${shareUrl}`;
   ogImageAlt={t.meta.homeOgAlt}
 >
   <section class="hero" id="inicio">
-    <img
-      class="hero-watermark"
-      src="/assets/logo-mark-large-640.png"
-      alt={markAlt}
-      width="640"
-      height="650"
-      loading="lazy"
-      decoding="async"
-      fetchpriority="low"
-    />
+    <div class="hero-bg" id="heroBg" aria-hidden="true">
+      <canvas data-hero-canvas aria-hidden="true"></canvas>
+      <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <defs>
+          <linearGradient id="hb-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#22e6f5" />
+            <stop offset="1" stop-color="#2fd9b0" />
+          </linearGradient>
+          <linearGradient id="hb-ig" gradientUnits="userSpaceOnUse" x1="8" y1="40" x2="40" y2="8">
+            <stop offset="0" stop-color="#fdc830" />
+            <stop offset=".45" stop-color="#f5365c" />
+            <stop offset="1" stop-color="#9b3cd6" />
+          </linearGradient>
+          <linearGradient id="hb-tt" gradientUnits="userSpaceOnUse" x1="14" y1="40" x2="38" y2="10">
+            <stop offset="0" stop-color="#25f4ee" />
+            <stop offset="1" stop-color="#fe2c55" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
     <div class="container hero-inner">
       <div class="hero-copy">
         <span class="hero-badge">
@@ -79,10 +89,12 @@ const shareText = `${title} — ${shareUrl}`;
       <aside class="hero-panel" aria-label={t.hero.panelTitle}>
         <span class="hero-panel-icon">
           <img
-            src="/assets/logo-mark-large-112.webp"
+            src="/assets/logo-mark-large-56.webp"
+            srcset="/assets/logo-mark-large-56.webp 56w, /assets/logo-mark-large-112.webp 112w"
+            sizes="56px"
             alt={markAlt}
             width="56"
-            height="56"
+            height="57"
           />
         </span>
         <div class="hero-panel-head">
@@ -415,6 +427,462 @@ const shareText = `${title} — ${shareUrl}`;
 </BaseLayout>
 
 <script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const root = hero?.querySelector<HTMLElement>('#heroBg');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+  const canvasContext = canvas?.getContext('2d');
+
+  if (hero && root && canvas && canvasContext) {
+    const context: CanvasRenderingContext2D = canvasContext;
+    type NodeKind = 'logo' | 'laptop' | 'phone' | 'chat' | 'insta' | 'desktop' | 'fb' | 'tiktok' | 'inn' | 'yt';
+
+    type NetworkNode = {
+      kind: NodeKind;
+      x: number;
+      y: number;
+      w: number;
+      color: [string, string];
+      label: string;
+      tip: string;
+      fx: string;
+      depth: number;
+      element: HTMLDivElement;
+      baseX: number;
+      baseY: number;
+      centerX: number;
+      centerY: number;
+      width: number;
+      height: number;
+      offsetX: number;
+      offsetY: number;
+      velocityX: number;
+      velocityY: number;
+      phase: number;
+      radius: number;
+      pop: number;
+      hot: boolean;
+    };
+
+    type Spark = {
+      x: number;
+      y: number;
+      velocityX: number;
+      velocityY: number;
+      life: number;
+      color: string;
+    };
+
+    type Flow = {
+      color: string;
+      y: number;
+      amplitude: number;
+      frequency: number;
+      phase: number;
+      speed: number;
+      tail: number;
+      position: number;
+      velocity: number;
+      opacity: number;
+    };
+
+    const english = document.documentElement.lang === 'en';
+    const labels = english
+      ? ['Windytech', 'Laptops', 'Mobile apps', 'WhatsApp', 'Instagram', 'Computers', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube', 'Equipment', 'Digital']
+      : ['Windytech', 'Laptops', 'Apps móviles', 'WhatsApp', 'Instagram', 'Computadoras', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube', 'Equipos', 'Digital'];
+    const nodeSpecs: Omit<NetworkNode, 'element' | 'baseX' | 'baseY' | 'centerX' | 'centerY' | 'width' | 'height' | 'offsetX' | 'offsetY' | 'velocityX' | 'velocityY' | 'phase' | 'radius' | 'pop' | 'hot'>[] = [
+      { kind: 'logo', x: 9, y: 80, w: 250, depth: 0.25, tip: 'Windytech', fx: '✦', label: labels[0], color: ['#2fd9b0', '#22e6f5'] },
+      { kind: 'laptop', x: 31, y: 87, w: 150, depth: 0.7, tip: 'Laptops', fx: '</>', label: labels[1], color: ['#3b82f6', '#60a5fa'] },
+      { kind: 'phone', x: 52, y: 11, w: 58, depth: 0.9, tip: labels[2], fx: '📱', label: labels[2], color: ['#f59e0b', '#fbbf24'] },
+      { kind: 'chat', x: 41, y: 13, w: 62, depth: 1, tip: 'WhatsApp', fx: '+1', label: labels[3], color: ['#25d366', '#5cf08f'] },
+      { kind: 'insta', x: 67, y: 89, w: 60, depth: 1.1, tip: 'Instagram', fx: '♥', label: labels[4], color: ['#e1306c', '#f77737'] },
+      { kind: 'desktop', x: 91, y: 15, w: 150, depth: 0.6, tip: labels[5], fx: '</>', label: labels[5], color: ['#a855f7', '#c084fc'] },
+      { kind: 'fb', x: 96, y: 53, w: 58, depth: 1, tip: 'Facebook', fx: '+1', label: labels[6], color: ['#1877f2', '#4c9aff'] },
+      { kind: 'tiktok', x: 3, y: 44, w: 56, depth: 1.2, tip: 'TikTok', fx: '♪', label: labels[7], color: ['#fe2c55', '#25f4ee'] },
+      { kind: 'inn', x: 75, y: 10, w: 56, depth: 0.9, tip: 'LinkedIn', fx: '+1', label: labels[8], color: ['#0a66c2', '#3aa0ff'] },
+      { kind: 'yt', x: 58, y: 90, w: 62, depth: 1.1, tip: 'YouTube', fx: '▶', label: labels[9], color: ['#ff2d2d', '#ff7a59'] },
+      { kind: 'laptop', x: 85, y: 85, w: 130, depth: 0.8, tip: labels[10], fx: '</>', label: labels[10], color: ['#ec4899', '#f472b6'] },
+      { kind: 'logo', x: 24, y: 9, w: 64, depth: 0.5, tip: '', fx: '✦', label: labels[11], color: ['#2fd9b0', '#22e6f5'] },
+    ];
+
+    const arm = (rotation: number) =>
+      `<g class="arm" transform="rotate(${rotation})"><path pathLength="100" d="M-33 -69 L0 -100 L34 -69 L-3 -59 L4 -27"/><path pathLength="100" d="M-73 -72 L-21 -17"/></g>`;
+    const ART: Record<NodeKind, string> = {
+      logo: `<svg class="lg" viewBox="-110 -110 220 220">${arm(0)}${arm(90)}${arm(180)}${arm(270)}<circle class="core" r="8"/></svg>`,
+      laptop: `<svg class="dev" viewBox="0 0 120 90"><rect x="20" y="6" width="80" height="54" rx="5"/><path d="M6 68h108l-9 11a4 4 0 0 1-3 1.5H18a4 4 0 0 1-3-1.5z"/><path d="M50 72h20"/><g class="scr" transform="translate(30 17)"><path class="ln" pathLength="60" d="M0 0h30"/><path class="ln" pathLength="60" d="M0 10h44"/><path class="ln" pathLength="60" d="M0 20h24"/><rect class="bar" x="46" y="30" width="5" height="8" rx="1"/><rect class="bar" x="54" y="24" width="5" height="14" rx="1"/><rect class="bar" x="62" y="28" width="5" height="10" rx="1"/></g><rect class="sc" x="24" y="10" width="72" height="2"/><circle class="dot" cx="60" cy="63.5" r="1.2"/></svg>`,
+      desktop: `<svg class="dev" viewBox="0 0 120 96"><rect x="10" y="4" width="100" height="64" rx="6"/><path d="M52 68l-4 16h24l-4-16"/><path d="M38 88h44"/><g class="scr" transform="translate(22 16)"><path class="ln" pathLength="60" d="M0 0h34"/><path class="ln" pathLength="60" d="M0 10h52"/><path class="ln" pathLength="60" d="M0 20h28"/><rect class="bar" x="58" y="34" width="6" height="10" rx="1"/><rect class="bar" x="67" y="26" width="6" height="18" rx="1"/><rect class="bar" x="76" y="30" width="6" height="14" rx="1"/></g><rect class="sc" x="14" y="8" width="92" height="2"/></svg>`,
+      phone: `<svg class="dev" viewBox="0 0 60 104"><rect x="6" y="4" width="48" height="96" rx="9"/><path d="M24 11h12"/><g class="scr" transform="translate(15 26)"><path class="ln" pathLength="60" d="M0 0h26"/><path class="ln" pathLength="60" d="M0 10h18"/><path class="ln" pathLength="60" d="M0 20h30"/><rect class="bar" x="2" y="40" width="6" height="16" rx="1"/><rect class="bar" x="12" y="32" width="6" height="24" rx="1"/><rect class="bar" x="22" y="36" width="6" height="20" rx="1"/></g><rect class="sc" x="10" y="18" width="40" height="2"/></svg>`,
+      chat: `<svg viewBox="0 0 48 48"><path d="M24 8C15.2 8 8 14.4 8 22.4c0 3.1 1.1 6 3 8.3L9 39l7.8-2.5c2 1.1 4.3 1.7 7.2 1.7 8.8 0 16-6.4 16-14.4S32.8 8 24 8z"/><path d="M18 17c0 7 5 12 12 12"/></svg>`,
+      insta: `<svg viewBox="0 0 48 48"><rect x="9" y="9" width="30" height="30" rx="9"/><circle cx="24" cy="24" r="7"/><circle class="f" cx="32.5" cy="15.5" r="1.8"/></svg>`,
+      fb: `<svg viewBox="0 0 48 48"><path d="M27 41V26h5l1-6h-6v-3.5c0-1.8.8-3 3-3h3V8.3C32.5 8.2 30.7 8 28.5 8 24 8 21 10.7 21 15.5V20h-5v6h5v15z"/></svg>`,
+      tiktok: `<svg viewBox="0 0 48 48"><path d="M27 9v21a6.5 6.5 0 1 1-6.5-6.5M27 9c.8 5 4 8.5 9.5 9"/></svg>`,
+      inn: `<svg viewBox="0 0 48 48"><path d="M13 20v17M13 12v.5M21 37V20M21 28c0-5 3-8 6.5-8s6.5 2.5 6.5 7v10"/></svg>`,
+      yt: `<svg viewBox="0 0 48 48"><rect x="7" y="12" width="34" height="24" rx="8"/><path d="M20 18v12l10-6z"/></svg>`,
+    };
+
+    const nodes: NetworkNode[] = nodeSpecs.map((spec) => {
+      const element = document.createElement('div');
+      element.style.setProperty('--c1', spec.color[0]);
+      element.style.setProperty('--c2', spec.color[1]);
+      element.className = `node ${spec.kind}${/^(chat|insta|fb|tiktok|inn|yt)$/.test(spec.kind) ? ' soc' : ''}`;
+      element.innerHTML = ART[spec.kind] + (spec.tip ? `<span class="tip">${spec.tip}</span>` : '');
+      root.appendChild(element);
+      return {
+        ...spec,
+        element,
+        baseX: 0,
+        baseY: 0,
+        centerX: 0,
+        centerY: 0,
+        width: 0,
+        height: 0,
+        offsetX: 0,
+        offsetY: 0,
+        velocityX: 0,
+        velocityY: 0,
+        phase: Math.random() * Math.PI * 2,
+        radius: 24,
+        pop: 0,
+        hot: false,
+      };
+    });
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    root.classList.add('is-paused');
+    const sparks: Spark[] = [];
+    const ripples: { x: number; y: number; radius: number; life: number; color: string }[] = [];
+    const particles: { x: number; y: number; velocityX: number; velocityY: number; phase: number; color: string }[] = [];
+    const flows: Flow[] = [];
+    const edges: { from: number; to: number; phase: number }[] = [];
+    const pointer = { x: 0, y: 0, smoothX: 0, smoothY: 0, inside: false };
+    let width = 0;
+    let height = 0;
+    let scale = 1;
+    let time = 0;
+    let frameId = 0;
+    let lastFrame = 0;
+    let visible = false;
+    let active = false;
+
+    const palette = ['#22e6f5', '#3b82f6', '#a855f7', '#ec4899', '#f59e0b', '#25d366'];
+    const resize = () => {
+      const bounds = root.getBoundingClientRect();
+      width = bounds.width;
+      height = bounds.height;
+      if (!width || !height) return;
+
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(1_400_000 / (width * height)));
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+      scale = Math.max(0.5, Math.min(1.1, width / 1400));
+      nodes.forEach((node) => {
+        node.element.style.width = `${node.w * scale}px`;
+        node.width = node.element.offsetWidth;
+        node.height = node.element.offsetHeight;
+        node.baseX = (node.x / 100) * width;
+        node.baseY = (node.y / 100) * height;
+        node.centerX = node.baseX;
+        node.centerY = node.baseY;
+        node.radius = Math.max(node.width, node.height) * 0.6;
+      });
+
+      edges.length = 0;
+      nodes.forEach((node, index) => {
+        const nearest = nodes
+          .map((other, otherIndex) => ({
+            index: otherIndex,
+            distance: Math.hypot(node.baseX - other.baseX, node.baseY - other.baseY),
+          }))
+          .filter((other) => other.index !== index)
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 2);
+
+        nearest.forEach(({ index: otherIndex }) => {
+          if (!edges.some((edge) => edge.from === otherIndex && edge.to === index || edge.from === index && edge.to === otherIndex)) {
+            edges.push({ from: index, to: otherIndex, phase: Math.random() });
+          }
+        });
+      });
+
+      const particleCount = Math.min(70, Math.floor((width * height) / 18_000));
+      particles.length = 0;
+      for (let index = 0; index < particleCount; index += 1) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          velocityX: (Math.random() - 0.5) * 0.22,
+          velocityY: (Math.random() - 0.5) * 0.22,
+          phase: Math.random() * Math.PI * 2,
+          color: palette[index % palette.length],
+        });
+      }
+
+      flows.length = 0;
+      for (let index = 0; index < 16; index += 1) {
+        flows.push({
+          color: palette[index % palette.length],
+          y: height * (0.05 + Math.random() * 0.9),
+          amplitude: 20 + Math.random() * 70,
+          frequency: 0.0015 + Math.random() * 0.003,
+          phase: Math.random() * 6,
+          speed: 0.15 + Math.random() * 0.4,
+          tail: 0.18 + Math.random() * 0.3,
+          position: Math.random(),
+          velocity: 0.0006 + Math.random() * 0.0012,
+          opacity: 0.15 + Math.random() * 0.3,
+        });
+      }
+
+      if (reduceMotion.matches) draw(0, false);
+      else requestFrame();
+    };
+
+    const updateNode = (node: NetworkNode) => {
+      const rotation = Math.sin(time * 0.5 + node.phase) * 3 * (reduceMotion.matches ? 0 : 1);
+      const scaleUp = 1 + (node.hot ? 0.14 : 0) + (node.pop * 0.3);
+      node.element.classList.toggle('hot', node.hot);
+      node.element.style.transform = `translate3d(${node.centerX - node.width / 2}px, ${node.centerY - node.height / 2}px, 0) rotate(${rotation}deg) scale(${scaleUp})`;
+    };
+
+    function draw(delta: number, animate: boolean) {
+      if (!width || !height) return;
+      time += animate ? delta / 60 : 0;
+      context.clearRect(0, 0, width, height);
+      pointer.smoothX += (pointer.x - pointer.smoothX) * 0.12;
+      pointer.smoothY += (pointer.y - pointer.smoothY) * 0.12;
+
+      const gridSpacing = 46;
+      for (let x = gridSpacing / 2; x < width; x += gridSpacing) {
+        for (let y = gridSpacing / 2; y < height; y += gridSpacing) {
+          const distance = pointer.inside ? Math.hypot(x - pointer.smoothX, y - pointer.smoothY) : Infinity;
+          const highlight = Math.max(0, 1 - distance / 230);
+          context.globalAlpha = 0.12 + highlight * 0.65;
+          context.fillStyle = '#4cf0d0';
+          const dotSize = 1 + highlight * 2;
+          context.fillRect(x - dotSize / 2, y - dotSize / 2, dotSize, dotSize);
+        }
+      }
+
+      flows.forEach((flow) => {
+        if (animate) flow.position = (flow.position + flow.velocity * delta) % 1.4;
+        const head = flow.position * width;
+        const tail = flow.tail * width;
+        const start = Math.max(0, head - tail);
+        const gradient = context.createLinearGradient(head - tail, 0, head, 0);
+        gradient.addColorStop(0, `rgba(0, 0, 0, 0)`);
+        gradient.addColorStop(1, `${flow.color}${Math.round(flow.opacity * 255).toString(16).padStart(2, '0')}`);
+        context.beginPath();
+        for (let x = start; x <= Math.min(width, head); x += 8) {
+          const y =
+            flow.y +
+            Math.sin(x * flow.frequency * 3 + flow.phase + time * flow.speed) * flow.amplitude +
+            Math.cos(x * flow.frequency - time * 0.3 + flow.phase) * flow.amplitude * 0.5;
+          if (x === start) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+        context.strokeStyle = gradient;
+        context.lineWidth = 1.5;
+        context.stroke();
+      });
+
+      if (animate) {
+        particles.forEach((particle) => {
+          particle.x = (particle.x + particle.velocityX * delta + width) % width;
+          particle.y = (particle.y + particle.velocityY * delta + height) % height;
+        });
+      }
+      particles.forEach((particle) => {
+        context.globalAlpha = 0.24 + Math.sin(time * 1.5 + particle.phase) * 0.12;
+        context.fillStyle = particle.color;
+        context.beginPath();
+        context.arc(particle.x, particle.y, 1.2, 0, Math.PI * 2);
+        context.fill();
+      });
+
+      nodes.forEach((node) => {
+        const motion = animate && !reduceMotion.matches;
+        let parallaxX = 0;
+        let parallaxY = 0;
+        if (pointer.inside && motion) {
+          parallaxX = (pointer.smoothX - width / 2) * -node.depth * 0.035;
+          parallaxY = (pointer.smoothY - height / 2) * -node.depth * 0.035;
+        }
+        if (animate) {
+          const dx = node.centerX - pointer.x;
+          const dy = node.centerY - pointer.y;
+          const distance = Math.hypot(dx, dy) || 1;
+          if (pointer.inside && motion && distance < 150 * scale) {
+            const force = (1 - distance / (150 * scale)) * 1.3;
+            node.velocityX += (dx / distance) * force;
+            node.velocityY += (dy / distance) * force;
+          }
+          node.velocityX = (node.velocityX - node.offsetX * 0.045) * 0.86;
+          node.velocityY = (node.velocityY - node.offsetY * 0.045) * 0.86;
+          node.offsetX += node.velocityX;
+          node.offsetY += node.velocityY;
+        }
+        node.centerX = node.baseX + Math.sin(time * 0.6 + node.phase) * 10 * scale * (motion ? 1 : 0) + parallaxX + node.offsetX;
+        node.centerY = node.baseY + Math.cos(time * 0.5 + node.phase) * 13 * scale * (motion ? 1 : 0) + parallaxY + node.offsetY;
+        node.radius = Math.max(node.width, node.height) * 0.6;
+        node.hot = pointer.inside && Math.hypot(pointer.x - node.centerX, pointer.y - node.centerY) < node.radius;
+        node.pop *= 0.9;
+        updateNode(node);
+      });
+
+      context.globalAlpha = 1;
+      context.setLineDash([4, 8]);
+      context.lineDashOffset = animate ? -time * 14 : 0;
+      edges.forEach(({ from, to, phase }) => {
+        const a = nodes[from];
+        const b = nodes[to];
+        context.strokeStyle = a.hot || b.hot ? `${a.color[0]}aa` : `${a.color[0]}45`;
+        context.lineWidth = a.hot || b.hot ? 1.5 : 1;
+        context.beginPath();
+        context.moveTo(a.centerX, a.centerY);
+        context.lineTo(b.centerX, b.centerY);
+        context.stroke();
+
+        const progress = (time * 0.12 + phase) % 1;
+        const x = a.centerX + (b.centerX - a.centerX) * progress;
+        const y = a.centerY + (b.centerY - a.centerY) * progress;
+        context.fillStyle = b.color[0];
+        context.beginPath();
+        context.arc(x, y, a.hot || b.hot ? 2.5 : 1.5, 0, Math.PI * 2);
+        context.fill();
+      });
+      context.setLineDash([]);
+
+      for (let index = ripples.length - 1; index >= 0; index -= 1) {
+        const ripple = ripples[index];
+        if (animate) {
+          ripple.radius += 5 * delta;
+          ripple.life -= 0.025 * delta;
+        }
+        if (ripple.life <= 0) {
+          ripples.splice(index, 1);
+          continue;
+        }
+        context.globalAlpha = ripple.life;
+        context.strokeStyle = ripple.color;
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+        context.stroke();
+      }
+
+      for (let index = sparks.length - 1; index >= 0; index -= 1) {
+        const spark = sparks[index];
+        if (animate) {
+          spark.x += spark.velocityX * delta;
+          spark.y += spark.velocityY * delta;
+          spark.velocityX *= 0.96;
+          spark.velocityY *= 0.96;
+          spark.life -= 0.025 * delta;
+        }
+        if (spark.life <= 0) {
+          sparks.splice(index, 1);
+          continue;
+        }
+        context.globalAlpha = spark.life;
+        context.fillStyle = spark.color;
+        context.beginPath();
+        context.arc(spark.x, spark.y, 2.4 * spark.life, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.globalAlpha = 1;
+    }
+
+    function requestFrame() {
+      if (active && visible && !document.hidden && !reduceMotion.matches && !frameId) {
+        frameId = window.requestAnimationFrame(renderFrame);
+      }
+    }
+
+    function renderFrame(now: number) {
+      frameId = 0;
+      if (!active || !visible || document.hidden) return;
+      if (now - lastFrame < 33) {
+        requestFrame();
+        return;
+      }
+      const delta = lastFrame ? Math.min((now - lastFrame) / (1000 / 60), 2.5) : 1;
+      lastFrame = now;
+      draw(delta, true);
+      requestFrame();
+    }
+
+    const updatePointer = (event: PointerEvent) => {
+      const bounds = canvas.getBoundingClientRect();
+      pointer.x = event.clientX - bounds.left;
+      pointer.y = event.clientY - bounds.top;
+      pointer.inside = pointer.x >= 0 && pointer.y >= 0 && pointer.x <= bounds.width && pointer.y <= bounds.height;
+      if (reduceMotion.matches) draw(0, false);
+      else requestFrame();
+    };
+
+    hero.addEventListener('pointermove', updatePointer, { passive: true });
+    hero.addEventListener('pointerleave', () => {
+      pointer.inside = false;
+      if (reduceMotion.matches) draw(0, false);
+      else requestFrame();
+    });
+    hero.addEventListener('pointerdown', (event) => {
+      updatePointer(event);
+      const hit = nodes.find((node) => Math.hypot(node.centerX - pointer.x, node.centerY - pointer.y) < node.radius);
+      const color = hit?.color[0] ?? '#4cf0d0';
+      ripples.push({ x: pointer.x, y: pointer.y, radius: 0, life: 0.8, color });
+      for (let index = 0; index < 14 && sparks.length < 64; index += 1) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 3;
+        sparks.push({
+          x: pointer.x,
+          y: pointer.y,
+          velocityX: Math.cos(angle) * speed,
+          velocityY: Math.sin(angle) * speed,
+          life: 1,
+          color: index % 2 ? color : hit?.color[1] ?? '#22e6f5',
+        });
+      }
+      if (hit) {
+        hit.pop = 1;
+        const floatingText = document.createElement('span');
+        floatingText.className = 'fl';
+        floatingText.textContent = hit.fx;
+        floatingText.style.setProperty('--c1', hit.color[0]);
+        floatingText.style.left = `${hit.centerX}px`;
+        floatingText.style.top = `${hit.centerY - hit.height / 2}px`;
+        root.appendChild(floatingText);
+        window.setTimeout(() => floatingText.remove(), 1300);
+      }
+      if (reduceMotion.matches) draw(0, false);
+      else requestFrame();
+    }, { passive: true });
+
+    const updateVisibility = () => {
+      active = visible && !document.hidden;
+      root.classList.toggle('is-paused', !active || reduceMotion.matches);
+      if (active) {
+        if (reduceMotion.matches) draw(0, false);
+        else requestFrame();
+      } else if (frameId) {
+        window.cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      updateVisibility();
+    });
+    observer.observe(hero);
+    document.addEventListener('visibilitychange', updateVisibility);
+    reduceMotion.addEventListener('change', updateVisibility);
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(resize).observe(hero);
+    else window.addEventListener('resize', resize, { passive: true });
+    resize();
+  }
+
   document.querySelectorAll<HTMLButtonElement>('[data-copy-share]').forEach((button) => {
     button.addEventListener('click', async () => {
       const label = button.querySelector('span');

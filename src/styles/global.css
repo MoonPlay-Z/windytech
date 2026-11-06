@@ -639,35 +639,282 @@ article[id] {
   position: relative;
   overflow: hidden;
   color: #fff;
-  background:
-    radial-gradient(60% 90% at 88% 8%, rgba(61, 220, 181, 0.28) 0%, rgba(61, 220, 181, 0) 62%),
-    radial-gradient(55% 80% at 0% 100%, rgba(43, 159, 168, 0.32) 0%, rgba(43, 159, 168, 0) 65%),
-    linear-gradient(135deg, #0a1b2b 0%, #0e2234 45%, #153045 100%);
+  background: #050f12;
 }
 
-.hero::before {
-  content: "";
+.hero-bg {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1.5px);
-  background-size: 28px 28px;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
-  mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+  z-index: 0;
+  overflow: hidden;
   pointer-events: none;
+  background:
+    radial-gradient(800px 480px at 6% 100%, rgba(20, 150, 120, 0.38), transparent 65%),
+    radial-gradient(700px 440px at 92% 4%, rgba(120, 70, 220, 0.3), transparent 70%),
+    radial-gradient(600px 400px at 96% 96%, rgba(236, 72, 153, 0.2), transparent 70%),
+    radial-gradient(600px 380px at 45% 0%, rgba(37, 99, 235, 0.18), transparent 70%),
+    linear-gradient(120deg, #07201f 0%, #07151d 50%, #0a0f1c 100%);
 }
 
-.hero-watermark {
+.hero-bg canvas {
   position: absolute;
-  right: -140px;
-  top: -120px;
-  width: 640px;
-  max-width: none;
-  opacity: 0.07;
-  pointer-events: none;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-bg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.hero-bg .node {
+  --c1: #4cf0d0;
+  --c2: #22e6f5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.24;
+  will-change: transform;
+  transition: filter 250ms ease, opacity 250ms ease;
+}
+
+.hero-bg .node.hot {
+  filter: drop-shadow(0 0 18px var(--c1));
+  opacity: 0.95;
+}
+
+.hero-bg .tip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--c1), var(--c2));
+  color: #fff;
+  font: 600 11px/1 var(--font-body);
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.hero-bg .node.hot .tip {
+  opacity: 1;
+  transform: translate(-50%, 10px);
+}
+
+.hero-bg .dev > * {
+  fill: rgba(6, 24, 28, 0.62);
+  stroke: var(--c1);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-bg .dev .scr * {
+  fill: none;
+}
+
+.hero-bg .ln {
+  stroke: var(--c2);
+  stroke-width: 2.4;
+  stroke-dasharray: 60;
+  animation: hb-type 4.2s ease-in-out infinite;
+}
+
+.hero-bg .ln:nth-of-type(2) {
+  animation-delay: 500ms;
+}
+
+.hero-bg .ln:nth-of-type(3) {
+  animation-delay: 1s;
+}
+
+.hero-bg .bar {
+  fill: var(--c1) !important;
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: hb-bar 2.2s ease-in-out infinite alternate;
+}
+
+.hero-bg .bar:nth-of-type(2) {
+  animation-delay: 350ms;
+}
+
+.hero-bg .bar:nth-of-type(3) {
+  animation-delay: 700ms;
+}
+
+.hero-bg .sc {
+  fill: var(--c2) !important;
+  fill-opacity: 0.6;
+  stroke: none;
+  animation: hb-scan 3.4s linear infinite;
+}
+
+.hero-bg .dot {
+  fill: var(--c1) !important;
+  stroke: none;
+  animation: hb-blink 1.6s ease-in-out infinite;
+}
+
+.hero-bg .soc {
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--c1) 60%, transparent);
+  border-radius: 50%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--c1) 34%, transparent), rgba(8, 20, 30, 0.72) 72%);
+  backdrop-filter: blur(6px);
+}
+
+.hero-bg .soc svg {
+  width: 56%;
+}
+
+.hero-bg .soc svg * {
+  fill: none;
+  stroke: var(--c1);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-bg .soc svg .f {
+  fill: var(--c1);
+  stroke: none;
+}
+
+.hero-bg .soc.insta svg * {
+  stroke: url(#hb-ig);
+}
+
+.hero-bg .soc.insta svg .f {
+  fill: #f77737;
+  stroke: none;
+}
+
+.hero-bg .soc.tiktok svg * {
+  stroke: url(#hb-tt);
+}
+
+.hero-bg .soc::after {
+  position: absolute;
+  inset: -6px;
+  border: 1px solid color-mix(in srgb, var(--c1) 55%, transparent);
+  border-radius: 50%;
+  content: "";
+  animation: hb-ring 3s ease-out infinite;
+}
+
+.hero-bg .lg {
+  animation: hb-spin 60s linear infinite;
+}
+
+.hero-bg .lg .arm path {
+  fill: none;
+  stroke: url(#hb-grad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  animation: hb-draw 7s ease-in-out infinite;
+}
+
+.hero-bg .lg .arm:nth-child(2) path {
+  animation-delay: 500ms;
+}
+
+.hero-bg .lg .arm:nth-child(3) path {
+  animation-delay: 1s;
+}
+
+.hero-bg .lg .arm:nth-child(4) path {
+  animation-delay: 1.5s;
+}
+
+.hero-bg .lg .core {
+  fill: url(#hb-grad);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hb-core 2.6s ease-in-out infinite;
+}
+
+.hero-bg .fl {
+  position: absolute;
+  color: var(--c1, #7dffe3);
+  font: 700 15px var(--font-body);
+  text-shadow: 0 0 10px var(--c1, #2fd9b0);
+  animation: hb-up 1.3s ease-out forwards;
+}
+
+.hero-bg.is-paused *,
+.hero-bg.is-paused *::before,
+.hero-bg.is-paused *::after {
+  animation-play-state: paused !important;
+}
+
+@keyframes hb-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hb-draw {
+  0% { stroke-dashoffset: 100; }
+  35%, 65% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -100; }
+}
+
+@keyframes hb-core {
+  50% { transform: scale(1.7); }
+}
+
+@keyframes hb-type {
+  0% { stroke-dashoffset: 60; }
+  40%, 80% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -60; }
+}
+
+@keyframes hb-bar {
+  from { transform: scaleY(0.3); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes hb-scan {
+  0% { transform: translateY(0); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
+
+@keyframes hb-blink {
+  50% { opacity: 0.25; }
+}
+
+@keyframes hb-ring {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes hb-up {
+  to { transform: translateY(-70px) scale(1.3); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg *,
+  .hero-bg *::before,
+  .hero-bg *::after {
+    animation: none !important;
+  }
 }
 
 .hero-inner {
   position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: center;
