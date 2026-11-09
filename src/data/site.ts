@@ -3,6 +3,8 @@ export type Lang = 'es' | 'en';
 export const site = {
   name: 'Windytech',
   legalName: 'Windytech',
+  /* Nombre anterior de la marca: alias para buscadores, nunca nombre principal. */
+  alternateName: ['Windy Tech'] as string[],
   slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
   url: 'https://www.windytech.studio',
   domain: 'www.windytech.studio',
@@ -14,11 +16,16 @@ export const site = {
   logo: '/assets/logo-square.png',
   // Fecha de referencia para datos estructurados. Ajusta si la empresa existe desde antes.
   foundingDate: '2026',
-  contentUpdated: '2026-11-05',
+  contentUpdated: '2026-11-09',
   address: {
     country: 'VE',
     countryName: 'Venezuela',
+    /* Rellenar solo con una ciudad/estado reales; si están vacíos no se publican. */
+    locality: '',
+    region: '',
   },
+  /* Cuenta de X/Twitter oficial (@usuario) cuando exista. */
+  twitter: '',
   areaServed: ['Venezuela', 'Worldwide'],
   currenciesAccepted: 'USD',
   paymentAccepted: 'Binance, PayPal',
@@ -55,7 +62,7 @@ export const content = {
       home: 'Inicio',
       items: [
         { label: 'Inicio', href: '#inicio' },
-        { label: 'Servicios', href: '#servicios' },
+        { label: 'Servicios', href: '/servicios/' },
         { label: 'Campañas', href: '#campanas' },
         { label: 'Equipos', href: '#equipos' },
         { label: 'Pagos', href: '#pagos' },
@@ -99,27 +106,31 @@ export const content = {
         {
           label: 'Desarrollo de software',
           icon: 'code',
+          href: '/servicios/desarrollo-de-software/',
           message: 'Hola Windytech, quiero desarrollar software a medida para mi negocio.',
         },
         {
           label: 'Automatización de WhatsApp',
           icon: 'chat',
+          href: '/servicios/automatizacion-whatsapp/',
           message: 'Hola Windytech, quiero automatizar mi WhatsApp.',
         },
         {
           label: 'Landing page o sitio web',
           icon: 'layout',
+          href: '/servicios/paginas-web/',
           message: 'Hola Windytech, quiero una landing page o un sitio web.',
         },
         {
           label: 'Marketing, SEO y publicidad',
           icon: 'chart',
+          href: '/servicios/marketing-seo/',
           message: 'Hola Windytech, quiero marketing, SEO y publicidad para mi negocio.',
         },
         {
           label: 'Equipos informáticos',
           icon: 'monitor',
-          href: '#equipos',
+          href: '/servicios/equipos-informaticos/',
         },
       ],
       panelFooter: [
@@ -384,7 +395,7 @@ export const content = {
       home: 'Home',
       items: [
         { label: 'Home', href: '#inicio' },
-        { label: 'Services', href: '#servicios' },
+        { label: 'Services', href: '/en/services/' },
         { label: 'Campaigns', href: '#campanas' },
         { label: 'Equipment', href: '#equipos' },
         { label: 'Payments', href: '#pagos' },
@@ -428,27 +439,31 @@ export const content = {
         {
           label: 'Custom software',
           icon: 'code',
+          href: '/en/services/custom-software-development/',
           message: 'Hello Windytech, I want to build custom software for my business.',
         },
         {
           label: 'WhatsApp automation',
           icon: 'chat',
+          href: '/en/services/whatsapp-automation/',
           message: 'Hello Windytech, I want to automate my WhatsApp.',
         },
         {
           label: 'Landing page or website',
           icon: 'layout',
+          href: '/en/services/web-design/',
           message: 'Hello Windytech, I want a landing page or a website.',
         },
         {
           label: 'Marketing, SEO and ads',
           icon: 'chart',
+          href: '/en/services/seo-marketing/',
           message: 'Hello Windytech, I want marketing, SEO and advertising for my business.',
         },
         {
           label: 'IT equipment',
           icon: 'monitor',
-          href: '#equipos',
+          href: '/en/services/it-equipment/',
         },
       ],
       panelFooter: [

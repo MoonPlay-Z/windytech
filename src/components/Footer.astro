@@ -31,7 +31,7 @@ const wordmarkAlt =
 
     <nav class="footer-nav" aria-label={navAria}>
       {t.nav.items.map((item) => (
-        <a href={`${homeHref}${item.href}`}>
+        <a href={item.href.startsWith('/') ? item.href : `${homeHref}${item.href}`}>
           {lang === 'es' ? `Ir a ${item.label}` : `Go to ${item.label}`}
         </a>
       ))}

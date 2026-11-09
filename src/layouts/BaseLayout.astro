@@ -11,6 +11,11 @@ interface BreadcrumbItem {
   path: string;
 }
 
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 interface Props {
   lang: Lang;
   title: string;
@@ -24,6 +29,14 @@ interface Props {
   pageType?: string;
   /** Migas de pan visibles en buscadores. La primera debe ser el inicio. */
   breadcrumb?: BreadcrumbItem[];
+  /** Tipo Open Graph: website en inicio, article en artículos. */
+  ogType?: 'website' | 'article';
+  /** Fecha ISO de la última revisión real del contenido. */
+  dateModified?: string;
+  /** Preguntas frecuentes de la página; generan schema FAQPage. */
+  faq?: FaqItem[];
+  /** Nodos JSON-LD adicionales (Service, BlogPosting...) para esta página. */
+  extraSchema?: Record<string, unknown>[];
 }
 
 const {
@@ -37,6 +50,10 @@ const {
   noindex = false,
   pageType = 'WebPage',
   breadcrumb = [],
+  ogType = 'website',
+  dateModified = site.contentUpdated,
+  faq = [],
+  extraSchema = [],
 } = Astro.props;
 
 const t = content[lang];
@@ -99,7 +116,7 @@ const schemaGraph = {
         caption: ogImageAlt,
       },
       datePublished: site.contentUpdated,
-      dateModified: site.contentUpdated,
+      dateModified,
       ...(isHomePage || pageType === 'AboutPage'
         ? { mainEntity: { '@id': organisationId } }
         : {}),
@@ -110,6 +127,7 @@ const schemaGraph = {
       '@id': organisationId,
       name: site.name,
       legalName: site.legalName,
+      alternateName: site.alternateName,
       url: site.url,
       slogan: site.slogan,
       description: aboutContent[lang].homeText,
@@ -137,6 +155,8 @@ const schemaGraph = {
       address: {
         '@type': 'PostalAddress',
         addressCountry: site.address.country,
+        ...(site.address.region ? { addressRegion: site.address.region } : {}),
+        ...(site.address.locality ? { addressLocality: site.address.locality } : {}),
       },
       areaServed: [
         { '@type': 'Country', name: site.address.countryName },
@@ -202,12 +222,12 @@ const schemaGraph = {
         }),
       },
     },
-    ...(isHomePage
+    ...(isHomePage || faq.length > 0
       ? [
           {
             '@type': 'FAQPage',
             '@id': `${canonical}#faq`,
-            mainEntity: t.faqs.items.map(({ question, answer }) => ({
+            mainEntity: (faq.length > 0 ? faq : t.faqs.items).map(({ question, answer }) => ({
               '@type': 'Question',
               name: question,
               acceptedAnswer: {
@@ -218,6 +238,7 @@ const schemaGraph = {
           },
         ]
       : []),
+    ...extraSchema,
     ...(breadcrumbSchema ? [breadcrumbSchema] : []),
   ],
 };
@@ -243,6 +264,22 @@ const schemaGraph = {
     {!noindex && <link rel="alternate" hreflang="es" href={esUrl} />}
     {!noindex && <link rel="alternate" hreflang="en" href={enUrl} />}
     {!noindex && <link rel="alternate" hreflang="x-default" href={esUrl} />}
+    {!noindex && (
+      <link
+        rel="alternate"
+        type="text/plain"
+        href="/llms.txt"
+        title="Windytech — resumen para sistemas de IA"
+      />
+    )}
+    {!noindex && (
+      <link
+        rel="alternate"
+        type="text/plain"
+        href="/llms-full.txt"
+        title="Windytech — contenido completo para sistemas de IA"
+      />
+    )}
 
     <!-- Iconos: Google pide al menos 48x48 y Bing reutiliza el favicon del sitio. -->
     <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
@@ -256,7 +293,7 @@ const schemaGraph = {
 
     <meta name="format-detection" content="telephone=no" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -271,6 +308,7 @@ const schemaGraph = {
     <meta property="og:locale:alternate" content={altLocale} />
 
     <meta name="twitter:card" content="summary_large_image" />
+    {site.twitter && <meta name="twitter:site" content={site.twitter} />}
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />

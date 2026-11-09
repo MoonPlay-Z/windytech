@@ -2434,3 +2434,45 @@ a.contact-card:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Páginas de servicio --- */
+.about-service-list strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--navy);
+  font-size: 15px;
+}
+
+.card h3 a {
+  color: inherit;
+}
+
+.card h3 a:hover {
+  color: var(--teal-dark);
+}
+
+.service-related {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-related a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--teal-dark);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.service-related a:hover {
+  color: var(--navy);
+}
+
+.service-related svg {
+  flex: none;
+}

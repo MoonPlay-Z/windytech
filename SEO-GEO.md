@@ -47,13 +47,29 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
   contacto para motores generativos (ChatGPT, Gemini, Perplexity, Copilot...).
 - `sameAs` preparado en `src/data/site.ts` para enlazar redes y perfiles oficiales.
 
+### Páginas de servicio (Fase 2)
+
+- Hub `/servicios/` + 6 páginas en español y `/en/services/` + 6 en inglés.
+- Cada página tiene título y descripción propios, un solo H1, respuesta directa al
+  inicio, qué incluye, proceso, casos de uso, cómo se cotiza y 5 preguntas frecuentes.
+- Datos estructurados `Service` + `OfferCatalog` + `FAQPage` + `BreadcrumbList`.
+- Enlaces internos desde la portada, el panel del hero, el menú y el pie.
+- Contenido en `src/data/services.ts`; plantilla en `src/components/ServicePage.astro`.
+
 ### Indexación
 
-- `sitemap.xml` con las 8 URLs y etiquetas `hreflang` español/inglés.
-- `robots.txt` con el sitemap declarado.
+- `dist/sitemap.xml` se genera en cada `npm run build` con `scripts/generate-sitemap.mjs`:
+  recorre el HTML construido, lee canonical y `hreflang` y excluye las páginas `noindex`.
+  Hoy incluye 22 URLs y crece solo al añadir páginas.
+- `robots.txt` con el sitemap declarado y permisos para Google, Bing, Brave, DuckDuckGo,
+  Apple, Yandex, Naver, Seznam, Qwant y rastreadores de IA.
 - `canonical` y `hreflang` en todas las páginas.
-- `Content-Type` correcto para XML, texto e imágenes.
-- Soporte para códigos de verificación de Google, Bing y Yandex en `site.ts`.
+- Cabeceras de seguridad y caché en `vercel.json` (`_headers` no aplica en Vercel).
+- `llms.txt` (resumen) y `llms-full.txt` (perfil completo) enlazados con
+  `rel="alternate" type="text/plain"`.
+- Verificación de Bing activa (`msvalidate.01`). Google y Yandex se activan al pegar su
+  código en `site.verification`.
+- Comprobación automática: `npm run seo:check` y workflow `.github/workflows/seo.yml`.
 
 ---
 
@@ -69,7 +85,7 @@ sameAs: [
 
 verification: {
   google: 'CÓDIGO_DE_SEARCH_CONSOLE',
-  bing: 'CÓDIGO_DE_BING_WEBMASTER',
+  bing: '1A53073E9F99FBDBD7E6229B2FCBB9B2', // ya configurado
   yandex: '',
 },
 ```
@@ -92,7 +108,8 @@ Después de editar, ejecuta `npm run build` y vuelve a desplegar.
    propiedad de prefijo `https://www.windytech.studio/` (verificación por meta tag).
 3. Si usas meta tag, pega el código en `site.verification.google`, despliega y verifica.
 4. Envía `https://www.windytech.studio/sitemap.xml`.
-5. Usa **Inspección de URLs** → *Solicitar indexación* en `/`, `/nosotros/` y `/en/`.
+5. Usa **Inspección de URLs** → *Solicitar indexación* en `/`, `/servicios/`, cada página
+   de servicio, `/nosotros/` y `/en/`.
 
 ### Bing Webmaster Tools (alimenta Bing, Copilot, DuckDuckGo y Yahoo)
 
@@ -193,10 +210,16 @@ Si la imagen no cambia, agrega un parámetro temporal al compartir
 ## 6. Checklist después de desplegar
 
 - [ ] `https://www.windytech.studio/favicon.ico` responde 200.
+- [ ] `https://www.windytech.studio/assets/logo-mark-large-56.webp` responde 200.
 - [ ] `https://www.windytech.studio/assets/og.png` responde 200 y mide 1200×630.
-- [ ] `https://www.windytech.studio/sitemap.xml` incluye `/nosotros/` y `/en/about/`.
+- [ ] `https://www.windytech.studio/sitemap.xml` incluye las 22 URLs y los `hreflang`.
+- [ ] `https://www.windytech.studio/servicios/` y las 6 páginas de servicio responden 200.
 - [ ] `https://www.windytech.studio/robots.txt` permite Bingbot y Bravebot.
+- [ ] `https://www.windytech.studio/llms.txt` y `/llms-full.txt` responden 200.
 - [ ] `https://www.windytech.studio/3912b45e618c49a3694bc4c10ff020f4.txt` devuelve la clave.
+- [ ] La home incluye `<meta name="msvalidate.01" ...>`.
+- [ ] Cabeceras `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy` presentes.
+- [ ] `npm run seo:check` sin errores antes de desplegar.
 - [ ] Search Console y Bing Webmaster verificados y sitemap enviado.
 - [ ] `npm run indexnow` ejecutado sin errores.
 - [ ] Perfil de Google Business y Bing Places creados.

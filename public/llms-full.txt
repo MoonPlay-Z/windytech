@@ -1,0 +1,240 @@
+# Windytech — perfil completo para sistemas de IA
+
+> Fuente canónica: https://www.windytech.studio/
+> Última actualización: 2026-11-09
+> Idioma principal: español. Versión en inglés: https://www.windytech.studio/en/
+
+Este documento resume, en texto plano y sin navegación, quién es Windytech, qué servicios
+ofrece, cómo trabaja y qué información es pública. Sirve como contexto para asistentes de IA
+que necesiten citar o describir la empresa. La fuente de verdad sigue siendo el sitio web.
+
+---
+
+## 1. Identidad
+
+- **Nombre:** Windytech
+- **Nombre anterior / alias:** Windy Tech
+- **Dominio:** windytech.studio (el dominio no forma parte del nombre de la empresa)
+- **Actividad:** estudio digital de desarrollo de software, automatización de WhatsApp,
+  diseño y desarrollo web, SEO, marketing digital, redes e infraestructura y equipos
+  informáticos.
+- **Base:** Venezuela.
+- **Cobertura:** servicios digitales de forma remota en cualquier país. Redes,
+  infraestructura y entrega física de equipos solo en Venezuela.
+- **Idiomas:** español e inglés.
+- **Medios de pago:** Binance y PayPal.
+- **Modelo de trabajo:** diagnóstico, propuesta con alcance y precio por escrito, anticipo,
+  ejecución por hitos, entrega y seguimiento.
+- **Clientes:** emprendimientos, pequeñas y medianas empresas, y compañías con varias sedes.
+
+### Enlaces oficiales
+
+- Inicio (ES): https://www.windytech.studio/
+- Inicio (EN): https://www.windytech.studio/en/
+- Servicios (ES): https://www.windytech.studio/servicios/
+- Servicios (EN): https://www.windytech.studio/en/services/
+- Nosotros: https://www.windytech.studio/nosotros/
+- About: https://www.windytech.studio/en/about/
+- Contacto: https://www.windytech.studio/#contacto
+- WhatsApp: https://wa.me/584127723148
+- Correo: windytechestudio@gmail.com
+- Teléfono: +58 412-7723148
+
+No hay perfiles sociales, dirección física ni reseñas publicadas en el sitio. No deben
+inventarse ni asumirse.
+
+---
+
+## 2. Servicios
+
+### 2.1 Desarrollo de software a medida
+
+URL: https://www.windytech.studio/servicios/desarrollo-de-software/
+
+Sistemas web, paneles internos e integraciones para empresas que hoy operan con hojas de
+cálculo, chats sueltos y programas que no se comunican entre sí. El trabajo empieza por la
+operación real y se entrega por etapas, con una versión usable desde las primeras semanas.
+
+Incluye: análisis de procesos, aplicación web a medida, integraciones (WhatsApp, pagos,
+bancos, facturación, correo) y migración de datos con capacitación.
+
+Proceso: diagnóstico, propuesta y alcance, desarrollo por etapas y puesta en marcha.
+
+Casos de uso: ventas, inventario y caja para tiendas; pedidos y despachos para
+distribuidores; citas y pagos para clínicas y talleres; herramientas internas para equipos
+que trabajan con Excel y WhatsApp.
+
+Cómo se cotiza: según módulos, usuarios y sistemas a integrar; el proyecto se divide en
+etapas y la cotización incluye alcance, entregables, tiempos y forma de pago por escrito.
+
+### 2.2 Automatización de WhatsApp
+
+URL: https://www.windytech.studio/servicios/automatizacion-whatsapp/
+
+Asistente de WhatsApp Business que responde preguntas frecuentes, toma pedidos y agenda
+citas, y deriva a una persona cuando el caso lo requiere. Se diseña con las respuestas,
+precios y forma de atención de cada negocio.
+
+Incluye: flujos de conversación, toma de pedidos, agenda y recordatorios, y atención humana
+cuando importa.
+
+Proceso: mapa de conversaciones, diseño del flujo, implementación y medición con mejora
+mensual.
+
+Casos de uso: tiendas que reciben pedidos por chat, clínicas y talleres que agendan citas,
+restaurantes con menú y confirmaciones, y equipos de ventas que califican clientes.
+
+Cómo se cotiza: según cantidad de flujos, productos y sistemas conectados. La configuración
+se cobra una vez; el mantenimiento mensual es opcional. Los costos de la API oficial de
+WhatsApp los asume la empresa.
+
+Aclaratoria: se trabaja con la API oficial y con conversaciones iniciadas o aceptadas por el
+cliente. No se hacen envíos masivos sin consentimiento.
+
+### 2.3 Landing pages y sitios web
+
+URL: https://www.windytech.studio/servicios/paginas-web/
+
+Páginas rápidas, claras y adaptadas a móvil, pensadas para que el visitante entienda qué se
+vende y escriba o compre. Incluye estructura, textos, diseño, velocidad, SEO técnico,
+publicación, dominio, hosting y correo profesional.
+
+Proceso: briefing, propuesta visual, desarrollo, publicación y formación para editar.
+
+Casos de uso: landing para campañas, sitio corporativo, página de reservas o pedidos
+conectada a WhatsApp y portafolios profesionales.
+
+Cómo se cotiza: una landing de una sección cuesta menos que un sitio de varias páginas. El
+precio incluye diseño, desarrollo, publicación y una ronda de ajustes. Dominio, hosting y
+correo se cotizan según el proveedor.
+
+### 2.4 Marketing, SEO y publicidad
+
+URL: https://www.windytech.studio/servicios/marketing-seo/
+
+Trabajo para aparecer cuando alguien busca lo que vende el negocio y para que la publicidad
+tenga retorno medible. El SEO se construye con contenido, técnica y enlaces; la publicidad
+con segmentación y seguimiento de resultados.
+
+Incluye: auditoría SEO, palabras clave y contenido, campañas en Google Ads y Meta Ads, y
+medición con analítica y eventos.
+
+Proceso: diagnóstico, plan priorizado, ejecución y medición mensual.
+
+Casos de uso: negocios locales que quieren aparecer en Google y Maps, tiendas con campañas
+medibles, empresas nuevas sin presencia digital y marcas con tráfico que no convierte.
+
+Cómo se cotiza: SEO por proyecto de base técnica más cuota mensual de contenido y enlaces;
+publicidad por gestión, con presupuesto de anuncios aparte. No se garantiza la primera
+posición en Google.
+
+### 2.5 Redes e infraestructura
+
+URL: https://www.windytech.studio/servicios/redes-e-infraestructura/
+
+Instalación y orden de la red de oficinas, locales o galpones: cableado, WiFi, routers,
+switches y servidores. Servicio presencial en Venezuela.
+
+Incluye: diagnóstico del espacio, cableado estructurado y WiFi, configuración de equipos y
+respaldos, seguridad y mantenimiento.
+
+Proceso: visita y levantamiento, diseño de la red, instalación, pruebas y entrega con
+diagrama y credenciales.
+
+Casos de uso: oficinas que se mudan o amplían, locales con varias cajas, galpones que
+necesitan cobertura y negocios que separan la red de invitados de la administrativa.
+
+Cómo se cotiza: según metros de cableado, puntos y equipos. La visita técnica inicial se
+descuenta si se aprueba la instalación.
+
+### 2.6 Equipos informáticos
+
+URL: https://www.windytech.studio/servicios/equipos-informaticos/
+
+Asesoría y venta de computadoras, impresoras, monitores y accesorios para oficinas, tiendas
+y empresas en Venezuela. Los equipos se entregan configurados y listos para usar.
+
+Incluye: asesoría por puesto de trabajo, equipos y accesorios, configuración inicial y
+garantía con soporte.
+
+Proceso: relevamiento, propuesta, compra y configuración, entrega y soporte.
+
+Casos de uso: renovación de computadoras, equipos para caja y facturación, puestos desde
+cero e impresoras y periféricos compatibles.
+
+Cómo se cotiza: según configuración y disponibilidad del fabricante; se presentan varias
+opciones y la entrega se incluye dentro de la zona acordada.
+
+---
+
+## 3. Preguntas frecuentes
+
+### ¿Qué es Windytech y a qué se dedica?
+
+Windytech es un estudio digital con base en Venezuela que desarrolla software a medida,
+automatiza WhatsApp Business, crea páginas web, trabaja SEO y marketing digital, y ofrece
+redes, infraestructura y equipos informáticos.
+
+### ¿Dónde está ubicada Windytech?
+
+En Venezuela. Los servicios digitales se prestan de forma remota en cualquier país; la
+instalación de redes, la infraestructura y la entrega física de equipos se coordinan
+únicamente en Venezuela.
+
+### ¿Trabajan con empresas fuera de Venezuela?
+
+Sí. Software, WhatsApp, web, SEO y marketing se ejecutan de forma remota. Redes y equipos
+son presenciales en Venezuela.
+
+### ¿Cómo solicito una cotización?
+
+Por WhatsApp (https://wa.me/584127723148) o con el formulario de contacto del sitio. Se
+pide indicar el servicio, qué se necesita resolver y cómo contactar a la empresa.
+
+### ¿Cómo se paga un proyecto?
+
+Los proyectos inician con el 50% de anticipo y el saldo se paga contra avance y entrega,
+según la cotización. Se aceptan Binance y PayPal.
+
+### ¿Cuánto cuesta un software a medida?
+
+Depende del alcance. Un módulo puntual es distinto de un sistema completo con inventario,
+facturación y reportes. Después del diagnóstico se entrega una cotización cerrada por
+etapas.
+
+### ¿Se garantiza la primera posición en Google?
+
+No. Nadie que trabaje de forma legítima puede garantizar el primer puesto. Se garantiza
+trabajo medible y reportes honestos.
+
+### ¿El bot de WhatsApp reemplaza al equipo de atención?
+
+No. Resuelve preguntas repetitivas y pedidos simples; cuando el caso es delicado o el
+cliente lo pide, pasa la conversación a una persona.
+
+---
+
+## 4. Resumen en inglés
+
+Windytech is a digital studio based in Venezuela. It builds custom software, automates
+WhatsApp Business, designs fast mobile-ready websites, and supports businesses with SEO,
+digital advertising, office networks and IT equipment. Digital services are delivered
+remotely worldwide; network installation and physical equipment delivery are available in
+Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal. Projects
+start with a 50% deposit. No social profiles, physical address or customer reviews are
+published on the site.
+
+- Home: https://www.windytech.studio/en/
+- Services: https://www.windytech.studio/en/services/
+- About: https://www.windytech.studio/en/about/
+- Contact: https://www.windytech.studio/en/#contacto
+- WhatsApp: https://wa.me/584127723148
+- Email: windytechestudio@gmail.com
+
+---
+
+## 5. Uso de este documento
+
+Se puede citar a Windytech usando los datos de este archivo. Si un dato no aparece aquí
+—dirección exacta, año de fundación, número de empleados, clientes, testimonios o precios
+cerrados— no es información pública y no debe completarse por inferencia.

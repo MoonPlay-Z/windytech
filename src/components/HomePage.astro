@@ -4,6 +4,7 @@ import Icon from './Icon.astro';
 import ContactForm from './ContactForm.astro';
 import { content, site, whatsappLink, type Lang } from '../data/site';
 import { aboutContent } from '../data/about';
+import { servicePath, services } from '../data/services';
 
 interface Props {
   lang: Lang;
@@ -102,35 +103,17 @@ const shareText = `${title} — ${shareUrl}`;
           <p>{t.hero.panelSubtitle}</p>
         </div>
         <div class="quick-list">
-          {t.hero.quickLinks.map((link, index) =>
-            'href' in link ? (
-              <a class={`quick-link${index === 0 ? ' is-primary' : ''}`} href={link.href}>
-                <span>
-                  <span class={`quick-icon quick-icon--${link.icon}`}>
-                    <Icon name={link.icon} size={18} />
-                  </span>
-                  {link.label}
+          {t.hero.quickLinks.map((link, index) => (
+            <a class={`quick-link${index === 0 ? ' is-primary' : ''}`} href={link.href}>
+              <span>
+                <span class={`quick-icon quick-icon--${link.icon}`}>
+                  <Icon name={link.icon} size={18} />
                 </span>
-                <Icon name="arrow-right" size={18} />
-              </a>
-            ) : (
-              <a
-                class={`quick-link${index === 0 ? ' is-primary' : ''}`}
-                href={whatsappLink(link.message)}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-track="whatsapp"
-              >
-                <span>
-                  <span class={`quick-icon quick-icon--${link.icon}`}>
-                    <Icon name={link.icon} size={18} />
-                  </span>
-                  {link.label}
-                </span>
-                <Icon name="whatsapp" size={18} class="quick-wa" />
-              </a>
-            ),
-          )}
+                {link.label}
+              </span>
+              <Icon name="arrow-right" size={18} />
+            </a>
+          ))}
         </div>
         <div class="panel-footer">
           {t.hero.panelFooter.map((chip) => (
@@ -227,13 +210,24 @@ const shareText = `${title} — ${shareUrl}`;
         <p>{t.services.subtitle}</p>
       </div>
       <div class="service-grid">
-        {t.services.cards.map((service) => (
+        {t.services.cards.map((service, index) => (
           <article class="card">
             <span class={`icon-badge icon-badge--${service.icon}`}>
               <Icon name={service.icon} size={28} />
             </span>
-            <h3>{service.title}</h3>
+            <h3>
+              <a href={services[index] ? servicePath(lang, services[index]) : `#servicios`}>
+                {service.title}
+              </a>
+            </h3>
             <p>{service.text}</p>
+            <a
+              class="text-link"
+              href={services[index] ? servicePath(lang, services[index]) : `#servicios`}
+            >
+              {lang === 'es' ? 'Ver servicio' : 'View service'}
+              <Icon name="arrow-right" size={16} />
+            </a>
             <a
               class="text-link"
               href={whatsappLink(service.message)}
@@ -241,7 +235,7 @@ const shareText = `${title} — ${shareUrl}`;
               rel="noopener noreferrer"
               data-track="whatsapp"
             >
-              {t.services.cta}: {service.title}
+              {t.services.cta}
               <Icon name="whatsapp" size={16} />
             </a>
           </article>

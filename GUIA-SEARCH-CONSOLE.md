@@ -1,6 +1,6 @@
 # Manual de Google Search Console — Windytech
 
-Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windytech: Astro, deploy en Vercel, dominio canónico `www.windytech.studio`, contenido bilingüe y 8 URLs en el sitemap.
+Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windytech: Astro, deploy en Vercel, dominio canónico `www.windytech.studio`, contenido bilingüe y 22 URLs en el sitemap.
 
 ---
 
@@ -18,10 +18,17 @@ Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windy
 | Guía SEO/GEO | `SEO-GEO.md` |
 | Panel | https://search.google.com/search-console |
 
-Páginas incluidas en el sitemap:
+Páginas incluidas en el sitemap (se genera en cada build, hoy 22 URLs):
 
 ```
 /                          /en/
+/servicios/                /en/services/
+/servicios/desarrollo-de-software/                    /en/services/custom-software-development/
+/servicios/automatizacion-whatsapp/                   /en/services/whatsapp-automation/
+/servicios/paginas-web/                               /en/services/web-design/
+/servicios/marketing-seo/                             /en/services/seo-marketing/
+/servicios/redes-e-infraestructura/                   /en/services/networks-infrastructure/
+/servicios/equipos-informaticos/                      /en/services/it-equipment/
 /nosotros/                 /en/about/
 /legal/privacidad/         /legal/terminos/
 /en/legal/privacy/         /en/legal/terms/
@@ -145,7 +152,7 @@ No necesitas las dos. Si creas la de dominio, la meta de Google no hace falta.
 
 - [ ] Propiedad verificada.
 - [ ] **Sitemaps → Añadir sitemap** → `sitemap.xml` → Enviar.
-- [ ] Confirmar estado **Correcto** y que descubre las 8 URLs.
+- [ ] Confirmar estado **Correcto** y que descubre las 22 URLs.
 - [ ] **Inspección de URL** en `/`, `/nosotros/`, `/en/`, `/en/about/` → *Probar URL publicada* → *Solicitar indexación*.
 - [ ] Revisar **Indexación de páginas**: sin errores nuevos.
 - [ ] Revisar **Seguridad** y **Acciones manuales**: deben estar limpias.
@@ -600,7 +607,7 @@ Para este proyecto, el stack gratuito es suficiente durante los primeros 3–6 m
 
 1. **Search Console:** Rendimiento + Indexación + Sitemaps.
 2. **GA4:** sesiones, fuentes y conversiones (WhatsApp, formulario).
-3. **Screaming Frog:** crawl de `https://www.windytech.studio` (8 URLs).
+3. **Screaming Frog:** crawl de `https://www.windytech.studio` (22 URLs).
    - Revisa títulos duplicados, metas largas, 404, redirecciones y canonical.
 4. **PageSpeed Insights:** `/`, `/nosotros/`, `/en/`.
 5. **Rich Results Test:** home, `/nosotros/` y `/en/about/`.

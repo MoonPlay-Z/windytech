@@ -30,8 +30,23 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
+User-agent: Applebot-Extended
+Allow: /
+
 # Yandex
 User-agent: YandexBot
+Allow: /
+
+# Naver
+User-agent: Yeti
+Allow: /
+
+# Seznam
+User-agent: SeznamBot
+Allow: /
+
+# Qwant
+User-agent: Qwantify
 Allow: /
 
 # Motores generativos y asistentes de IA
@@ -63,6 +78,18 @@ User-agent: Amazonbot
 Allow: /
 
 User-agent: meta-externalagent
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+User-agent: cohere-ai
 Allow: /
 
 Sitemap: https://www.windytech.studio/sitemap.xml

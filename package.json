@@ -5,9 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/generate-sitemap.mjs",
     "preview": "astro preview",
     "check": "astro check",
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "seo:check": "node scripts/check-seo.mjs",
     "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {

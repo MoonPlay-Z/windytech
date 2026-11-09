@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from './Icon.astro';
+import { site, whatsappLink, type Lang } from '../data/site';
+import { serviceHub, services } from '../data/services';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const hub = serviceHub[lang];
+const es = lang === 'es';
+const homeHref = es ? '/' : '/en/';
+const homeLabel = es ? 'Inicio' : 'Home';
+const viewLabel = es ? 'Ver servicio' : 'View service';
+
+const itemList = {
+  '@type': 'ItemList',
+  '@id': `${new URL(hub.path, site.url).toString()}#services`,
+  name: hub.h1,
+  itemListElement: services.map((service, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: service[lang].title,
+    description: service[lang].cardText,
+    url: new URL(es ? service.pathEs : service.pathEn, site.url).toString(),
+  })),
+};
+---
+
+<BaseLayout
+  lang={lang}
+  title={hub.title}
+  description={hub.description}
+  path={hub.path}
+  altPath={hub.altPath}
+  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImageAlt={`${hub.h1} — ${site.name}`}
+  pageType="CollectionPage"
+  extraSchema={[itemList]}
+  breadcrumb={[
+    { name: homeLabel, path: homeHref },
+    { name: hub.h1, path: hub.path },
+  ]}
+>
+  <section class="about-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label={hub.labels.breadcrumb}>
+        <a href={homeHref}>{homeLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span>{hub.h1}</span>
+      </nav>
+      <span class="eyebrow">{hub.eyebrow}</span>
+      <h1>{hub.h1}</h1>
+      <p class="about-intro">{hub.intro}</p>
+      <div class="about-hero-actions">
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(es ? 'Hola Windytech, quiero una cotización.' : 'Hello Windytech, I would like a quote.')}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {hub.cta}
+          <Icon name="whatsapp" size={18} />
+        </a>
+        <a class="btn btn-light" href={`${homeHref}#servicios`}>
+          {es ? 'Ver en la página principal' : 'See on the home page'}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <div class="service-grid">
+        {services.map((service) => {
+          const s = service[lang];
+          return (
+            <article class="card">
+              <span class={`icon-badge icon-badge--${s.icon}`}>
+                <Icon name={s.icon} size={28} />
+              </span>
+              <h2>
+                <a href={es ? service.pathEs : service.pathEn}>{s.title}</a>
+              </h2>
+              <p>{s.cardText}</p>
+              <a class="text-link" href={es ? service.pathEs : service.pathEn}>
+                {viewLabel}
+                <Icon name="arrow-right" size={16} />
+              </a>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <div class="cta-copy">
+        <h2>{hub.ctaTitle}</h2>
+        <p>{hub.ctaText}</p>
+      </div>
+      <a
+        class="btn btn-dark"
+        href={whatsappLink(es ? 'Hola Windytech, necesito ayuda para elegir un servicio.' : 'Hello Windytech, I need help choosing a service.')}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="whatsapp"
+      >
+        {hub.cta}
+        <Icon name="whatsapp" size={18} />
+      </a>
+    </div>
+  </section>
+</BaseLayout>

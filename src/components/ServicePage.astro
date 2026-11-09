@@ -1,0 +1,248 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from './Icon.astro';
+import { site, whatsappLink, type Lang } from '../data/site';
+import { servicePath, services, type Service } from '../data/services';
+
+interface Props {
+  lang: Lang;
+  service: Service;
+  path: string;
+  altPath: string;
+}
+
+const { lang, service, path, altPath } = Astro.props;
+const s = service[lang];
+const es = lang === 'es';
+const homeHref = es ? '/' : '/en/';
+const hubHref = es ? '/servicios/' : '/en/services/';
+const homeLabel = es ? 'Inicio' : 'Home';
+const hubLabel = es ? 'Servicios' : 'Services';
+const labels = es
+  ? {
+      breadcrumb: 'Ruta de navegación',
+      related: 'Otros servicios',
+      cta: 'Pedir cotización',
+      back: 'Ver todos los servicios',
+    }
+  : {
+      breadcrumb: 'Breadcrumb',
+      related: 'Other services',
+      cta: 'Request a quote',
+      back: 'See all services',
+    };
+
+const canonical = new URL(path, site.url).toString();
+const related = s.related
+  .map((slug) => services.find((item) => item[lang].slug === slug))
+  .filter((item): item is Service => Boolean(item));
+
+const serviceSchema = {
+  '@type': 'Service',
+  '@id': `${canonical}#service`,
+  name: s.title,
+  description: s.metaDescription,
+  serviceType: s.title,
+  url: canonical,
+  provider: { '@id': `${site.url}/#organization` },
+  areaServed:
+    service.id === 'networks' || service.id === 'equipment'
+      ? [{ '@type': 'Country', name: site.address.countryName }]
+      : [
+          { '@type': 'Country', name: site.address.countryName },
+          { '@type': 'Place', name: 'Worldwide' },
+        ],
+  availableLanguage: ['Spanish', 'English'],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: s.includesTitle,
+    itemListElement: s.includes.map((item, index) => ({
+      '@type': 'Offer',
+      position: index + 1,
+      itemOffered: {
+        '@type': 'Service',
+        name: item.title,
+        description: item.text,
+      },
+    })),
+  },
+};
+---
+
+<BaseLayout
+  lang={lang}
+  title={s.metaTitle}
+  description={s.metaDescription}
+  path={path}
+  altPath={altPath}
+  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImageAlt={`${s.title} — ${site.name}`}
+  pageType="WebPage"
+  dateModified={site.contentUpdated}
+  faq={s.faqs}
+  extraSchema={[serviceSchema]}
+  breadcrumb={[
+    { name: homeLabel, path: homeHref },
+    { name: hubLabel, path: hubHref },
+    { name: s.title, path },
+  ]}
+>
+  <section class="about-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label={labels.breadcrumb}>
+        <a href={homeHref}>{homeLabel}</a>
+        <span aria-hidden="true">/</span>
+        <a href={hubHref}>{hubLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span>{s.title}</span>
+      </nav>
+      <span class="eyebrow">{s.eyebrow}</span>
+      <h1>{s.title}</h1>
+      <p class="about-intro">{s.intro}</p>
+      <div class="about-hero-actions">
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(s.message)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {labels.cta}
+          <Icon name="whatsapp" size={18} />
+        </a>
+        <a class="btn btn-light" href={hubHref}>{labels.back}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container about-page-grid">
+      <article class="about-page-main">
+        <h2>{s.includesTitle}</h2>
+        <ul class="about-service-list">
+          {s.includes.map((item) => (
+            <li>
+              <Icon name="check" size={20} />
+              <span>
+                <strong>{item.title}</strong>
+                {item.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <h2>{s.processTitle}</h2>
+        <ol class="about-steps">
+          {s.process.map((step, index) => (
+            <li>
+              <span class="about-step-number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span>
+                <strong>{step.title}</strong>
+                {step.text}
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <h2>{s.useCasesTitle}</h2>
+        <ul class="about-service-list">
+          {s.useCases.map((useCase) => (
+            <li>
+              <Icon name="check-simple" size={20} />
+              <span>{useCase}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h2>{s.pricingTitle}</h2>
+        <ul>
+          {s.pricing.map((paragraph) => <li>{paragraph}</li>)}
+        </ul>
+      </article>
+
+      <aside class="about-page-aside">
+        <div class="about-facts-card">
+          <h2>{s.title}</h2>
+          <dl class="about-page-facts">
+            {s.quickFacts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div class="about-contact-card">
+          <h2>{s.ctaTitle}</h2>
+          <p>{s.ctaText}</p>
+          <a
+            class="btn btn-primary"
+            href={whatsappLink(s.message)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            {labels.cta}
+            <Icon name="whatsapp" size={18} />
+          </a>
+        </div>
+
+        {related.length > 0 && (
+          <div class="about-facts-card">
+            <h2>{labels.related}</h2>
+            <ul class="service-related">
+              {related.map((item) => (
+                <li>
+                  <a href={servicePath(lang, item)}>
+                    {item[lang].title}
+                    <Icon name="arrow-right" size={16} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="preguntas">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{s.eyebrow}</span>
+        <h2>{s.faqTitle}</h2>
+        <p>{s.metaDescription}</p>
+      </div>
+      <div class="faq-list">
+        {s.faqs.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <div class="cta-copy">
+        <h2>{s.ctaTitle}</h2>
+        <p>{s.ctaText}</p>
+      </div>
+      <a
+        class="btn btn-dark"
+        href={whatsappLink(s.message)}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="whatsapp"
+      >
+        {labels.cta}
+        <Icon name="whatsapp" size={18} />
+      </a>
+    </div>
+  </section>
+</BaseLayout>
