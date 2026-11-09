@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import { aboutContent } from '../data/about';
 import { site, whatsappLink, type Lang } from '../data/site';
+import { servicePath, services } from '../data/services';
 
 interface Props {
   lang: Lang;
@@ -70,10 +71,14 @@ const whatsappMessage =
 
         <h2>{a.servicesTitle}</h2>
         <ul class="about-service-list">
-          {a.services.map((service) => (
+          {a.services.map((serviceText, index) => (
             <li>
               <Icon name="check" size={20} />
-              <span>{service}</span>
+              {services[index] ? (
+                <a href={servicePath(lang, services[index])}>{serviceText}</a>
+              ) : (
+                <span>{serviceText}</span>
+              )}
             </li>
           ))}
         </ul>

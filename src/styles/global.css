@@ -1794,6 +1794,33 @@ a.contact-card:hover {
   color: var(--mint);
 }
 
+.footer-services {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  padding-bottom: 28px;
+  font-size: 15px;
+}
+
+.footer-services-title {
+  color: var(--footer-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.footer-services-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer-services a:hover {
+  color: var(--mint);
+}
+
 .footer-bottom {
   display: flex;
   flex-wrap: wrap;
@@ -2115,6 +2142,18 @@ a.contact-card:hover {
 .about-service-list svg {
   flex: none;
   margin-top: 2px;
+  color: var(--teal-dark);
+}
+
+.about-service-list a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.about-service-list a:hover {
   color: var(--teal-dark);
 }
 

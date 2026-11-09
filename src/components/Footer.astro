@@ -1,5 +1,6 @@
 ---
 import { content, site, type Lang } from '../data/site';
+import { servicePath, services } from '../data/services';
 
 interface Props {
   lang: Lang;
@@ -9,6 +10,10 @@ const { lang } = Astro.props;
 const t = content[lang];
 const homeHref = lang === 'es' ? '/' : '/en/';
 const navAria = lang === 'es' ? 'Navegación del pie de página' : 'Footer navigation';
+const servicesAria = lang === 'es' ? 'Servicios de Windytech' : 'Windytech services';
+const servicesTitle = lang === 'es' ? 'Servicios' : 'Services';
+const servicesHub = lang === 'es' ? '/servicios/' : '/en/services/';
+const servicesHubLabel = lang === 'es' ? 'Todos los servicios' : 'All services';
 const wordmarkAlt =
   lang === 'es'
     ? 'Windytech — desarrollo de software y automatización'
@@ -36,6 +41,16 @@ const wordmarkAlt =
         </a>
       ))}
       <a href={t.nav.aboutHref}>{t.nav.about}</a>
+    </nav>
+  </div>
+
+  <div class="container footer-services">
+    <span class="footer-services-title">{servicesTitle}</span>
+    <nav class="footer-services-links" aria-label={servicesAria}>
+      <a href={servicesHub}>{servicesHubLabel}</a>
+      {services.map((service) => (
+        <a href={servicePath(lang, service)}>{service[lang].title}</a>
+      ))}
     </nav>
   </div>
 
