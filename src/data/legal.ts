@@ -12,7 +12,7 @@ export const legalContent = {
       title: 'Política de privacidad',
       updated: 'Última actualización: 4 de noviembre de 2026',
       intro:
-        'En Windy Tech respetamos tu privacidad. Esta política explica qué datos recopilamos, cómo los usamos y qué puedes hacer al respecto.',
+        'En Windytech respetamos tu privacidad. Esta política explica qué datos recopilamos, cómo los usamos y qué puedes hacer al respecto.',
       sections: [
         {
           heading: 'Qué datos recopilamos',
@@ -71,7 +71,7 @@ export const legalContent = {
       title: 'Términos y condiciones',
       updated: 'Última actualización: 4 de noviembre de 2026',
       intro:
-        'Estos términos regulan el uso de este sitio y la contratación de servicios con Windy Tech. Al solicitar una cotización o contratar un servicio, aceptas estas condiciones.',
+        'Estos términos regulan el uso de este sitio y la contratación de servicios con Windytech. Al solicitar una cotización o contratar un servicio, aceptas estas condiciones.',
       sections: [
         {
           heading: 'Uso del sitio',
@@ -106,7 +106,7 @@ export const legalContent = {
         {
           heading: 'Propiedad intelectual',
           paragraphs: [
-            'Una vez recibido el pago completo, el cliente es dueño de los entregables finales acordados. Windy Tech conserva la propiedad de su código base, frameworks, herramientas internas y componentes reutilizables. Las licencias de terceros se rigen por sus propios términos.',
+            'Una vez recibido el pago completo, el cliente es dueño de los entregables finales acordados. Windytech conserva la propiedad de su código base, frameworks, herramientas internas y componentes reutilizables. Las licencias de terceros se rigen por sus propios términos.',
           ],
         },
         {
@@ -153,7 +153,7 @@ export const legalContent = {
       title: 'Privacy policy',
       updated: 'Last updated: November 4, 2026',
       intro:
-        'At Windy Tech we respect your privacy. This policy explains what data we collect, how we use it and what you can do about it.',
+        'At Windytech we respect your privacy. This policy explains what data we collect, how we use it and what you can do about it.',
       sections: [
         {
           heading: 'What data we collect',
@@ -212,7 +212,7 @@ export const legalContent = {
       title: 'Terms and conditions',
       updated: 'Last updated: November 4, 2026',
       intro:
-        'These terms govern the use of this site and the contracting of services with Windy Tech. By requesting a quote or hiring a service, you accept these conditions.',
+        'These terms govern the use of this site and the contracting of services with Windytech. By requesting a quote or hiring a service, you accept these conditions.',
       sections: [
         {
           heading: 'Use of the site',
@@ -247,7 +247,7 @@ export const legalContent = {
         {
           heading: 'Intellectual property',
           paragraphs: [
-            'Once full payment is received, the client owns the agreed final deliverables. Windy Tech retains ownership of its base code, frameworks, internal tools and reusable components. Third-party licenses are governed by their own terms.',
+            'Once full payment is received, the client owns the agreed final deliverables. Windytech retains ownership of its base code, frameworks, internal tools and reusable components. Third-party licenses are governed by their own terms.',
           ],
         },
         {

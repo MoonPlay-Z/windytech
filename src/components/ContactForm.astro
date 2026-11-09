@@ -98,8 +98,8 @@ const f = t.contact.form;
 
       const intro =
         lang === 'en'
-          ? `Hello Windy Tech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
-          : `Hola Windy Tech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
+          ? `Hello Windytech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
+          : `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
 
       const text = `${intro}${message ? `\n\n${message}` : ''}`;
       const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;

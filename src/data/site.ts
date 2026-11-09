@@ -1,9 +1,8 @@
 export type Lang = 'es' | 'en';
 
 export const site = {
-  name: 'Windy Tech',
-  legalName: 'Windy Tech',
-  alternateName: 'Windytech.studio',
+  name: 'Windytech',
+  legalName: 'Windytech',
   slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
   url: 'https://www.windytech.studio',
   domain: 'www.windytech.studio',
@@ -35,7 +34,7 @@ export const site = {
    */
   verification: {
     google: '',
-    bing: '',
+    bing: '1A53073E9F99FBDBD7E6229B2FCBB9B2',
     yandex: '',
   },
 };
@@ -47,10 +46,10 @@ export function whatsappLink(message: string) {
 export const content = {
   es: {
     meta: {
-      homeTitle: 'Windy Tech | Software a medida, WhatsApp y páginas web',
+      homeTitle: 'Windytech | Software a medida, WhatsApp y páginas web',
       homeDescription:
         'Desarrollo de software a medida, automatización de WhatsApp, webs y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
-      homeOgAlt: 'Windy Tech — Desarrollo de software, automatización y marketing',
+      homeOgAlt: 'Windytech — Desarrollo de software, automatización y marketing',
     },
     nav: {
       home: 'Inicio',
@@ -68,7 +67,7 @@ export const content = {
       closeMenu: 'Cerrar menú',
       switchLang: 'Ver sitio en inglés',
       switchLangShort: 'EN',
-      about: 'Acerca de Windy Tech',
+      about: 'Acerca de Windytech',
       aboutHref: '/nosotros/',
     },
     campaignBar: {
@@ -77,12 +76,12 @@ export const content = {
       link: 'Ver campañas',
     },
     whatsapp: {
-      general: 'Hola Windy Tech, quiero una cotización.',
+      general: 'Hola Windytech, quiero una cotización.',
       floatLabel: 'Escríbenos por WhatsApp',
-      campaign: 'Hola Windy Tech, vengo de la campaña ',
+      campaign: 'Hola Windytech, vengo de la campaña ',
     },
     hero: {
-      badge: 'Windy Tech · Desarrollo & Automatización',
+      badge: 'Windytech · Desarrollo & Automatización',
       titleBefore: 'Desarrollo de software,',
       titleHighlight: 'WhatsApp y páginas web',
       description:
@@ -100,22 +99,22 @@ export const content = {
         {
           label: 'Desarrollo de software',
           icon: 'code',
-          message: 'Hola Windy Tech, quiero desarrollar software a medida para mi negocio.',
+          message: 'Hola Windytech, quiero desarrollar software a medida para mi negocio.',
         },
         {
           label: 'Automatización de WhatsApp',
           icon: 'chat',
-          message: 'Hola Windy Tech, quiero automatizar mi WhatsApp.',
+          message: 'Hola Windytech, quiero automatizar mi WhatsApp.',
         },
         {
           label: 'Landing page o sitio web',
           icon: 'layout',
-          message: 'Hola Windy Tech, quiero una landing page o un sitio web.',
+          message: 'Hola Windytech, quiero una landing page o un sitio web.',
         },
         {
           label: 'Marketing, SEO y publicidad',
           icon: 'chart',
-          message: 'Hola Windy Tech, quiero marketing, SEO y publicidad para mi negocio.',
+          message: 'Hola Windytech, quiero marketing, SEO y publicidad para mi negocio.',
         },
         {
           label: 'Equipos informáticos',
@@ -141,7 +140,7 @@ export const content = {
           title: 'Un sistema que trabaja como tu negocio',
           text: 'Diseñamos y desarrollamos herramientas, paneles e integraciones para ordenar tu operación.',
           cta: 'Quiero mi sistema',
-          message: 'Hola Windy Tech, vengo de la campaña Software a medida',
+          message: 'Hola Windytech, vengo de la campaña Software a medida',
         },
         {
           tag: 'WhatsApp 24/7',
@@ -149,7 +148,7 @@ export const content = {
           title: 'Atiende a tus clientes sin parar',
           text: 'Un asistente automático responde, toma pedidos y agenda citas mientras tú trabajas.',
           cta: 'Quiero mi asistente',
-          message: 'Hola Windy Tech, vengo de la campaña WhatsApp 24/7',
+          message: 'Hola Windytech, vengo de la campaña WhatsApp 24/7',
         },
         {
           tag: 'Página web',
@@ -157,7 +156,7 @@ export const content = {
           title: 'Tu landing page lista para vender',
           text: 'Una página clara, rápida y con botón directo a tu WhatsApp para convertir visitas en clientes.',
           cta: 'Quiero mi página',
-          message: 'Hola Windy Tech, vengo de la campaña Página web',
+          message: 'Hola Windytech, vengo de la campaña Página web',
         },
         {
           tag: 'Marketing y SEO',
@@ -165,7 +164,7 @@ export const content = {
           title: 'Atrae clientes nuevos cada semana',
           text: 'Posicionamiento en Google y publicidad para que más personas encuentren tu negocio.',
           cta: 'Quiero más clientes',
-          message: 'Hola Windy Tech, vengo de la campaña Marketing y SEO',
+          message: 'Hola Windytech, vengo de la campaña Marketing y SEO',
         },
       ],
     },
@@ -179,42 +178,42 @@ export const content = {
           icon: 'code',
           title: 'Desarrollo de software a medida',
           text: 'Aplicaciones web, paneles, integraciones y herramientas internas diseñadas para tu forma de trabajar.',
-          message: 'Hola Windy Tech, quiero cotizar desarrollo de software a medida.',
+          message: 'Hola Windytech, quiero cotizar desarrollo de software a medida.',
         },
         {
           icon: 'chat',
           title: 'Automatización de WhatsApp',
           text: 'Chatbots y respuestas automáticas para atender clientes, tomar pedidos y agendar citas sin que tu equipo esté pegado al teléfono.',
-          message: 'Hola Windy Tech, quiero cotizar automatización de WhatsApp.',
+          message: 'Hola Windytech, quiero cotizar automatización de WhatsApp.',
         },
         {
           icon: 'layout',
           title: 'Landing pages y sitios web',
           text: 'Diseño y desarrollo de páginas rápidas, claras y listas para celular, pensadas para que el visitante te escriba o te compre.',
-          message: 'Hola Windy Tech, quiero cotizar una landing page o sitio web.',
+          message: 'Hola Windytech, quiero cotizar una landing page o sitio web.',
         },
         {
           icon: 'chart',
           title: 'Marketing, SEO y publicidad',
           text: 'Posicionamiento en Google y campañas publicitarias para atraer clientes nuevos y medir resultados.',
-          message: 'Hola Windy Tech, quiero cotizar marketing, SEO y publicidad.',
+          message: 'Hola Windytech, quiero cotizar marketing, SEO y publicidad.',
         },
         {
           icon: 'network',
           title: 'Redes e infraestructura',
           text: 'Configuramos tus equipos en red y la infraestructura de tu local u oficina. Disponible solo en Venezuela.',
-          message: 'Hola Windy Tech, quiero cotizar configuración de redes e infraestructura.',
+          message: 'Hola Windytech, quiero cotizar configuración de redes e infraestructura.',
         },
         {
           icon: 'monitor',
           title: 'Equipos informáticos',
           text: 'Venta de computadoras y equipos para oficinas, tiendas y empresas, con asesoría para elegir lo que de verdad necesitas.',
-          message: 'Hola Windy Tech, quiero cotizar equipos informáticos.',
+          message: 'Hola Windytech, quiero cotizar equipos informáticos.',
         },
       ],
     },
     share: {
-      label: '¿Te resultó útil? Comparte Windy Tech',
+      label: '¿Te resultó útil? Comparte Windytech',
       navLabel: 'Compartir esta página',
       whatsapp: 'Compartir por WhatsApp',
       facebook: 'Compartir en Facebook',
@@ -266,7 +265,7 @@ export const content = {
         'Asesoría para importar o exportar equipos',
       ],
       cta: 'Cotizar equipo por WhatsApp',
-      message: 'Hola Windy Tech, quiero cotizar un equipo informático.',
+      message: 'Hola Windytech, quiero cotizar un equipo informático.',
       note: 'Te confirmamos disponibilidad, precio y tiempo de entrega al cotizar.',
     },
     payments: {
@@ -286,17 +285,17 @@ export const content = {
       subtitle: 'Conoce qué hacemos, cómo trabajamos y cómo pedir una cotización.',
       items: [
         {
-          question: '¿Qué es Windy Tech y a qué se dedica?',
+          question: '¿Qué es Windytech y a qué se dedica?',
           answer:
-            'Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.',
+            'Windytech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.',
         },
         {
-          question: '¿Dónde está ubicada Windy Tech?',
+          question: '¿Dónde está ubicada Windytech?',
           answer:
-            'Windy Tech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.',
+            'Windytech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.',
         },
         {
-          question: '¿Qué servicios digitales ofrece Windy Tech?',
+          question: '¿Qué servicios digitales ofrece Windytech?',
           answer:
             'Desarrollamos software a medida y aplicaciones web, automatizamos WhatsApp Business, diseñamos páginas web y landing pages, y ofrecemos SEO, marketing digital, publicidad, redes e infraestructura y equipos informáticos.',
         },
@@ -376,10 +375,10 @@ export const content = {
   },
   en: {
     meta: {
-      homeTitle: 'Windy Tech | Custom Software, WhatsApp & Web Design',
+      homeTitle: 'Windytech | Custom Software, WhatsApp & Web Design',
       homeDescription:
         'Custom software, WhatsApp automation, web design and SEO for businesses. Remote digital services and network support in Venezuela.',
-      homeOgAlt: 'Windy Tech — Software development, automation and marketing',
+      homeOgAlt: 'Windytech — Software development, automation and marketing',
     },
     nav: {
       home: 'Home',
@@ -397,7 +396,7 @@ export const content = {
       closeMenu: 'Close menu',
       switchLang: 'Ver sitio en español',
       switchLangShort: 'ES',
-      about: 'About Windy Tech',
+      about: 'About Windytech',
       aboutHref: '/en/about/',
     },
     campaignBar: {
@@ -406,12 +405,12 @@ export const content = {
       link: 'See campaigns',
     },
     whatsapp: {
-      general: 'Hello Windy Tech, I would like a quote.',
+      general: 'Hello Windytech, I would like a quote.',
       floatLabel: 'Message us on WhatsApp',
-      campaign: 'Hello Windy Tech, I am coming from the campaign ',
+      campaign: 'Hello Windytech, I am coming from the campaign ',
     },
     hero: {
-      badge: 'Windy Tech · Development & Automation',
+      badge: 'Windytech · Development & Automation',
       titleBefore: 'Custom software,',
       titleHighlight: 'WhatsApp automation & web design',
       description:
@@ -429,22 +428,22 @@ export const content = {
         {
           label: 'Custom software',
           icon: 'code',
-          message: 'Hello Windy Tech, I want to build custom software for my business.',
+          message: 'Hello Windytech, I want to build custom software for my business.',
         },
         {
           label: 'WhatsApp automation',
           icon: 'chat',
-          message: 'Hello Windy Tech, I want to automate my WhatsApp.',
+          message: 'Hello Windytech, I want to automate my WhatsApp.',
         },
         {
           label: 'Landing page or website',
           icon: 'layout',
-          message: 'Hello Windy Tech, I want a landing page or a website.',
+          message: 'Hello Windytech, I want a landing page or a website.',
         },
         {
           label: 'Marketing, SEO and ads',
           icon: 'chart',
-          message: 'Hello Windy Tech, I want marketing, SEO and advertising for my business.',
+          message: 'Hello Windytech, I want marketing, SEO and advertising for my business.',
         },
         {
           label: 'IT equipment',
@@ -470,7 +469,7 @@ export const content = {
           title: 'A system that works like your business',
           text: 'We design and build tools, dashboards and integrations to organize your operation.',
           cta: 'I want my system',
-          message: 'Hello Windy Tech, I am coming from the Custom software campaign',
+          message: 'Hello Windytech, I am coming from the Custom software campaign',
         },
         {
           tag: 'WhatsApp 24/7',
@@ -478,7 +477,7 @@ export const content = {
           title: 'Serve your customers non-stop',
           text: 'An automated assistant replies, takes orders and books appointments while you work.',
           cta: 'I want my assistant',
-          message: 'Hello Windy Tech, I am coming from the WhatsApp 24/7 campaign',
+          message: 'Hello Windytech, I am coming from the WhatsApp 24/7 campaign',
         },
         {
           tag: 'Website',
@@ -486,7 +485,7 @@ export const content = {
           title: 'Your landing page ready to sell',
           text: 'A clear, fast page with a direct WhatsApp button to turn visits into customers.',
           cta: 'I want my page',
-          message: 'Hello Windy Tech, I am coming from the Website campaign',
+          message: 'Hello Windytech, I am coming from the Website campaign',
         },
         {
           tag: 'Marketing & SEO',
@@ -494,7 +493,7 @@ export const content = {
           title: 'Attract new customers every week',
           text: 'Google ranking and advertising so more people find your business.',
           cta: 'I want more customers',
-          message: 'Hello Windy Tech, I am coming from the Marketing & SEO campaign',
+          message: 'Hello Windytech, I am coming from the Marketing & SEO campaign',
         },
       ],
     },
@@ -507,42 +506,42 @@ export const content = {
           icon: 'code',
           title: 'Custom software development',
           text: 'Web applications, dashboards, integrations and internal tools designed around the way you work.',
-          message: 'Hello Windy Tech, I would like a quote for custom software development.',
+          message: 'Hello Windytech, I would like a quote for custom software development.',
         },
         {
           icon: 'chat',
           title: 'WhatsApp automation',
           text: 'Chatbots and automated replies to serve customers, take orders and book appointments without keeping your team on the phone.',
-          message: 'Hello Windy Tech, I would like a quote for WhatsApp automation.',
+          message: 'Hello Windytech, I would like a quote for WhatsApp automation.',
         },
         {
           icon: 'layout',
           title: 'Landing pages and websites',
           text: 'Fast, clear, mobile-ready pages designed to make visitors message you or buy from you.',
-          message: 'Hello Windy Tech, I would like a quote for a landing page or website.',
+          message: 'Hello Windytech, I would like a quote for a landing page or website.',
         },
         {
           icon: 'chart',
           title: 'Marketing, SEO and advertising',
           text: 'Google ranking and ad campaigns to attract new customers and measure results.',
-          message: 'Hello Windy Tech, I would like a quote for marketing, SEO and advertising.',
+          message: 'Hello Windytech, I would like a quote for marketing, SEO and advertising.',
         },
         {
           icon: 'network',
           title: 'Networks and infrastructure',
           text: 'We set up your office or store network and IT infrastructure. Available in Venezuela only.',
-          message: 'Hello Windy Tech, I would like a quote for network and infrastructure setup.',
+          message: 'Hello Windytech, I would like a quote for network and infrastructure setup.',
         },
         {
           icon: 'monitor',
           title: 'IT equipment',
           text: 'Computers and equipment for offices, stores and companies, with advice on what you really need.',
-          message: 'Hello Windy Tech, I would like a quote for IT equipment.',
+          message: 'Hello Windytech, I would like a quote for IT equipment.',
         },
       ],
     },
     share: {
-      label: 'Find this useful? Share Windy Tech',
+      label: 'Find this useful? Share Windytech',
       navLabel: 'Share this page',
       whatsapp: 'Share on WhatsApp',
       facebook: 'Share on Facebook',
@@ -585,7 +584,7 @@ export const content = {
         'Guidance to import or export equipment',
       ],
       cta: 'Quote equipment on WhatsApp',
-      message: 'Hello Windy Tech, I would like a quote for IT equipment.',
+      message: 'Hello Windytech, I would like a quote for IT equipment.',
       note: "We'll confirm availability, price and delivery time when we quote.",
     },
     payments: {
@@ -605,17 +604,17 @@ export const content = {
       subtitle: 'Learn what we do, how we work and how to request a quote.',
       items: [
         {
-          question: 'What is Windy Tech and what does it do?',
+          question: 'What is Windytech and what does it do?',
           answer:
-            'Windy Tech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It helps businesses in any country sell more and work better with custom digital solutions.',
+            'Windytech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It helps businesses in any country sell more and work better with custom digital solutions.',
         },
         {
-          question: 'Where is Windy Tech located?',
+          question: 'Where is Windytech located?',
           answer:
-            'Windy Tech is based in Venezuela and delivers digital projects remotely to clients in any country. Network setup, infrastructure and physical equipment delivery are coordinated in Venezuela only.',
+            'Windytech is based in Venezuela and delivers digital projects remotely to clients in any country. Network setup, infrastructure and physical equipment delivery are coordinated in Venezuela only.',
         },
         {
-          question: 'What digital services does Windy Tech offer?',
+          question: 'What digital services does Windytech offer?',
           answer:
             'We build custom software and web applications, automate WhatsApp Business, design websites and landing pages, and offer SEO, digital marketing, advertising, network infrastructure and IT equipment.',
         },

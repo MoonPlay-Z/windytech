@@ -1,6 +1,6 @@
-# Windy Tech — sitio web
+# Windytech — sitio web
 
-Sitio bilingüe (español / inglés) para Windy Tech, construido con Astro y CSS propio.
+Sitio bilingüe (español / inglés) para Windytech, construido con Astro y CSS propio.
 La primera versión está enfocada en **servicios**: desarrollo de software, automatización,
 webs, marketing, redes y equipos. El catálogo de equipos queda para una fase posterior.
 

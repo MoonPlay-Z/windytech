@@ -1,6 +1,8 @@
-# Windy Tech
+# Windytech
 
-> Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
+> Windytech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
+
+El nombre de la empresa es Windytech. `windytech.studio` es su dominio web, no parte del nombre.
 
 - Sitio web: https://www.windytech.studio/
 - Inglés: https://www.windytech.studio/en/
@@ -10,7 +12,7 @@
 
 ## Perfil de la empresa
 
-- **Nombre:** Windy Tech
+- **Nombre:** Windytech
 - **Actividad:** desarrollo de software a medida, automatización de WhatsApp Business, diseño y desarrollo web, SEO, marketing digital, redes e infraestructura, y equipos informáticos.
 - **Base:** Venezuela.
 - **Cobertura:** servicios digitales de forma remota en cualquier país; redes, infraestructura y entrega física de equipos solo en Venezuela.
@@ -30,15 +32,15 @@
 
 ## Preguntas frecuentes
 
-### ¿Qué es Windy Tech y a qué se dedica?
+### ¿Qué es Windytech y a qué se dedica?
 
-Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
+Windytech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.
 
-### ¿Dónde está ubicada Windy Tech?
+### ¿Dónde está ubicada Windytech?
 
-Windy Tech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.
+Windytech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.
 
-### ¿Qué servicios digitales ofrece Windy Tech?
+### ¿Qué servicios digitales ofrece Windytech?
 
 Desarrollo de software a medida y aplicaciones web, automatización de WhatsApp Business, diseño de páginas web y landing pages, SEO, marketing digital, publicidad, redes e infraestructura, y equipos informáticos.
 
@@ -63,7 +65,7 @@ Los proyectos inician con el 50% de anticipo y el saldo se paga contra avance y 
 
 ## English summary
 
-Windy Tech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It builds custom software, automates WhatsApp Business support, creates websites and landing pages, and supports businesses with SEO, advertising, networks and IT equipment. Digital services are delivered remotely worldwide; on-site network and equipment work is available in Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal.
+Windytech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It builds custom software, automates WhatsApp Business support, creates websites and landing pages, and supports businesses with SEO, advertising, networks and IT equipment. Digital services are delivered remotely worldwide; on-site network and equipment work is available in Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal.
 
 - Services: https://www.windytech.studio/en/#servicios
 - About: https://www.windytech.studio/en/about/

@@ -1,4 +1,4 @@
-# Windy Tech — https://www.windytech.studio
+# Windytech — https://www.windytech.studio
 # Todos los contenidos públicos pueden indexarse.
 
 User-agent: *

@@ -37,8 +37,8 @@ export const aboutContent: Record<Lang, AboutContent> = {
     eyebrow: 'ACERCA DE WINDY TECH',
     homeTitle: 'Un estudio que construye, automatiza y posiciona',
     homeText:
-      'Windy Tech es un estudio digital que ayuda a negocios a vender más y trabajar mejor. Diseñamos software a medida, automatizamos WhatsApp, creamos páginas web y acompañamos con marketing, SEO y equipos informáticos.',
-    homeCta: 'Conoce más sobre Windy Tech',
+      'Windytech es un estudio digital que ayuda a negocios a vender más y trabajar mejor. Diseñamos software a medida, automatizamos WhatsApp, creamos páginas web y acompañamos con marketing, SEO y equipos informáticos.',
+    homeCta: 'Conoce más sobre Windytech',
     homeFacts: [
       {
         label: 'Qué hacemos',
@@ -57,18 +57,18 @@ export const aboutContent: Record<Lang, AboutContent> = {
         value: 'Alcance, precio y fechas por escrito antes de empezar.',
       },
     ],
-    pageTitle: 'Acerca de Windy Tech | Software, automatización y marketing',
+    pageTitle: 'Acerca de Windytech | Software, automatización y marketing',
     pageDescription:
-      'Windy Tech es un estudio de desarrollo de software, automatización de WhatsApp, páginas web y marketing digital. Conoce qué hacemos, cómo trabajamos, dónde prestamos servicio y cómo contactarnos.',
-    pageH1: 'Acerca de Windy Tech',
+      'Windytech es un estudio de desarrollo de software, automatización de WhatsApp, páginas web y marketing digital. Conoce qué hacemos, cómo trabajamos, dónde prestamos servicio y cómo contactarnos.',
+    pageH1: 'Acerca de Windytech',
     intro:
-      'Windy Tech es un estudio digital que diseña, construye y posiciona soluciones para negocios: software a medida, automatización de WhatsApp, páginas web, marketing y equipos informáticos.',
-    definitionTitle: '¿Qué es Windy Tech?',
+      'Windytech es un estudio digital que diseña, construye y posiciona soluciones para negocios: software a medida, automatización de WhatsApp, páginas web, marketing y equipos informáticos.',
+    definitionTitle: '¿Qué es Windytech?',
     definition: [
-      'Windy Tech es una empresa de servicios digitales con base en Venezuela que trabaja con clientes de cualquier país de forma remota. Su equipo desarrolla aplicaciones y herramientas a la medida, automatiza la atención por WhatsApp Business, crea sitios web y landing pages, y complementa el trabajo con SEO, publicidad y equipamiento informático.',
+      'Windytech es una empresa de servicios digitales con base en Venezuela que trabaja con clientes de cualquier país de forma remota. Su equipo desarrolla aplicaciones y herramientas a la medida, automatiza la atención por WhatsApp Business, crea sitios web y landing pages, y complementa el trabajo con SEO, publicidad y equipamiento informático.',
       'Trabaja con emprendimientos, pequeñas empresas, negocios en crecimiento y compañías con varias sedes. Cada proyecto se cotiza con alcance cerrado, precio claro y fechas definidas, y se atiende directamente con las personas que ejecutan el trabajo.',
     ],
-    servicesTitle: 'Qué hace Windy Tech',
+    servicesTitle: 'Qué hace Windytech',
     services: [
       'Desarrollo de software a medida: paneles, aplicaciones web, integraciones y herramientas internas.',
       'Automatización de WhatsApp Business: respuestas, pedidos, citas y seguimiento.',
@@ -77,7 +77,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
       'Redes e infraestructura para oficinas y locales, disponible en Venezuela.',
       'Venta y asesoría de equipos informáticos para empresas y emprendimientos.',
     ],
-    processTitle: 'Cómo trabaja Windy Tech',
+    processTitle: 'Cómo trabaja Windytech',
     process: [
       {
         title: 'Diagnóstico',
@@ -112,7 +112,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
     ],
     factsTitle: 'Datos de la empresa',
     facts: [
-      { label: 'Nombre', value: 'Windy Tech' },
+      { label: 'Nombre', value: 'Windytech' },
       {
         label: 'Actividad',
         value: 'Desarrollo de software, automatización, diseño web, marketing digital y equipos informáticos.',
@@ -127,17 +127,17 @@ export const aboutContent: Record<Lang, AboutContent> = {
       { label: 'Contacto', value: sharedContact },
       { label: 'Sitio web', value: site.domain },
     ],
-    ctaTitle: '¿Quieres trabajar con Windy Tech?',
+    ctaTitle: '¿Quieres trabajar con Windytech?',
     ctaText: 'Cuéntanos qué necesitas y te enviamos una cotización por WhatsApp.',
-    ctaButton: 'Hablar con Windy Tech',
+    ctaButton: 'Hablar con Windytech',
     backHome: 'Volver al inicio',
   },
   en: {
     eyebrow: 'ABOUT WINDY TECH',
     homeTitle: 'A studio that builds, automates and positions',
     homeText:
-      'Windy Tech is a digital studio that helps businesses sell more and work better. We build custom software, automate WhatsApp, create websites and support your growth with marketing, SEO and IT equipment.',
-    homeCta: 'Learn more about Windy Tech',
+      'Windytech is a digital studio that helps businesses sell more and work better. We build custom software, automate WhatsApp, create websites and support your growth with marketing, SEO and IT equipment.',
+    homeCta: 'Learn more about Windytech',
     homeFacts: [
       {
         label: 'What we do',
@@ -156,18 +156,18 @@ export const aboutContent: Record<Lang, AboutContent> = {
         value: 'Scope, price and timeline agreed in writing before we start.',
       },
     ],
-    pageTitle: 'About Windy Tech | Software, automation and marketing',
+    pageTitle: 'About Windytech | Software, automation and marketing',
     pageDescription:
-      'Windy Tech is a software development, WhatsApp automation, web design and digital marketing studio. Learn what we do, how we work, where we operate and how to contact us.',
-    pageH1: 'About Windy Tech',
+      'Windytech is a software development, WhatsApp automation, web design and digital marketing studio. Learn what we do, how we work, where we operate and how to contact us.',
+    pageH1: 'About Windytech',
     intro:
-      'Windy Tech is a digital studio that designs, builds and positions solutions for businesses: custom software, WhatsApp automation, websites, marketing and IT equipment.',
-    definitionTitle: 'What is Windy Tech?',
+      'Windytech is a digital studio that designs, builds and positions solutions for businesses: custom software, WhatsApp automation, websites, marketing and IT equipment.',
+    definitionTitle: 'What is Windytech?',
     definition: [
-      'Windy Tech is a digital services company based in Venezuela that works remotely with clients in any country. Its team builds custom applications and internal tools, automates WhatsApp Business support, creates websites and landing pages, and supports the work with SEO, advertising and IT equipment.',
+      'Windytech is a digital services company based in Venezuela that works remotely with clients in any country. Its team builds custom applications and internal tools, automates WhatsApp Business support, creates websites and landing pages, and supports the work with SEO, advertising and IT equipment.',
       'It works with startups, small businesses, growing companies and organizations with multiple locations. Every project is quoted with a fixed scope, clear pricing and defined dates, and clients speak directly with the people doing the work.',
     ],
-    servicesTitle: 'What Windy Tech does',
+    servicesTitle: 'What Windytech does',
     services: [
       'Custom software: dashboards, web applications, integrations and internal tools.',
       'WhatsApp Business automation: replies, orders, appointments and follow-up.',
@@ -176,7 +176,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
       'Networks and infrastructure for offices and stores, available in Venezuela.',
       'IT equipment sales and advice for businesses and startups.',
     ],
-    processTitle: 'How Windy Tech works',
+    processTitle: 'How Windytech works',
     process: [
       {
         title: 'Discovery',
@@ -211,7 +211,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
     ],
     factsTitle: 'Company details',
     facts: [
-      { label: 'Name', value: 'Windy Tech' },
+      { label: 'Name', value: 'Windytech' },
       {
         label: 'Business',
         value: 'Software development, automation, web design, digital marketing and IT equipment.',
@@ -226,9 +226,9 @@ export const aboutContent: Record<Lang, AboutContent> = {
       { label: 'Contact', value: sharedContact },
       { label: 'Website', value: site.domain },
     ],
-    ctaTitle: 'Want to work with Windy Tech?',
+    ctaTitle: 'Want to work with Windytech?',
     ctaText: 'Tell us what you need and we will send you a quote on WhatsApp.',
-    ctaButton: 'Talk to Windy Tech',
+    ctaButton: 'Talk to Windytech',
     backHome: 'Back to home',
   },
 };

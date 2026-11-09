@@ -1,8 +1,12 @@
-# SEO, GEO y presencia en buscadores — Windy Tech
+# SEO, GEO y presencia en buscadores — Windytech
 
 Guía de lo que ya está implementado en el sitio y de los pasos que dependen de cuentas
 externas (Google, Bing, Brave, redes sociales). El código no puede crear por sí solo un
 panel de empresa: los buscadores lo construyen cuando verifican la entidad.
+
+El nombre de la empresa y la marca es **Windytech**. `.studio` forma parte únicamente del
+dominio `windytech.studio`; no debe añadirse al nombre en títulos, perfiles ni datos
+estructurados.
 
 ---
 
@@ -33,12 +37,12 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
 ### Entidad de empresa ("Acerca de")
 
 - Nueva página `/nosotros/` y su versión inglesa `/en/about/`.
-- Sección "Acerca de Windy Tech" en la portada, enlazada desde el pie de página.
+- Sección "Acerca de Windytech" en la portada, enlazada desde el pie de página.
 - Datos estructurados JSON-LD:
   - `Organization` + `ProfessionalService` con nombre, actividad, fundación, correo,
     teléfono, país, cobertura, idiomas, medios de pago y catálogo de servicios.
   - `WebSite`, `WebPage` / `AboutPage`, `BreadcrumbList` y `FAQPage`.
-  - Preguntas de entidad: "¿Qué es Windy Tech?", "¿Dónde está ubicada?".
+  - Preguntas de entidad: "¿Qué es Windytech?", "¿Dónde está ubicada?".
 - `public/llms.txt` ampliado con perfil, servicios, proceso, preguntas frecuentes y
   contacto para motores generativos (ChatGPT, Gemini, Perplexity, Copilot...).
 - `sameAs` preparado en `src/data/site.ts` para enlazar redes y perfiles oficiales.
@@ -149,9 +153,9 @@ coherentes: mismo nombre, misma descripción, mismo dominio y mismo teléfono.
 
 ### Consistencia de la información (NAP)
 
-Usa siempre estos datos:
+Usa siempre estos datos; el dominio web no es parte del nombre de la empresa:
 
-- **Nombre:** Windy Tech
+- **Nombre:** Windytech
 - **Web:** https://www.windytech.studio
 - **WhatsApp:** +58 412-7723148
 - **Correo:** windytechestudio@gmail.com
