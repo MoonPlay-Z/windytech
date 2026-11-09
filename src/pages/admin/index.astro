@@ -1,0 +1,74 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../lib/auth';
+import { countQuotesByStatus, listPostsAdmin, listProductsAdmin, listProjectsAdmin } from '../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+
+if (!admin) {
+  return Astro.redirect('/admin/login/', 302);
+}
+
+const [products, projects, posts, quotes] = await Promise.all([
+  listProductsAdmin(),
+  listProjectsAdmin(),
+  listPostsAdmin(),
+  countQuotesByStatus(),
+]);
+---
+
+<AdminLayout title="Resumen" admin={admin} active="dashboard">
+  <div class="admin-grid">
+    <div class="admin-stat">
+      <strong>{products.length}</strong>
+      <span>Productos registrados</span>
+    </div>
+    <div class="admin-stat">
+      <strong>{quotes.NEW ?? 0}</strong>
+      <span>Cotizaciones nuevas</span>
+    </div>
+    <div class="admin-stat">
+      <strong>{projects.length}</strong>
+      <span>Proyectos</span>
+    </div>
+    <div class="admin-stat">
+      <strong>{posts.length}</strong>
+      <span>Publicaciones</span>
+    </div>
+  </div>
+
+  <section class="admin-card">
+    <h2>Accesos rápidos</h2>
+    <div class="admin-actions">
+      <a class="admin-btn" href="/admin/productos/nuevo/">Añadir producto</a>
+      <a class="admin-btn admin-btn--ghost" href="/admin/productos/">Gestionar catálogo</a>
+      <a class="admin-btn admin-btn--ghost" href="/admin/cotizaciones/">Ver cotizaciones</a>
+      <a class="admin-btn admin-btn--ghost" href="/admin/proyectos/">Proyectos</a>
+      <a class="admin-btn admin-btn--ghost" href="/admin/publicaciones/">Publicaciones</a>
+    </div>
+  </section>
+
+  <section class="admin-card">
+    <h2>Estado del catálogo</h2>
+    <table class="admin-table">
+      <thead>
+        <tr><th>Producto</th><th>Precio</th><th>Estado</th><th>Activo</th></tr>
+      </thead>
+      <tbody>
+        {products.slice(0, 8).map((product) => (
+          <tr>
+            <td><a href={`/admin/productos/${product.id}/`}>{product.name}</a></td>
+            <td>${(product.priceCents / 100).toFixed(2)}</td>
+            <td>{product.availability}</td>
+            <td>{product.isActive ? 'Sí' : 'No'}</td>
+          </tr>
+        ))}
+        {products.length === 0 && (
+          <tr><td colspan="4">Aún no hay productos. <a href="/admin/productos/nuevo/">Crea el primero</a>.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

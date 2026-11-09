@@ -1,0 +1,60 @@
+---
+interface UploadImage {
+  cloudinaryPublicId: string;
+  alt: string;
+  isPrimary: boolean;
+  position: number;
+}
+
+interface Props {
+  mode: 'multi' | 'single';
+  folder: string;
+  /** Nombre del campo: images (multi) o coverPublicId (single). */
+  field: string;
+  images?: UploadImage[];
+  publicId?: string | null;
+  label: string;
+}
+
+const { mode, folder, field, images = [], publicId = null, label } = Astro.props;
+const cloud = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '';
+const dataType = mode === 'multi' ? 'json' : 'string';
+const serialized =
+  mode === 'multi'
+    ? JSON.stringify(images.map((image, index) => ({ ...image, position: index })))
+    : publicId ?? '';
+---
+
+<div
+  class="uploader"
+  data-uploader
+  data-mode={mode}
+  data-folder={folder}
+  data-cloud={cloud}
+>
+  <label class="uploader-label">
+    <span>{label}</span>
+    <input type="file" accept="image/jpeg,image/png,image/webp" data-upload-input multiple={mode === 'multi'} />
+  </label>
+
+  {mode === 'multi' && (
+    <label class="uploader-alt">
+      <span>Texto alternativo de las nuevas imágenes</span>
+      <input type="text" data-upload-alt maxlength="200" placeholder="Ej. Laptop Lenovo ThinkPad E14" />
+    </label>
+  )}
+
+  <div class="upload-list" data-upload-list></div>
+  <p class="upload-error" data-upload-error hidden></p>
+
+  <input
+    type="hidden"
+    data-upload-value
+    data-field={field}
+    data-type={dataType}
+    value={serialized.replace(/"/g, '&quot;')}
+  />
+  <p class="admin-hint">
+    Sube imágenes JPG, PNG o WebP de hasta 10 MB. La entrega usa Cloudinary con <code>f_auto,q_auto</code>.
+  </p>
+</div>

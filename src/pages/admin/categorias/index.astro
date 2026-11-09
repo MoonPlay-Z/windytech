@@ -1,0 +1,45 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listCategoriesAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const categories = await listCategoriesAdmin();
+---
+
+<AdminLayout title="Categorías" admin={admin} active="categories">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nueva/">Nueva categoría</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr><th style="width:40px">#</th><th>Nombre (ES)</th><th>Slug ES</th><th>Productos</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        {categories.map((category) => (
+          <tr>
+            <td>{category.id}</td>
+            <td>{category.name}</td>
+            <td>{category.slug}</td>
+            <td>{category.products}</td>
+            <td>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete="/api/admin/categories?id={category.id}"
+                data-confirm="¿Eliminar esta categoría?"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        ))}
+        {categories.length === 0 && <tr><td colspan="5">Sin categorías.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

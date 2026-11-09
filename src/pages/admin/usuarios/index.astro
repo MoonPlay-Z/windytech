@@ -1,0 +1,35 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { requireOwner } from '../../../lib/api';
+import { listAdmins } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+if (!requireOwner(admin)) return Astro.redirect('/admin/', 302);
+
+const users = await listAdmins();
+---
+
+<AdminLayout title="Usuarios" admin={admin} active="users">
+  <section class="admin-card">
+    <table class="admin-table">
+      <thead>
+        <tr><th style="width:40px">#</th><th>Correo</th><th>Rol</th><th>Activo</th></tr>
+      </thead>
+      <tbody>
+        {users.map((user) => (
+          <tr>
+            <td>{user.id}</td>
+            <td>{user.email}</td>
+            <td>{user.role}</td>
+            <td>{user.isActive ? 'Sí' : 'No'}</td>
+          </tr>
+        ))}
+        {users.length === 0 && <tr><td colspan="4">Sin usuarios.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

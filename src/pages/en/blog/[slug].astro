@@ -1,0 +1,11 @@
+---
+import PostPage from '../../../components/catalog/PostPage.astro';
+import { getPost } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const post = await getPost('en', Astro.params.slug ?? '');
+if (!post) return Astro.redirect('/en/blog/', 302);
+---
+
+<PostPage locale="en" post={post} />

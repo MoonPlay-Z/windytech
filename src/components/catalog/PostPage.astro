@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site, type Lang } from '../../data/site';
+import { blogPath, type PostSummary } from '../../lib/catalog';
+import { imageUrl } from '../../lib/cloudinary';
+import { renderMarkdown } from '../../lib/markdown';
+
+interface Props {
+  locale: Lang;
+  post: PostSummary;
+}
+
+const { locale, post } = Astro.props;
+const es = locale === 'es';
+const listHref = blogPath(locale);
+const href = `${listHref}${post.slug}/`;
+const cover = post.coverPublicId
+  ? imageUrl(post.coverPublicId, { width: 1600, crop: 'fill', aspectRatio: '16:9', gravity: 'auto' })
+  : null;
+const published = post.publishedAt ? new Date(post.publishedAt) : null;
+
+const schema = {
+  '@type': 'BlogPosting',
+  '@id': `${new URL(href, site.url)}#article`,
+  headline: post.title,
+  description: post.excerpt,
+  url: new URL(href, site.url).toString(),
+  inLanguage: locale,
+  author: { '@type': 'Person', name: post.author || site.name },
+  publisher: { '@id': `${site.url}/#organization` },
+  ...(published ? { datePublished: published.toISOString(), dateModified: published.toISOString() } : {}),
+  ...(cover ? { image: { '@type': 'ImageObject', url: cover } } : {}),
+  ...(post.tags.length > 0 ? { keywords: post.tags.join(', ') } : {}),
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${post.title} | ${site.name}`}
+  description={post.excerpt}
+  path={href}
+  altPath={`${es ? '/en/blog/' : '/blog/'}${post.slug}/`}
+  ogImage={cover ?? (es ? '/assets/og.png' : '/assets/og-en.png')}
+  ogImageAlt={post.title}
+  ogType="article"
+  extraSchema={[schema]}
+  dateModified={published ? published.toISOString().slice(0, 10) : site.contentUpdated}
+  breadcrumb={[
+    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: 'Blog', path: listHref },
+    { name: post.title, path: href },
+  ]}
+>
+  <article class="section section--white article-page">
+    <div class="container article-container">
+      <nav class="breadcrumb" aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'}>
+        <a href={es ? '/' : '/en/'}>{es ? 'Inicio' : 'Home'}</a>
+        <span aria-hidden="true">/</span>
+        <a href={listHref}>Blog</a>
+      </nav>
+      <h1>{post.title}</h1>
+      <div class="article-meta">
+        {published && (
+          <time datetime={post.publishedAt ?? ''}>
+            {new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', { dateStyle: 'long' }).format(published)}
+          </time>
+        )}
+        <span>{post.author}</span>
+      </div>
+      {cover && (
+        <img class="article-cover" src={cover} alt={post.title} width="1600" height="900" loading="eager" />
+      )}
+      <div class="prose" set:html={renderMarkdown(post.bodyMd)} />
+      {post.tags.length > 0 && (
+        <div class="article-tags">
+          {post.tags.map((tag) => <span>{tag}</span>)}
+        </div>
+      )}
+      <a class="btn btn-light" href={listHref}>{es ? 'Volver al blog' : 'Back to blog'}</a>
+    </div>
+  </article>
+</BaseLayout>

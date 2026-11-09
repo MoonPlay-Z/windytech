@@ -1,0 +1,73 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+---
+
+<AdminLayout title="Nueva promoción" admin={admin} active="promotions">
+  <section class="admin-card">
+    <h2>Nueva promoción</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/promotions" data-success="Promoción guardada." data-redirect="/admin/promociones/">
+      <div class="admin-form-row">
+        <label>
+          <span>Nombre</span>
+          <input name="name" data-field="name" type="text" required />
+        </label>
+        <label>
+          <span>Tipo</span>
+          <select name="type" data-field="type">
+            <option value="PERCENT">Porcentaje</option>
+            <option value="FIXED">Monto fijo (USD)</option>
+          </select>
+        </label>
+        <label>
+          <span>Valor</span>
+          <input type="number" name="value" data-field="value" data-type="number" min="0" step="0.01" required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Inicio</span>
+          <input type="datetime-local" name="startsAt" data-field="startsAt" required />
+        </label>
+        <label>
+          <span>Fin (opcional)</span>
+          <input type="datetime-local" name="endsAt" data-field="endsAt" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Prioridad</span>
+          <input type="number" name="priority" data-field="priority" data-type="number" min="0" value="0" />
+        </label>
+        <label>
+          <span>Badge ES</span>
+          <input name="badgeEs" data-field="badgeEs" type="text" placeholder="Oferta" />
+        </label>
+        <label>
+          <span>Badge EN</span>
+          <input name="badgeEn" data-field="badgeEn" type="text" placeholder="Offer" />
+        </label>
+      </div>
+      <label>
+        <span>Productos afectados (IDs, separados por coma)</span>
+        <input name="productIds" data-field="productIds" data-type="array" type="text" placeholder="1, 2, 3" />
+        <p class="admin-hint">Déjalo vacío para aplicar a toda la tienda.</p>
+      </label>
+      <label>
+        <span>Categorías afectadas (IDs, separados por coma)</span>
+        <input name="categoryIds" data-field="categoryIds" data-type="array" type="text" placeholder="1, 2" />
+      </label>
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear promoción</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/promociones/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

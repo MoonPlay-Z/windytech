@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site, whatsappLink, type Lang } from '../../data/site';
+import { projectsPath, type ProjectSummary } from '../../lib/catalog';
+import { projectImage } from '../../lib/cloudinary';
+import { renderMarkdown } from '../../lib/markdown';
+
+interface Props {
+  locale: Lang;
+  project: ProjectSummary;
+}
+
+const { locale, project } = Astro.props;
+const es = locale === 'es';
+const listHref = projectsPath(locale);
+const href = `${listHref}${project.slug}/`;
+const cover = project.coverPublicId ? projectImage(project.coverPublicId, 1600) : null;
+
+const schema = {
+  '@type': 'CreativeWork',
+  '@id': `${new URL(href, site.url)}#project`,
+  name: project.title,
+  description: project.summary,
+  url: new URL(href, site.url).toString(),
+  creator: { '@id': `${site.url}/#organization` },
+  dateCreated: project.year ? String(project.year) : undefined,
+  ...(cover ? { image: { '@type': 'ImageObject', url: cover } } : {}),
+  ...(project.clientName ? { sourceOrganization: { '@type': 'Organization', name: project.clientName } } : {}),
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${project.title} | ${site.name}`}
+  description={project.summary}
+  path={href}
+  altPath={`${es ? '/en/projects/' : '/proyectos/'}${project.slug}/`}
+  ogImage={cover ?? (es ? '/assets/og.png' : '/assets/og-en.png')}
+  ogImageAlt={project.title}
+  ogType="article"
+  extraSchema={[schema]}
+  breadcrumb={[
+    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: es ? 'Proyectos' : 'Projects', path: listHref },
+    { name: project.title, path: href },
+  ]}
+>
+  <section class="about-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'}>
+        <a href={es ? '/' : '/en/'}>{es ? 'Inicio' : 'Home'}</a>
+        <span aria-hidden="true">/</span>
+        <a href={listHref}>{es ? 'Proyectos' : 'Projects'}</a>
+      </nav>
+      <span class="eyebrow">{project.year ?? (es ? 'PROYECTO' : 'PROJECT')}</span>
+      <h1>{project.title}</h1>
+      <p class="about-intro">{project.summary}</p>
+      <div class="product-meta">
+        {project.services.map((service) => <span>{service}</span>)}
+        {project.clientName && <span>{project.clientName}</span>}
+      </div>
+    </div>
+  </section>
+
+  {cover && (
+    <div class="container">
+      <img
+        class="project-cover"
+        src={cover}
+        alt={project.title}
+        width="1600"
+        height="900"
+        loading="eager"
+      />
+    </div>
+  )}
+
+  <section class="section section--white">
+    <div class="container product-description">
+      <div class="prose" set:html={renderMarkdown(project.descriptionMd)} />
+      {project.images && project.images.length > 0 && (
+        <div class="project-gallery">
+          {project.images.map((image) => (
+            <img
+              src={projectImage(image.cloudinaryPublicId, 800)}
+              alt={image.alt || project.title}
+              width="800"
+              height="450"
+              loading="lazy"
+            />
+          ))}
+        </div>
+      )}
+      <div class="quote-actions">
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(es ? 'Hola Windytech, quiero un proyecto como este.' : 'Hello Windytech, I want a project like this one.')}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {es ? 'Quiero un proyecto así' : 'I want a project like this'}
+        </a>
+        <a class="btn btn-light" href={listHref}>{es ? 'Ver todos los proyectos' : 'See all projects'}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

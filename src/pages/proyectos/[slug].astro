@@ -1,0 +1,11 @@
+---
+import ProjectPage from '../../components/catalog/ProjectPage.astro';
+import { getProject } from '../../lib/db/queries';
+
+export const prerender = false;
+
+const project = await getProject('es', Astro.params.slug ?? '');
+if (!project) return Astro.redirect('/proyectos/', 302);
+---
+
+<ProjectPage locale="es" project={project} />

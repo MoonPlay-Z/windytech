@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../Icon.astro';
+import { site, whatsappLink, type Lang } from '../../data/site';
+import { projectsPath, type ProjectSummary } from '../../lib/catalog';
+import { projectImage } from '../../lib/cloudinary';
+
+interface Props {
+  locale: Lang;
+  projects: ProjectSummary[];
+}
+
+const { locale, projects } = Astro.props;
+const es = locale === 'es';
+
+const copy = es
+  ? {
+      eyebrow: 'PROYECTOS',
+      title: 'Trabajo real, con permiso del cliente',
+      intro:
+        'Una selección de proyectos entregados. Publicamos nombre y detalles solo cuando el cliente lo autoriza; el resto se describe de forma general.',
+      empty: 'Estamos preparando los primeros casos. Mientras tanto, cuéntanos qué necesitas.',
+      cta: 'Quiero un proyecto así',
+      read: 'Ver caso',
+      year: 'Año',
+      services: 'Servicios',
+    }
+  : {
+      eyebrow: 'PROJECTS',
+      title: 'Real work, with client permission',
+      intro:
+        'A selection of delivered projects. We publish names and details only when the client authorizes it; the rest is described in general terms.',
+      empty: 'We are preparing the first case studies. In the meantime, tell us what you need.',
+      cta: 'I want a project like this',
+      read: 'View case',
+      year: 'Year',
+      services: 'Services',
+    };
+
+const href = projectsPath(locale);
+const itemList = {
+  '@type': 'ItemList',
+  name: copy.title,
+  itemListElement: projects.map((project, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: new URL(`${href}${project.slug}/`, site.url).toString(),
+    name: project.title,
+  })),
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${copy.title} | ${site.name}`}
+  description={copy.intro}
+  path={href}
+  altPath={es ? '/en/projects/' : '/proyectos/'}
+  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  extraSchema={[itemList]}
+  breadcrumb={[
+    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: copy.eyebrow, path: href },
+  ]}
+>
+  <section class="catalog-hero">
+    <div class="container">
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="catalog-intro">{copy.intro}</p>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      {projects.length === 0 ? (
+        <div class="catalog-empty">
+          <Icon name="layout" size={40} />
+          <p>{copy.empty}</p>
+          <a
+            class="btn btn-primary"
+            href={whatsappLink(es ? 'Hola Windytech, quiero un proyecto como los de su portafolio.' : 'Hello Windytech, I want a project like the ones in your portfolio.')}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {copy.cta}
+          </a>
+        </div>
+      ) : (
+        <div class="project-grid">
+          {projects.map((project) => (
+            <article class="project-card">
+              <a class="project-card-media" href={`${href}${project.slug}/`}>
+                {project.coverPublicId ? (
+                  <img
+                    src={projectImage(project.coverPublicId, 800)}
+                    srcset={[400, 800, 1200].map((width) => `${projectImage(project.coverPublicId, width)} ${width}w`).join(', ')}
+                    sizes="(max-width: 700px) 100vw, 50vw"
+                    alt={project.title}
+                    width="800"
+                    height="450"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span class="product-card-placeholder" aria-hidden="true">
+                    <Icon name="layout" size={40} />
+                  </span>
+                )}
+              </a>
+              <div class="project-card-body">
+                <div class="product-meta">
+                  {project.year && <span>{project.year}</span>}
+                  {project.services.slice(0, 2).map((service) => <span>{service}</span>)}
+                </div>
+                <h2><a href={`${href}${project.slug}/`}>{project.title}</a></h2>
+                <p>{project.summary}</p>
+                <a class="product-card-link" href={`${href}${project.slug}/`}>
+                  {copy.read}
+                  <Icon name="arrow-right" size={15} />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

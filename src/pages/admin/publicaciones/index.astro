@@ -1,0 +1,36 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listPostsAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const posts = await listPostsAdmin();
+---
+
+<AdminLayout title="Publicaciones" admin={admin} active="posts">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nueva/">Nueva publicación</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr><th style="width:40px">#</th><th>Título (ES)</th><th>Autor</th><th>Publicada</th></tr>
+      </thead>
+      <tbody>
+        {posts.map((post) => (
+          <tr>
+            <td>{post.id}</td>
+            <td>{post.title}</td>
+            <td>{post.author}</td>
+            <td>{post.isPublished ? 'Sí' : 'No'}</td>
+          </tr>
+        ))}
+        {posts.length === 0 && <tr><td colspan="4">Sin publicaciones.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

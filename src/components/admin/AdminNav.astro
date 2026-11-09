@@ -1,0 +1,30 @@
+---
+interface Props {
+  active: string;
+  role: 'OWNER' | 'EDITOR';
+}
+
+const { active, role } = Astro.props;
+
+const links = [
+  { key: 'dashboard', label: 'Resumen', href: '/admin/' },
+  { key: 'products', label: 'Productos', href: '/admin/productos/' },
+  { key: 'categories', label: 'Categorías', href: '/admin/categorias/' },
+  { key: 'promotions', label: 'Promociones', href: '/admin/promociones/' },
+  { key: 'quotes', label: 'Cotizaciones', href: '/admin/cotizaciones/' },
+  { key: 'projects', label: 'Proyectos', href: '/admin/proyectos/' },
+  { key: 'posts', label: 'Publicaciones', href: '/admin/publicaciones/' },
+];
+
+if (role === 'OWNER') {
+  links.push({ key: 'users', label: 'Usuarios', href: '/admin/usuarios/' });
+}
+---
+
+<nav class="admin-nav" aria-label="Navegación del panel">
+  {links.map((link) => (
+    <a href={link.href} class:list={['admin-nav-link', { 'is-active': active === link.key }]}>
+      {link.label}
+    </a>
+  ))}
+</nav>

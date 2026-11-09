@@ -10,16 +10,35 @@
     "check": "astro check",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "seo:check": "node scripts/check-seo.mjs",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:push": "npx drizzle-kit push",
+    "db:studio": "npx drizzle-kit studio",
+    "test": "tsx test",
+    "test:pricing": "tsx src/lib/pricing.test.ts"
   },
   "dependencies": {
+    "@astrojs/node": "^9.5.5",
     "@iconify-json/lucide": "^1.2.151",
     "@iconify-json/simple-icons": "^1.2.101",
     "astro": "5.18.2",
-    "astro-icon": "^1.1.5"
+    "astro-icon": "^1.1.5",
+    "bcryptjs": "^3.0.3",
+    "decimal.js": "^10.6.0",
+    "dotenv": "^18.0.10",
+    "drizzle-orm": "^0.45.4",
+    "marked": "^18.1.3",
+    "pg": "^8.23.1",
+    "sanitize-html": "^2.13.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@types/pg": "^8.23.1",
+    "@types/sanitize-html": "^2.16.2",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.20.0",
     "typescript": "^5.9.3"
   }
 }

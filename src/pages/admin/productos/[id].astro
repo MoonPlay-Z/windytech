@@ -1,0 +1,70 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getProductAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const productId = Number(Astro.params.id);
+if (!Number.isInteger(productId) || productId <= 0) return Astro.redirect('/admin/productos/', 302);
+
+const product = await getProductAdmin(productId);
+if (!product) return Astro.redirect('/admin/productos/', 302);
+
+const translations: any[] = product.translations ?? [];
+const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
+const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
+const images: any[] = (product.images ?? []).map((image: any, index: number) => ({ ...image, position: index }));
+const specsJson = JSON.stringify(product.specs ?? {}, null, 2);
+
+const priceUsd = (product.priceCents / 100).toFixed(2);
+const compareAtUsd = product.compareAtCents != null ? (product.compareAtCents / 100).toFixed(2) : '';
+const isNew = product.condition === 'NEW';
+const isRefurbished = product.condition === 'REFURBISHED_A';
+const isUsed = product.condition === 'USED';
+const inStock = product.availability === 'IN_STOCK';
+const outOfStock = product.availability === 'OUT_OF_STOCK';
+const preorder = product.availability === 'PREORDER';
+const activeChecked = product.isActive ? 'checked' : '';
+const featuredChecked = product.isFeatured ? 'checked' : '';
+---
+<AdminLayout title="Editar producto" admin={admin} active="products">
+  <section class="admin-card">
+    <h2>Editar producto</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto guardado.">
+      <input type="hidden" data-field="id" data-type="number" value={String(productId)} />
+      <div class="admin-form-row">
+        <label><span>Marca</span><input name="brand" data-field="brand" type="text" value={product.brand} /></label>
+        <label><span>Modelo</span><input name="model" data-field="model" type="text" value={product.model} /></label>
+      </div>
+      <div class="admin-form-row">
+        <label><span>Precio USD</span><input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" value={priceUsd} /></label>
+        <label><span>SKU</span><input name="sku" data-field="sku" type="text" value={product.sku} /></label>
+      </div>
+      <div class="admin-form-row">
+        <label><span>Condición</span><select name="condition" data-field="condition"><option value="NEW" selected={isNew}>Nuevo</option><option value="REFURBISHED_A" selected={isRefurbished}>Reacondicionado Clase A</option><option value="USED" selected={isUsed}>Usado</option></select></label>
+        <label><span>Estado</span><select name="availability" data-field="availability"><option value="IN_STOCK" selected={inStock}>Disponible</option><option value="OUT_OF_STOCK" selected={outOfStock}>Agotado</option><option value="PREORDER" selected={preorder}>Preventa</option></select></label>
+        <label class="admin-check"><input type="checkbox" name="isActive" data-field="isActive" data-type="checkbox" checked={activeChecked === 'checked'} /> Activo</label>
+        <label class="admin-check"><input type="checkbox" name="isFeatured" data-field="isFeatured" data-type="checkbox" checked={featuredChecked === 'checked'} /> Destacado</label>
+      </div>
+      <label><span>Especificaciones (JSON)</span><textarea name="specs" data-field="specs" data-type="json" rows="4">{specsJson}</textarea></label>
+      <fieldset class="admin-fieldset"><legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label><span>Slug ES</span><input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} /></label>
+          <label><span>Slug EN</span><input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} /></label>
+        </div>
+        <div class="admin-form-row">
+          <label><span>Nombre ES</span><input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} /></label>
+          <label><span>Nombre EN</span><input name="tr.en.name" data-field="tr.en.name" type="text" value={enTranslation.name ?? ''} /></label>
+        </div>
+      </fieldset>
+      <ImageUploader mode="multi" folder={`windytech/productos/${productId}`} field="images" label="Imágenes del producto" images={images} />
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions"><button class="admin-btn" type="submit">Guardar cambios</button></div>
+    </form>
+  </section>
+</AdminLayout>

@@ -1,0 +1,38 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listProjectsAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const projects = await listProjectsAdmin();
+---
+
+<AdminLayout title="Proyectos" admin={admin} active="projects">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nuevo/">Nuevo proyecto</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr><th style="width:40px">#</th><th>Título</th><th>Año</th><th>Cliente</th><th>Publicado</th><th>Aprobado</th></tr>
+      </thead>
+      <tbody>
+        {projects.map((project) => (
+          <tr>
+            <td>{project.id}</td>
+            <td>{project.title}</td>
+            <td>{project.year ?? '—'}</td>
+            <td>{project.clientName}</td>
+            <td>{project.isPublished ? 'Sí' : 'No'}</td>
+            <td>{project.clientApproved ? 'Sí' : 'No'}</td>
+          </tr>
+        ))}
+        {projects.length === 0 && <tr><td colspan="6">Sin proyectos.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

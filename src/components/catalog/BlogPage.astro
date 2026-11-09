@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../Icon.astro';
+import { site, type Lang } from '../../data/site';
+import { blogPath, type PostSummary } from '../../lib/catalog';
+import { imageUrl } from '../../lib/cloudinary';
+
+interface Props {
+  locale: Lang;
+  posts: PostSummary[];
+}
+
+const { locale, posts } = Astro.props;
+const es = locale === 'es';
+const href = blogPath(locale);
+
+const copy = es
+  ? {
+      eyebrow: 'BLOG',
+      title: 'Notas sobre software, automatización y equipos',
+      intro:
+        'Guías y criterios prácticos para elegir tecnología, automatizar procesos y cuidar la operación de tu negocio.',
+      empty: 'Todavía no hay publicaciones. Vuelve pronto.',
+      read: 'Leer artículo',
+    }
+  : {
+      eyebrow: 'BLOG',
+      title: 'Notes on software, automation and equipment',
+      intro:
+        'Practical guides and criteria to choose technology, automate processes and take care of your business operations.',
+      empty: 'No posts yet. Check back soon.',
+      read: 'Read article',
+    };
+
+const itemList = {
+  '@type': 'ItemList',
+  name: copy.title,
+  itemListElement: posts.map((post, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: new URL(`${href}${post.slug}/`, site.url).toString(),
+    name: post.title,
+  })),
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${copy.title} | ${site.name}`}
+  description={copy.intro}
+  path={href}
+  altPath={es ? '/en/blog/' : '/blog/'}
+  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  extraSchema={[itemList]}
+  breadcrumb={[
+    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: 'Blog', path: href },
+  ]}
+>
+  <section class="catalog-hero">
+    <div class="container">
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="catalog-intro">{copy.intro}</p>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      {posts.length === 0 ? (
+        <div class="catalog-empty">
+          <Icon name="file-text" size={40} />
+          <p>{copy.empty}</p>
+        </div>
+      ) : (
+        <div class="blog-grid">
+          {posts.map((post) => (
+            <article class="blog-card">
+              <a class="blog-card-media" href={`${href}${post.slug}/`}>
+                {post.coverPublicId ? (
+                  <img
+                    src={imageUrl(post.coverPublicId, { width: 800, crop: 'fill', aspectRatio: '16:9', gravity: 'auto' })}
+                    alt={post.title}
+                    width="800"
+                    height="450"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span class="product-card-placeholder" aria-hidden="true">
+                    <Icon name="file-text" size={40} />
+                  </span>
+                )}
+              </a>
+              <div class="blog-card-body">
+                {post.publishedAt && (
+                  <time datetime={post.publishedAt}>
+                    {new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', { dateStyle: 'medium' }).format(new Date(post.publishedAt))}
+                  </time>
+                )}
+                <h2><a href={`${href}${post.slug}/`}>{post.title}</a></h2>
+                <p>{post.excerpt}</p>
+                <a class="product-card-link" href={`${href}${post.slug}/`}>
+                  {copy.read}
+                  <Icon name="arrow-right" size={15} />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

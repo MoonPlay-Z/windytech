@@ -1,0 +1,55 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listPromotionsAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const promotions = await listPromotionsAdmin();
+---
+
+<AdminLayout title="Promociones" admin={admin} active="promotions">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nueva/">Nueva promoción</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Valor</th>
+          <th>Prioridad</th>
+          <th>Activa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {promotions.map((promotion) => (
+          <tr>
+            <td>{promotion.id}</td>
+            <td>{promotion.name}</td>
+            <td>{promotion.type}</td>
+            <td>{promotion.type === 'PERCENT' ? `${promotion.value}%` : promotion.value}</td>
+            <td>{promotion.priority}</td>
+            <td>{promotion.isActive ? 'Sí' : 'No'}</td>
+            <td>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete="/api/admin/promotions?id={promotion.id}"
+                data-confirm="¿Eliminar esta promoción?"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        ))}
+        {promotions.length === 0 && <tr><td colspan="7">Sin promociones.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

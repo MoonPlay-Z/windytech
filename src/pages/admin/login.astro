@@ -1,0 +1,43 @@
+---
+import '../../styles/global.css';
+import '../../styles/admin.css';
+import { sessionFromRequest } from '../../lib/auth';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (admin) return Astro.redirect('/admin/', 302);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso al panel | Windytech</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+  </head>
+  <body class="admin-body">
+    <main class="admin-login">
+      <form class="admin-login-card admin-form" data-login-form>
+        <h1>Panel Windytech</h1>
+        <p class="admin-hint">Acceso para el equipo autorizado. Las sesiones duran 8 horas.</p>
+        <label>
+          <span>Correo</span>
+          <input type="email" name="email" autocomplete="username" required />
+        </label>
+        <label>
+          <span>Contraseña</span>
+          <input type="password" name="password" autocomplete="current-password" minlength="8" required />
+        </label>
+        <p class="admin-message" data-form-message hidden></p>
+        <button class="admin-btn" type="submit">Entrar</button>
+        <p class="admin-hint">¿Olvidaste la contraseña? Pide al propietario que la restablezca.</p>
+      </form>
+    </main>
+    <script>
+      import '../../scripts/admin';
+    </script>
+  </body>
+</html>

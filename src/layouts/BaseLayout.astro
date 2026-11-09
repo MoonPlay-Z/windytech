@@ -37,6 +37,10 @@ interface Props {
   faq?: FaqItem[];
   /** Nodos JSON-LD adicionales (Service, BlogPosting...) para esta página. */
   extraSchema?: Record<string, unknown>[];
+  /** Moneda sugerida para visitantes de Venezuela. */
+  currencyDefault?: 'USD' | 'VES';
+  /** Oculta el botón flotante de WhatsApp cuando estorba (carrito/panel). */
+  hideWhatsappFloat?: boolean;
 }
 
 const {
@@ -54,6 +58,8 @@ const {
   dateModified = site.contentUpdated,
   faq = [],
   extraSchema = [],
+  currencyDefault = 'USD',
+  hideWhatsappFloat = false,
 } = Astro.props;
 
 const t = content[lang];
@@ -340,22 +346,27 @@ const schemaGraph = {
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />
   </head>
-  <body>
+  <body data-currency-default={currencyDefault}>
     <a class="skip-link" href="#main">{skipLabel}</a>
     <Header lang={lang} altHref={altPath} />
     <main id="main">
       <slot />
     </main>
     <Footer lang={lang} />
-    <a
-      class="wa-float"
-      href={whatsappLink(t.whatsapp.general)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={t.whatsapp.floatLabel}
-      data-track="whatsapp"
-    >
-      <Icon name="whatsapp" size={26} />
-    </a>
+    {!hideWhatsappFloat && (
+      <a
+        class="wa-float"
+        href={whatsappLink(t.whatsapp.general)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t.whatsapp.floatLabel}
+        data-track="whatsapp"
+      >
+        <Icon name="whatsapp" size={26} />
+      </a>
+    )}
+    <script>
+      import '../scripts/cart';
+    </script>
   </body>
 </html>

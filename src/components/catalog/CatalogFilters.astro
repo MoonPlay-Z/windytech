@@ -1,0 +1,83 @@
+---
+import { catalogCopy, conditionLabels, type Category, type Locale } from '../../lib/catalog';
+
+interface Props {
+  locale: Locale;
+  categories: Category[];
+  brands: string[];
+  action: string;
+  values: {
+    q: string;
+    category: string;
+    condition: string;
+    brand: string;
+    min: string;
+    max: string;
+  };
+}
+
+const { locale, categories, brands, action, values } = Astro.props;
+const t = catalogCopy[locale];
+const es = locale === 'es';
+const conditions = Object.entries(conditionLabels[locale]) as [string, string][];
+---
+
+<form class="catalog-filters" method="get" action={action} data-catalog-filters>
+  <label class="catalog-field catalog-field--search">
+    <span>{t.search}</span>
+    <input type="search" name="q" value={values.q} placeholder={t.search} />
+  </label>
+
+  <label class="catalog-field">
+    <span>{t.filters}</span>
+    <select name="category">
+      <option value="">{t.allCategories}</option>
+      {categories.map((category) => (
+        <option value={category.slug} selected={values.category === category.slug}>
+          {category.name} ({category.productCount})
+        </option>
+      ))}
+    </select>
+  </label>
+
+  <label class="catalog-field">
+    <span>{es ? 'Condición' : 'Condition'}</span>
+    <select name="condition">
+      <option value="">{t.allConditions}</option>
+      {conditions.map(([value, label]) => (
+        <option value={value} selected={values.condition === value}>{label}</option>
+      ))}
+    </select>
+  </label>
+
+  <label class="catalog-field">
+    <span>{es ? 'Marca' : 'Brand'}</span>
+    <select name="brand">
+      <option value="">{t.allBrands}</option>
+      {brands.map((brand) => (
+        <option value={brand} selected={values.brand === brand}>{brand}</option>
+      ))}
+    </select>
+  </label>
+
+  <label class="catalog-field catalog-field--price">
+    <span>{es ? 'Precio (USD)' : 'Price (USD)'}</span>
+    <div class="catalog-price-range">
+      <input type="number" name="min" min="0" step="1" value={values.min} placeholder={es ? 'Mín.' : 'Min'} />
+      <input type="number" name="max" min="0" step="1" value={values.max} placeholder={es ? 'Máx.' : 'Max'} />
+    </div>
+  </label>
+
+  <div class="catalog-filter-actions">
+    <button class="btn btn-primary btn-sm" type="submit">{es ? 'Aplicar' : 'Apply'}</button>
+    <a class="catalog-clear" href={action}>{t.clear}</a>
+  </div>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-catalog-filters]').forEach((form) => {
+    form.querySelectorAll('select').forEach((select) => {
+      select.addEventListener('change', () => form.requestSubmit());
+    });
+  });
+</script>

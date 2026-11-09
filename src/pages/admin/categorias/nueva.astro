@@ -1,0 +1,61 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+---
+
+<AdminLayout title="Nueva categoría" admin={admin} active="categories">
+  <section class="admin-card">
+    <h2>Nueva categoría</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/categories" data-success="Categoría guardada." data-redirect="/admin/categorias/">
+      <div class="admin-form-row">
+        <label>
+          <span>Orden</span>
+          <input type="number" name="sortOrder" data-field="sortOrder" data-type="number" min="0" value="0" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Slug ES</span>
+          <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
+        </label>
+        <label>
+          <span>Slug EN</span>
+          <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Nombre ES</span>
+          <input name="tr.es.name" data-field="tr.es.name" type="text" required />
+        </label>
+        <label>
+          <span>Nombre EN</span>
+          <input name="tr.en.name" data-field="tr.en.name" type="text" required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Descripción ES</span>
+          <input name="tr.es.description" data-field="tr.es.description" type="text" />
+        </label>
+        <label>
+          <span>Descripción EN</span>
+          <input name="tr.en.description" data-field="tr.en.description" type="text" />
+        </label>
+      </div>
+      <ImageUploader mode="single" folder="windytech/categorias" field="imagePublicId" label="Imagen de categoría" />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear categoría</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/categorias/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

@@ -1,0 +1,10 @@
+---
+import BlogPage from '../../components/catalog/BlogPage.astro';
+import { getPosts } from '../../lib/db/queries';
+
+export const prerender = false;
+
+const posts = await getPosts('es');
+---
+
+<BlogPage locale="es" posts={posts} />

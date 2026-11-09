@@ -1,0 +1,108 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+---
+
+<AdminLayout title="Nuevo producto" admin={admin} active="products">
+  <section class="admin-card">
+    <h2>Nuevo producto</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto creado." data-redirect="/admin/productos/">
+      <div class="admin-form-row">
+        <label>
+          <span>Categoría ID</span>
+          <input type="number" name="categoryId" data-field="categoryId" data-type="number" min="0" />
+        </label>
+        <label>
+          <span>Marca</span>
+          <input name="brand" data-field="brand" type="text" />
+        </label>
+        <label>
+          <span>Modelo</span>
+          <input name="model" data-field="model" type="text" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Precio USD</span>
+          <input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" required />
+        </label>
+        <label>
+          <span>Precio tachado</span>
+          <input type="number" name="compareAt" data-field="compareAt" data-type="number" min="0" step="0.01" />
+        </label>
+        <label>
+          <span>SKU</span>
+          <input name="sku" data-field="sku" type="text" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Condición</span>
+          <select name="condition" data-field="condition">
+            <option value="NEW">Nuevo</option>
+            <option value="REFURBISHED_A">Reacondicionado Clase A</option>
+            <option value="USED">Usado</option>
+          </select>
+        </label>
+        <label>
+          <span>Estado</span>
+          <select name="availability" data-field="availability">
+            <option value="IN_STOCK">Disponible</option>
+            <option value="OUT_OF_STOCK">Agotado</option>
+            <option value="PREORDER">Preventa</option>
+          </select>
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isActive" data-field="isActive" data-type="checkbox" checked />
+          Activo
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isFeatured" data-field="isFeatured" data-type="checkbox" />
+          Destacado
+        </label>
+      </div>
+      <label>
+        <span>Especificaciones (JSON)</span>
+        <textarea name="specs" data-field="specs" data-type="json" rows="3">{}</textarea>
+      </label>
+
+      <fieldset class="admin-fieldset">
+        <legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug ES</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
+          </label>
+          <label>
+            <span>Slug EN</span>
+            <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Nombre ES</span>
+            <input name="tr.es.name" data-field="tr.es.name" type="text" required />
+          </label>
+          <label>
+            <span>Nombre EN</span>
+            <input name="tr.en.name" data-field="tr.en.name" type="text" required />
+          </label>
+        </div>
+      </fieldset>
+
+      <ImageUploader mode="multi" folder="windytech/productos/nuevo" field="images" label="Imágenes del producto" />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear producto</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/productos/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

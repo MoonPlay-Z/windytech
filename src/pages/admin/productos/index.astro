@@ -1,0 +1,60 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listProductsAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const products = await listProductsAdmin();
+---
+
+<AdminLayout title="Productos" admin={admin} active="products">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nuevo/">Añadir producto</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Producto</th>
+          <th>SKU</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Activo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((product) => (
+          <tr>
+            <td>{product.id}</td>
+            <td>
+              <a href={`/${product.id}/`}>{product.name}</a>
+            </td>
+            <td>{product.sku}</td>
+            <td>${(product.priceCents / 100).toFixed(2)}</td>
+            <td>{product.availability}</td>
+            <td>{product.isActive ? 'Sí' : 'No'}</td>
+            <td>
+              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/${product.id}/`}>Editar</a>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete="/api/admin/products?id={product.id}"
+                data-confirm="¿Eliminar este producto y sus imágenes?"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        ))}
+        {products.length === 0 && (
+          <tr><td colspan="7">Sin productos.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

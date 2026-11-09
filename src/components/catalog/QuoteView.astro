@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../Icon.astro';
+import { site, whatsappLink, type Lang } from '../../data/site';
+import { catalogCopy, type PublicQuote, type QuoteStatus } from '../../lib/catalog';
+import { formatUsd, formatVes } from '../../lib/money';
+
+interface Props {
+  quote: PublicQuote;
+  locale: Lang;
+}
+
+const { quote, locale } = Astro.props;
+const es = locale === 'es';
+const t = catalogCopy[locale];
+const expired = new Date(quote.validUntil).getTime() < Date.now();
+const path = es ? `/cotizacion/${quote.publicToken}/` : `/en/quote/${quote.publicToken}/`;
+const url = new URL(path, site.url).toString();
+const message = es
+  ? `Hola Windytech, quiero cotizar ${quote.number}:\n${url}`
+  : `Hello Windytech, I would like a quote for ${quote.number}:\n${url}`;
+
+const statusLabels: Record<QuoteStatus, { es: string; en: string }> = {
+  NEW: { es: 'Nueva', en: 'New' },
+  CONTACTED: { es: 'Contactada', en: 'Contacted' },
+  QUOTED: { es: 'Cotizada', en: 'Quoted' },
+  CLOSED: { es: 'Cerrada', en: 'Closed' },
+  LOST: { es: 'Perdida', en: 'Lost' },
+};
+
+const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
+  dateStyle: 'long',
+}).format(new Date(quote.validUntil));
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${t.quotePage} ${quote.number} | ${site.name}`}
+  description={es ? 'Resumen privado de tu cotización en Windytech.' : 'Private summary of your Windytech quote.'}
+  path={path}
+  altPath={es ? `/en/quote/${quote.publicToken}/` : `/cotizacion/${quote.publicToken}/`}
+  noindex
+  hideWhatsappFloat
+>
+  <section class="section section--soft quote-section">
+    <div class="container quote-container">
+      <div class="quote-head">
+        <span class="eyebrow">{t.quotePage}</span>
+        <h1>{quote.number}</h1>
+        <div class="quote-meta">
+          <span class:list={['quote-status', `is-${quote.status.toLowerCase()}`]}>
+            {statusLabels[quote.status][locale]}
+          </span>
+          <span>{t.quoteValid}: {validUntil}</span>
+        </div>
+        {expired && <p class="quote-expired">{t.quoteExpired}</p>}
+      </div>
+
+      <div class="quote-panel">
+        <h2>{t.quoteItems}</h2>
+        <div class="quote-table">
+          <div class="quote-row quote-row--head">
+            <span>{t.cartItem}</span>
+            <span>{t.cartQty}</span>
+            <span>{t.cartTotal}</span>
+          </div>
+          {quote.items.map((item) => (
+            <div class="quote-row">
+              <span>
+                <strong>{item.nameSnapshot}</strong>
+                {Object.entries(item.attributesSnapshot ?? {}).length > 0 && (
+                  <small>
+                    {Object.entries(item.attributesSnapshot)
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join(' · ')}
+                  </small>
+                )}
+              </span>
+              <span>{item.quantity}</span>
+              <span>{formatUsd(item.lineTotalCents)}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="quote-totals">
+          <div>
+            <span>{t.subtotal}</span>
+            <strong>{formatUsd(quote.subtotalCents)}</strong>
+          </div>
+          {quote.discountCents > 0 && (
+            <div>
+              <span>{t.discount}</span>
+              <strong>− {formatUsd(quote.discountCents)}</strong>
+            </div>
+          )}
+          {quote.taxCents > 0 && (
+            <div>
+              <span>{es ? 'IVA' : 'VAT'}</span>
+              <strong>{formatUsd(quote.taxCents)}</strong>
+            </div>
+          )}
+          <div class="quote-total-row">
+            <span>{t.total}</span>
+            <strong>{formatUsd(quote.totalCents)}</strong>
+          </div>
+          {quote.totalVesCents !== null && (
+            <div class="quote-ves">
+              <span>{es ? 'Equivalente en bolívares' : 'Bolívar equivalent'}</span>
+              <strong>{formatVes(quote.totalVesCents)}</strong>
+            </div>
+          )}
+          {quote.rateSnapshot && (
+            <p class="quote-note">
+              {t.rateNote}: {Number(quote.rateSnapshot).toFixed(2)} · {quote.rateDate}
+            </p>
+          )}
+          <p class="quote-note">{t.noTax}</p>
+        </div>
+      </div>
+
+      <div class="quote-panel">
+        <h2>{t.quoteCustomer}</h2>
+        <dl class="quote-customer">
+          <div>
+            <dt>{t.name}</dt>
+            <dd>{quote.customerName}</dd>
+          </div>
+          <div>
+            <dt>{t.phone}</dt>
+            <dd>{quote.phone}</dd>
+          </div>
+          {quote.notes && (
+            <div>
+              <dt>{t.notes}</dt>
+              <dd>{quote.notes}</dd>
+            </div>
+          )}
+        </dl>
+        <p class="quote-note">{t.quoteNotPurchase}</p>
+        <div class="quote-actions">
+          <a
+            class="btn btn-primary"
+            href={whatsappLink(message)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            <Icon name="whatsapp" size={18} />
+            {t.sendWhatsapp}
+          </a>
+          <a class="btn btn-light" href={es ? '/catalogo/' : '/en/catalog/'}>{t.continue}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

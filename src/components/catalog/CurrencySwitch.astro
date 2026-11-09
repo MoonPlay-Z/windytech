@@ -1,0 +1,22 @@
+---
+import type { Lang } from '../../data/site';
+import type { RateResult } from '../../lib/rate';
+
+interface Props {
+  locale: Lang;
+  rate: RateResult | null;
+}
+
+const { locale, rate } = Astro.props;
+const es = locale === 'es';
+---
+
+<div class="currency-switch" role="group" aria-label={es ? 'Moneda de exhibición' : 'Display currency'}>
+  <button type="button" data-currency-option="USD" aria-pressed="true">USD</button>
+  <button type="button" data-currency-option="VES" disabled={!rate}>Bs</button>
+</div>
+{rate && (
+  <span class="currency-note">
+    {es ? 'Tasa BCV' : 'BCV rate'}: {rate.rate.toFixed(2)} · {rate.date}
+  </span>
+)}

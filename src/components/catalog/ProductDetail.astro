@@ -1,0 +1,403 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../Icon.astro';
+import { site, whatsappLink, type Lang } from '../../data/site';
+import {
+  attributeLabels,
+  availabilityLabels,
+  catalogCopy,
+  conditionLabels,
+  priceFor,
+  primaryImage,
+  type CatalogProduct,
+} from '../../lib/catalog';
+import { productImage, productSrcSet, ogImage } from '../../lib/cloudinary';
+import { renderMarkdown } from '../../lib/markdown';
+import type { RateResult } from '../../lib/rate';
+
+interface Props {
+  product: CatalogProduct;
+  locale: Lang;
+  rate: RateResult | null;
+  currencyDefault: 'USD' | 'VES';
+  categoryName?: string;
+  altSlug?: string;
+}
+
+const { product, locale, rate, currencyDefault, categoryName, altSlug } = Astro.props;
+const es = locale === 'es';
+const t = catalogCopy[locale];
+const basePrice = priceFor(product, null, locale);
+const image = primaryImage(product);
+const catalogHref = es ? '/catalogo/' : '/en/catalog/';
+const href = `${catalogHref}${product.slug}/`;
+const condition = conditionLabels[locale][product.condition];
+const availability = availabilityLabels[locale][product.availability];
+const vesPrice = rate ? Math.round(basePrice.unitCents * rate.rate) : 0;
+const vesCompare = rate ? Math.round(Math.max(basePrice.compareAtCents, basePrice.listCents) * rate.rate) : 0;
+const description = product.seoDescription || product.shortDescription;
+const specs = Object.entries(product.specs ?? {});
+const consultMessage = es
+  ? `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`
+  : `Hello Windytech, I would like to check availability of ${product.name}.`;
+
+const availabilitySchema =
+  product.availability === 'IN_STOCK'
+    ? 'https://schema.org/InStock'
+    : product.availability === 'PREORDER'
+      ? 'https://schema.org/PreOrder'
+      : 'https://schema.org/OutOfStock';
+
+const conditionSchema =
+  product.condition === 'NEW'
+    ? 'https://schema.org/NewCondition'
+    : product.condition === 'REFURBISHED_A'
+      ? 'https://schema.org/RefurbishedCondition'
+      : 'https://schema.org/UsedCondition';
+
+const imageUrl = image ? ogImage(image.cloudinaryPublicId) : new URL(site.ogImage, site.url).toString();
+
+const offer = (variant: CatalogProduct['variants'][number] | null) => {
+  const price = priceFor(product, variant?.id ?? null, locale);
+  const sku = variant?.sku || product.sku || `WT-${product.id}`;
+  return {
+    '@type': 'Offer',
+    sku,
+    url: new URL(href, site.url).toString(),
+    priceCurrency: 'USD',
+    price: (price.unitCents / 100).toFixed(2),
+    availability: variant?.availability === 'OUT_OF_STOCK' ? 'https://schema.org/OutOfStock' : availabilitySchema,
+    itemCondition: conditionSchema,
+    seller: { '@id': `${site.url}/#organization` },
+    ...(image ? { image: imageUrl } : {}),
+    ...(price.compareAtCents > price.unitCents
+      ? {
+          priceSpecification: {
+            '@type': 'UnitPriceSpecification',
+            price: (price.unitCents / 100).toFixed(2),
+            priceCurrency: 'USD',
+            valueAddedTaxIncluded: false,
+          },
+        }
+      : {}),
+  };
+};
+
+const productSchema: Record<string, unknown> = {
+  '@type': 'ProductGroup',
+  '@id': `${new URL(href, site.url)}#product`,
+  name: product.name,
+  description,
+  productGroupID: String(product.id),
+  sku: product.sku || `WT-${product.id}`,
+  brand: { '@type': 'Brand', name: product.brand || site.name },
+  category: categoryName,
+  image: image ? [imageUrl] : undefined,
+  url: new URL(href, site.url).toString(),
+  offers: [offer(null)],
+  ...(product.variants.length > 0
+    ? {
+        variesBy: [
+          ...new Set(
+            product.variants.flatMap((variant) =>
+              Object.keys(variant.attributes ?? {}).map(
+                (key) => (attributeLabels[locale] as Record<string, string>)[key] ?? key,
+              ),
+            ),
+          ),
+        ],
+        hasVariant: product.variants.map((variant) => ({
+          '@type': 'Product',
+          name: `${product.name}${variant.labelEs || variant.labelEn ? ` — ${es ? variant.labelEs : variant.labelEn}` : ''}`,
+          sku: variant.sku || `${product.sku}-${variant.id}`,
+          offers: offer(variant),
+        })),
+      }
+    : {}),
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={product.seoTitle || `${product.name} | ${site.name}`}
+  description={description || t.intro}
+  path={href}
+  altPath={`${es ? '/en/catalog/' : '/catalogo/'}${altSlug ?? product.slug}/`}
+  ogImage={imageUrl}
+  ogImageAlt={image?.alt || product.name}
+  ogType="website"
+  currencyDefault={currencyDefault}
+  extraSchema={[productSchema]}
+  breadcrumb={[
+    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: t.navLabel, path: catalogHref },
+    { name: product.name, path: href },
+  ]}
+>
+  <section class="product-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'}>
+        <a href={es ? '/' : '/en/'}>{es ? 'Inicio' : 'Home'}</a>
+        <span aria-hidden="true">/</span>
+        <a href={catalogHref}>{t.navLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span>{product.name}</span>
+      </nav>
+
+      <div class="product-detail">
+        <div class="product-gallery" data-product-gallery>
+          <div class="product-gallery-main">
+            {image ? (
+              <img
+                src={productImage(image.cloudinaryPublicId, 1200)}
+                srcset={productSrcSet(image.cloudinaryPublicId)}
+                sizes="(max-width: 900px) 100vw, 55vw"
+                alt={image.alt || product.name}
+                width="1200"
+                height="900"
+                data-main-image
+              />
+            ) : (
+              <span class="product-card-placeholder" aria-hidden="true">
+                <Icon name="monitor" size={64} />
+              </span>
+            )}
+          </div>
+          {product.images.length > 1 && (
+            <div class="product-gallery-thumbs">
+              {product.images.map((item) => (
+                <button
+                  type="button"
+                  class="product-thumb"
+                  data-thumb
+                  data-full={productImage(item.cloudinaryPublicId, 1200)}
+                  data-srcset={productSrcSet(item.cloudinaryPublicId)}
+                  aria-label={item.alt || product.name}
+                >
+                  <img
+                    src={productImage(item.cloudinaryPublicId, 200)}
+                    alt={item.alt || product.name}
+                    width="200"
+                    height="150"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div class="product-info">
+          <div class="product-meta">
+            <span>{condition}</span>
+            {product.brand && <span>{product.brand}</span>}
+            {product.sku && <span>SKU: {product.sku}</span>}
+          </div>
+
+          <h1>{product.name}</h1>
+          {product.shortDescription && <p class="product-summary">{product.shortDescription}</p>}
+
+          <div class="product-price product-price--detail">
+            <span
+              class="product-price-now"
+              data-price-now
+              data-usd={basePrice.unitCents}
+              data-ves={vesPrice}
+            >
+              ${(basePrice.unitCents / 100).toFixed(2)}
+            </span>
+            <span class="product-price-note">{es ? 'sin IVA' : 'VAT excluded'}</span>
+            {Math.max(basePrice.compareAtCents, basePrice.listCents) > basePrice.unitCents && (
+              <span class="product-price-old" data-price-old data-usd={Math.max(basePrice.compareAtCents, basePrice.listCents)} data-ves={vesCompare}>
+                ${(Math.max(basePrice.compareAtCents, basePrice.listCents) / 100).toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <p
+            class="product-availability-note"
+            data-availability-note
+            data-label-in-stock={availabilityLabels[locale].IN_STOCK}
+            data-label-preorder={availabilityLabels[locale].PREORDER}
+            data-label-out={availabilityLabels[locale].OUT_OF_STOCK}
+          >
+            <span class:list={['product-availability', `is-${product.availability.toLowerCase()}`]}>
+              {availability}
+            </span>
+          </p>
+
+          {product.variants.length > 0 && (
+            <div class="product-variants">
+              <h2>{t.variants}</h2>
+              <div class="variant-list" data-variant-list>
+                {product.variants.map((variant) => {
+                  const variantPrice = priceFor(product, variant.id, locale);
+                  const label =
+                    (es ? variant.labelEs : variant.labelEn) ||
+                    Object.entries(variant.attributes ?? {})
+                      .map(([key, value]) => `${(attributeLabels[locale] as Record<string, string>)[key] ?? key}: ${value}`)
+                      .join(' · ');
+                  return (
+                    <button
+                      type="button"
+                      class="variant-option"
+                      data-variant-option
+                      data-variant-id={variant.id}
+                      data-variant-label={label}
+                      data-price={variantPrice.unitCents}
+                      data-ves={rate ? Math.round(variantPrice.unitCents * rate.rate) : 0}
+                      data-old={Math.max(variantPrice.compareAtCents, variantPrice.listCents)}
+                      data-old-ves={rate ? Math.round(Math.max(variantPrice.compareAtCents, variantPrice.listCents) * rate.rate) : 0}
+                      data-availability={variant.availability}
+                      data-image={variant.imagePublicId ? productImage(variant.imagePublicId, 1200) : image ? productImage(image.cloudinaryPublicId, 1200) : ''}
+                      data-image-srcset={variant.imagePublicId ? productSrcSet(variant.imagePublicId) : image ? productSrcSet(image.cloudinaryPublicId) : ''}
+                      disabled={variant.availability === 'OUT_OF_STOCK'}
+                      aria-pressed="false"
+                    >
+                      <span class="variant-label">{label}</span>
+                      <span class="variant-price" data-usd={variantPrice.unitCents} data-ves={rate ? Math.round(variantPrice.unitCents * rate.rate) : 0}>
+                        ${(variantPrice.unitCents / 100).toFixed(2)}
+                      </span>
+                      {variant.availability === 'OUT_OF_STOCK' && (
+                        <span class="variant-out">{t.outOfStock}</span>
+                      )}
+                      {variant.availability === 'PREORDER' && (
+                        <span class="variant-out">{t.preorder}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {specs.length > 0 && (
+            <div class="product-specs">
+              <h2>{t.specifications}</h2>
+              <dl>
+                {specs.map(([key, value]) => (
+                  <div>
+                    <dt>{attributeLabels[locale][key] ?? key}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          <div class="product-actions">
+            {product.availability === 'OUT_OF_STOCK' ? (
+              <a
+                class="btn btn-primary"
+                href={whatsappLink(consultMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon name="whatsapp" size={18} />
+                {t.askAvailability}
+              </a>
+            ) : (
+              <button
+                class="btn btn-primary"
+                type="button"
+                data-add-to-cart
+                data-id={product.id}
+                data-variant=""
+                data-slug={product.slug}
+                data-name={product.name}
+                data-variant-label=""
+                data-price={basePrice.unitCents}
+                data-availability={product.availability}
+                data-image={image ? productImage(image.cloudinaryPublicId, 400) : ''}
+                data-added-label={es ? 'Añadido' : 'Added'}
+              >
+                <Icon name="shopping-cart" size={18} />
+                {t.addToCart}
+              </button>
+            )}
+            <a class="btn btn-light" href={catalogHref}>
+              {t.backToCatalog}
+            </a>
+          </div>
+
+          <p class="product-note">{t.noTax} {t.quoteNotPurchase}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {product.descriptionMd && (
+    <section class="section section--white">
+      <div class="container product-description">
+        <h2>{t.description}</h2>
+        <div class="prose" set:html={renderMarkdown(product.descriptionMd)} />
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<script>
+  import '../../scripts/cart';
+
+  const priceNode = document.querySelector<HTMLElement>('[data-price-now]');
+  const oldNode = document.querySelector<HTMLElement>('[data-price-old]');
+  const availabilityNote = document.querySelector<HTMLElement>('[data-availability-note]');
+  const addButton = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
+  const mainImage = document.querySelector<HTMLImageElement>('[data-main-image]');
+
+  document.querySelectorAll<HTMLButtonElement>('[data-variant-option]').forEach((option) => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('[data-variant-option]').forEach((entry) => {
+        entry.setAttribute('aria-pressed', String(entry === option));
+        entry.classList.toggle('is-selected', entry === option);
+      });
+
+      const price = Number(option.dataset.price ?? '0');
+      const ves = Number(option.dataset.ves ?? '0');
+      const old = Number(option.dataset.old ?? '0');
+      const oldVes = Number(option.dataset.oldVes ?? '0');
+
+      if (priceNode) {
+        priceNode.dataset.usd = String(price);
+        priceNode.dataset.ves = String(ves);
+      }
+      if (oldNode) {
+        oldNode.dataset.usd = String(old);
+        oldNode.dataset.ves = String(oldVes);
+        oldNode.hidden = old <= price;
+      }
+      if (availabilityNote) {
+        const availability = option.dataset.availability ?? 'IN_STOCK';
+        const label =
+          availability === 'IN_STOCK'
+            ? availabilityNote.dataset.labelInStock
+            : availability === 'PREORDER'
+              ? availabilityNote.dataset.labelPreorder
+              : availabilityNote.dataset.labelOut;
+        availabilityNote.innerHTML = `<span class="product-availability is-${availability.toLowerCase()}">${label}</span>`;
+      }
+      if (addButton) {
+        addButton.dataset.variant = option.dataset.variantId ?? '';
+        addButton.dataset.variantLabel = option.dataset.variantLabel ?? '';
+        addButton.dataset.price = String(price);
+        addButton.dataset.availability = option.dataset.availability ?? 'IN_STOCK';
+        addButton.disabled = option.dataset.availability === 'OUT_OF_STOCK';
+      }
+
+      const image = option.dataset.image;
+      if (mainImage && image) {
+        mainImage.src = image;
+        mainImage.srcset = option.dataset.imageSrcset ?? '';
+      }
+      window.dispatchEvent(new CustomEvent('wt:prices-updated'));
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((thumb) => {
+    thumb.addEventListener('click', () => {
+      if (!mainImage) return;
+      mainImage.src = thumb.dataset.full ?? mainImage.src;
+      mainImage.srcset = thumb.dataset.srcset ?? mainImage.srcset;
+    });
+  });
+</script>

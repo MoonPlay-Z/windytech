@@ -1,0 +1,10 @@
+---
+import ProjectsPage from '../../../components/catalog/ProjectsPage.astro';
+import { getProjects } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const projects = await getProjects('en');
+---
+
+<ProjectsPage locale="en" projects={projects} />

@@ -1,0 +1,50 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listQuotes } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const quotes = await listQuotes();
+---
+
+<AdminLayout title="Cotizaciones" admin={admin} active="quotes">
+  <section class="admin-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:110px">Número</th>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th style="width:90px">Total</th>
+          <th style="width:90px">Estado</th>
+          <th style="width:130px">Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {quotes.map((quote) => (
+          <tr>
+            <td><a href={`/cotizacion/${quote.publicToken}/`}>{quote.number}</a></td>
+            <td>{quote.customerName}</td>
+            <td>{quote.phone}</td>
+            <td>${(quote.totalCents / 100).toFixed(2)} {quote.currency}</td>
+            <td>
+              <select data-quote-status={quote.id} value={quote.status}>
+                <option value="NEW">Nueva</option>
+                <option value="CONTACTED">Contactada</option>
+                <option value="QUOTED">Cotizada</option>
+                <option value="CLOSED">Cerrada</option>
+                <option value="LOST">Perdida</option>
+              </select>
+            </td>
+            <td>{new Date(quote.createdAt).toLocaleDateString('es-VE')}</td>
+          </tr>
+        ))}
+        {quotes.length === 0 && <tr><td colspan="6">Sin cotizaciones.</td></tr>}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>
