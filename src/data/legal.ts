@@ -71,7 +71,7 @@ export const legalContent = {
       title: 'Términos y condiciones',
       updated: 'Última actualización: 4 de noviembre de 2026',
       intro:
-        'Estos términos regulan el uso de este sitio y la contratación de servicios con Windytech. Al solicitar una cotización o contratar un servicio, aceptas estas condiciones.',
+        'Estos términos regulan el uso de este sitio y la contratación de servicios. Al solicitar una cotización o contratar un servicio, aceptas estas condiciones.',
       sections: [
         {
           heading: 'Uso del sitio',

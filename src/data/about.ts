@@ -59,7 +59,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
     ],
     pageTitle: 'Acerca de Windytech | Software, automatización y marketing',
     pageDescription:
-      'Windytech es un estudio de desarrollo de software, automatización de WhatsApp, páginas web y marketing digital. Conoce qué hacemos, cómo trabajamos, dónde prestamos servicio y cómo contactarnos.',
+      'Windytech es un estudio de software a medida, automatización de WhatsApp, páginas web y marketing digital. Conoce qué hacemos y cómo trabajamos.',
     pageH1: 'Acerca de Windytech',
     intro:
       'Windytech es un estudio digital que diseña, construye y posiciona soluciones para negocios: software a medida, automatización de WhatsApp, páginas web, marketing y equipos informáticos.',
@@ -158,7 +158,7 @@ export const aboutContent: Record<Lang, AboutContent> = {
     ],
     pageTitle: 'About Windytech | Software, automation and marketing',
     pageDescription:
-      'Windytech is a software development, WhatsApp automation, web design and digital marketing studio. Learn what we do, how we work, where we operate and how to contact us.',
+      'Windytech is a studio for custom software, WhatsApp automation, web design and digital marketing. Learn what we do, how we work and how to reach us.',
     pageH1: 'About Windytech',
     intro:
       'Windytech is a digital studio that designs, builds and positions solutions for businesses: custom software, WhatsApp automation, websites, marketing and IT equipment.',
