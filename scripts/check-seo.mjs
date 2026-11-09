@@ -21,6 +21,13 @@ const site = siteArg ? siteArg.slice('--site='.length).replace(/\/$/, '') : null
 const errors = [];
 const warnings = [];
 
+/*
+ * Archivos de verificación de propiedad (Google Search Console y similares):
+ * viven en la raíz pero no son páginas del sitio, así que se excluyen del chequeo.
+ */
+const VERIFICATION_FILE =
+  /(?:^|[\\/])[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.html$/i;
+
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
   const files = [];
@@ -57,7 +64,9 @@ async function loadHtml() {
     return pages;
   }
 
-  const files = (await walk(dist)).filter((file) => file.endsWith('.html'));
+  const files = (await walk(dist)).filter(
+    (file) => file.endsWith('.html') && !VERIFICATION_FILE.test(file),
+  );
   if (files.length === 0) {
     errors.push('No hay dist/*.html. Ejecuta `npm run build` antes de `npm run seo:check`.');
     return [];

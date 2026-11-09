@@ -40,7 +40,7 @@ export const site = {
    * consola y la etiqueta <meta> solo se renderiza cuando el valor no está vacío.
    */
   verification: {
-    google: '',
+    google: 'de7be1f2-4139-4e1c-8932-3fcb990ee688',
     bing: '1A53073E9F99FBDBD7E6229B2FCBB9B2',
     yandex: '',
   },
