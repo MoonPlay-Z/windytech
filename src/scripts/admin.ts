@@ -92,8 +92,22 @@ function setupLogin() {
 function setupLogout() {
   document.querySelectorAll<HTMLButtonElement>('[data-logout]').forEach((button) => {
     button.addEventListener('click', async () => {
-      await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/admin/';
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/admin/logout', {
+          method: 'POST',
+          credentials: 'same-origin',
+        });
+        const data = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error ?? 'No se pudo cerrar la sesión.');
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Error al cerrar sesión.');
+      } finally {
+        button.disabled = false;
+        window.location.href = '/admin/';
+      }
     });
   });
 }
