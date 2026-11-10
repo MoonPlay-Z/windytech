@@ -17,7 +17,13 @@ const users = await listAdmins();
   <section class="admin-card">
     <table class="admin-table">
       <thead>
-        <tr><th style="width:40px">#</th><th>Correo</th><th>Rol</th><th>Activo</th></tr>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Activo</th>
+          <th style="width:170px">Acciones</th>
+        </tr>
       </thead>
       <tbody>
         {users.map((user) => (
@@ -26,10 +32,65 @@ const users = await listAdmins();
             <td>{user.email}</td>
             <td>{user.role}</td>
             <td>{user.isActive ? 'Sí' : 'No'}</td>
+            <td>
+              <div class="admin-actions-cell">
+                {user.id !== admin.id ? (
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--outline admin-btn--small"
+                    data-reset-password
+                    data-user-id={user.id}
+                    data-user-email={user.email}
+                  >
+                    Restablecer clave
+                  </button>
+                ) : (
+                  <span class="admin-text-muted">Tú</span>
+                )}
+              </div>
+            </td>
           </tr>
         ))}
-        {users.length === 0 && <tr><td colspan="4">Sin usuarios.</td></tr>}
+        {users.length === 0 && (
+          <tr><td colspan="5">Sin usuarios.</td></tr>
+        )}
       </tbody>
     </table>
   </section>
 </AdminLayout>
+
+<script>
+  document.querySelectorAll('[data-reset-password]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const userId = button.dataset.userId;
+      const userEmail = button.dataset.userEmail;
+      if (!userId) return;
+
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Restableciendo...';
+
+      try {
+        const response = await fetch(`/api/admin/users/${userId}/password`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'No se pudo restablecer la clave.');
+        }
+
+        alert(
+          `Nueva contraseña temporal para ${userEmail}:\n${data.temporaryPassword}\n\nCompártesela al usuario.`,
+        );
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Error inesperado.');
+      } finally {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    });
+  });
+</script>

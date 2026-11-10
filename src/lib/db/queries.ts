@@ -510,6 +510,19 @@ export async function updateAdminPassword(id: number, passwordHash: string) {
   return true;
 }
 
+export async function updateAdminEmail(id: number, email: string) {
+  const client = db();
+  if (!client) return false;
+  await client.execute(sql`UPDATE admin_users SET email = ${email.toLowerCase()} WHERE id = ${id}`);
+  return true;
+}
+
+export async function findAdminByEmailExcludingSelf(id: number, email: string) {
+  return one<{ id: number }>(
+    sql`SELECT id FROM admin_users WHERE lower(email) = lower(${email}) AND id <> ${id} LIMIT 1`
+  );
+}
+
 /* Sesiones */
 
 export async function insertSession(tokenHash: string, adminId: number, expiresAt: Date, ipHash: string, userAgent: string) {

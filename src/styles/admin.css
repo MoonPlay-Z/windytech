@@ -1040,3 +1040,40 @@
     min-height: 0;
   }
 }
+
+/* Perfil de administrador */
+.admin-field-hint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* Botones de tabla de usuarios */
+.admin-btn--small {
+  padding: 5px 9px;
+  font-size: 11px;
+  min-height: auto;
+}
+
+.admin-btn--outline {
+  background: transparent;
+  border-color: currentColor;
+  color: inherit;
+}
+
+.admin-actions-cell {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-text-muted {
+  color: var(--muted);
+  font-size: 12px;
+}

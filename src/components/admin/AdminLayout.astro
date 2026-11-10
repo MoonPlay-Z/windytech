@@ -36,6 +36,7 @@ const { title, admin, active } = Astro.props;
         <div class="admin-sidebar-footer">
           <span>{admin.email}</span>
           <span class="admin-role">{admin.role}</span>
+          <a href="/admin/perfil/" class="admin-btn admin-btn--ghost" style="font-size:12px">Mi perfil</a>
           <button type="button" class="admin-btn admin-btn--ghost" data-logout>Cerrar sesión</button>
         </div>
       </aside>
