@@ -11,10 +11,7 @@ const { lang, altHref } = Astro.props;
 const t = content[lang];
 const homeHref = lang === 'es' ? '/' : '/en/';
 const navAria = lang === 'es' ? 'Navegación principal' : 'Main navigation';
-const menuLabel = t.nav.menu;
-const markAlt = lang === 'es' ? 'Símbolo de Windytech' : 'Windytech symbol';
-const wordmarkAlt =
-  lang === 'es'
+const markAlt = lang === 'es'
     ? 'Windytech — desarrollo de software y automatización'
     : 'Windytech — software development and automation';
 ---
@@ -65,8 +62,19 @@ const wordmarkAlt =
     </nav>
 
     <div class="header-actions">
-      <a class="lang-switch" href={altHref} aria-label={t.nav.switchLang}>
-        {t.nav.switchLangShort}
+      <a
+        class="btn btn-sm btn-outline"
+        href="/cuenta/login/"
+        aria-label="Iniciar sesión"
+      >
+        Iniciar sesión
+      </a>
+      <a
+        class="btn btn-sm btn-outline ml-2"
+        href="/cuenta/registro/"
+        aria-label="Registrarse"
+      >
+        Registrarse
       </a>
       <a
         class="cart-link"
@@ -76,32 +84,6 @@ const wordmarkAlt =
         <Icon name="shopping-cart" size={20} />
         <span class="cart-count" data-cart-count hidden>0</span>
       </a>
-      <a
-        class="btn btn-primary header-cta"
-        href={whatsappLink(t.whatsapp.general)}
-        target="_blank"
-        rel="noopener noreferrer"
-        data-track="whatsapp"
-      >
-        {t.nav.headerCta}
-        <Icon name="whatsapp" size={18} />
-      </a>
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="primary-nav"
-        aria-label={menuLabel}
-        data-menu-toggle
-        data-open-label={t.nav.menu}
-        data-close-label={t.nav.closeMenu}
-      >
-        <span class="menu-box" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </button>
     </div>
   </div>
 </header>
