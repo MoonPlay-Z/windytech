@@ -168,6 +168,33 @@ export const loginSchema = z.object({
   password: z.string().min(8).max(200),
 });
 
+const customerPasswordSchema = z
+  .string()
+  .min(8)
+  .max(72)
+  .refine((value) => new TextEncoder().encode(value).length <= 72);
+
+export const customerLoginSchema = z.object({
+  email: z.string().trim().email().max(200),
+  password: customerPasswordSchema,
+});
+
+export const registerSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(200),
+  password: customerPasswordSchema,
+});
+
+export const customerProfileSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(200),
+});
+
+export const customerChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(200),
+  newPassword: customerPasswordSchema,
+});
+
 /** Convierte dólares del formulario a centavos enteros. */
 export function dollarsToCents(value: number): number {
   return Math.round(value * 100);

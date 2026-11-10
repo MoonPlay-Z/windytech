@@ -1,65 +1,41 @@
 import type { APIRoute } from 'astro';
+import { authenticateCustomer, customerCookieHeader, startCustomerSession } from '../../../lib/customer-auth';
 import { getDb } from '../../../lib/db';
-import { sql } from 'drizzle-orm';
+import { clientIp, rateLimit, sameOrigin } from '../../../lib/security';
+import { json } from '../../../lib/api';
+import { customerLoginSchema } from '../../../lib/validation';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
-  const db = getDb();
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
+  if (!getDb()) return json({ error: 'Base de datos no configurada.' }, 500);
 
-  if (!db) {
-    return new Response(
-      JSON.stringify({ error: 'Base de datos no configurada' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  const ip = clientIp(request);
+  if (!rateLimit(`customer-login:${ip}`, 8, 10 * 60 * 1000)) {
+    return json({ error: 'Demasiados intentos. Espera 10 minutos.' }, 429);
   }
 
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const payload: unknown = await request.json();
+    const parsed = customerLoginSchema.safeParse(payload);
+    if (!parsed.success) return json({ error: 'Correo o contraseña inválidos.' }, 422);
 
-    if (!email || !password) {
-      return new Response(
-        JSON.stringify({ error: 'Correo y contraseña son obligatorios' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const user = await authenticateCustomer(parsed.data.email, parsed.data.password);
+    if (!user) return json({ error: 'Correo o contraseña incorrectos.' }, 401);
 
-    // Para pruebas: buscar usuario por email
-    const result = await db.execute(
-      sql`SELECT id, email, password_hash, role FROM users WHERE email = ${email}`
-    );
-
-    const user = result.rows[0];
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Credenciales inválidas' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Placeholder: en producción usar bcrypt.compare(password, user.password_hash)
-    const passwordValid = password === '123456'; // TODO: reemplazar con comparación real
-
-    if (!passwordValid) {
-      return new Response(
-        JSON.stringify({ error: 'Credenciales inválidas' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const { password_hash, ...userData } = user;
-
-    return new Response(
-      JSON.stringify({ success: true, user: userData }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    const session = await startCustomerSession(user.id);
+    return json(
+      { success: true, user, redirect: '/cuenta/perfil/' },
+      200,
+      {
+        'Set-Cookie': customerCookieHeader(session.token, session.expiresAt),
+        'Cache-Control': 'no-store',
+      },
     );
   } catch (err) {
-    console.error('Error en login:', err);
-    return new Response(
-      JSON.stringify({ error: 'Error interno del servidor' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    if (err instanceof SyntaxError) return json({ error: 'Datos inválidos.' }, 400);
+    console.error('[auth] error al iniciar sesión:', err);
+    return json({ error: 'No se pudo iniciar sesión. Intenta de nuevo.' }, 500);
   }
 };

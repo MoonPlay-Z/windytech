@@ -330,6 +330,31 @@ export const sessions = pgTable(
   (table) => [index('sessions_admin_idx').on(table.adminId)],
 );
 
+export const customerAccounts = pgTable(
+  'customer_accounts',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull().unique(),
+    passwordHash: text('password_hash').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const customerSessions = pgTable(
+  'customer_sessions',
+  {
+    id: serial('id').primaryKey(),
+    tokenHash: text('token_hash').notNull().unique(),
+    customerId: integer('customer_id')
+      .notNull()
+      .references(() => customerAccounts.id, { onDelete: 'cascade' }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('customer_sessions_customer_idx').on(table.customerId)],
+);
+
 export const auditLog = pgTable(
   'audit_log',
   {

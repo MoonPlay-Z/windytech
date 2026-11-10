@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import { content, site, whatsappLink, type Lang } from '../data/site';
 import { aboutContent } from '../data/about';
+import { customerSessionFromRequest } from '../lib/customer-auth';
 
 interface BreadcrumbItem {
   name: string;
@@ -78,6 +79,8 @@ const websiteId = `${site.url}/#website`;
 const logoId = `${site.url}/#logo`;
 
 const isHomePage = path === '/' || path === '/en/';
+
+const customer = await customerSessionFromRequest(Astro.request);
 
 const breadcrumbSchema =
   breadcrumb.length > 0
@@ -348,7 +351,7 @@ const schemaGraph = {
   </head>
   <body data-currency-default={currencyDefault}>
     <a class="skip-link" href="#main">{skipLabel}</a>
-    <Header lang={lang} altHref={altPath} />
+    <Header lang={lang} altHref={altPath} customer={customer} />
     <main id="main">
       <slot />
     </main>

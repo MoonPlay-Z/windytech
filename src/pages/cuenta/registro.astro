@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/account.css';
+import { customerSessionFromRequest } from '../../lib/customer-auth';
+
+export const prerender = false;
+
+if (await customerSessionFromRequest(Astro.request)) {
+  return Astro.redirect('/cuenta/perfil/', 302);
+}
+---
+
+<BaseLayout
+  lang="es"
+  title="Crear cuenta | Windytech"
+  description="Crea tu cuenta de Windytech."
+  path="/cuenta/registro/"
+  altPath="/cuenta/registro/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">Empieza aquí</p>
+        <h1>Todo lo tuyo, <span>en un solo lugar.</span></h1>
+        <p class="account-intro-copy">
+          Crea tu cuenta para disfrutar una experiencia más simple y personalizada.
+        </p>
+        <a class="account-home-link" href="/">← Volver al sitio</a>
+      </aside>
+
+      <div class="account-card">
+        <div class="account-card-heading">
+          <p class="eyebrow">Únete a Windytech</p>
+          <h2>Crear cuenta</h2>
+          <p>Completa tus datos para comenzar.</p>
+        </div>
+        <form class="account-form" data-auth-form action="/api/auth/register">
+          <div class="account-field">
+            <label for="register-name">Nombre</label>
+            <input
+              id="register-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              minlength="2"
+              maxlength="120"
+              placeholder="Tu nombre"
+            />
+          </div>
+          <div class="account-field">
+            <label for="register-email">Correo electrónico</label>
+            <input
+              id="register-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="200"
+              placeholder="tu@correo.com"
+            />
+          </div>
+          <div class="account-field">
+            <label for="register-password">Contraseña</label>
+            <input
+              id="register-password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              maxlength="72"
+              placeholder="Mínimo 8 caracteres"
+            />
+            <span class="account-field-hint">Usa al menos 8 caracteres.</span>
+          </div>
+          <p class="account-message" data-auth-message role="alert" hidden></p>
+          <button class="btn btn-primary account-submit" type="submit">Crear mi cuenta</button>
+        </form>
+        <p class="account-switch">
+          ¿Ya tienes cuenta? <a href="/cuenta/login/">Inicia sesión</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+    <script>
+      import '../../scripts/customer-auth';
+    </script>
+</BaseLayout>

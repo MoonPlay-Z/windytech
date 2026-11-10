@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/account.css';
+import { customerSessionFromRequest } from '../../lib/customer-auth';
+
+export const prerender = false;
+
+const customer = await customerSessionFromRequest(Astro.request);
+if (!customer) return Astro.redirect('/cuenta/login/', 302);
+---
+
+<BaseLayout
+  lang="es"
+  title="Mi cuenta | Windytech"
+  description="Tu cuenta de Windytech."
+  path="/cuenta/perfil/"
+  altPath="/cuenta/perfil/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout account-layout--profile">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">Tu espacio Windytech</p>
+        <h1>Hola, <span>{customer.name}.</span></h1>
+        <p class="account-intro-copy">
+          Bienvenido a tu cuenta. Aquí tienes tus datos de acceso.
+        </p>
+        <a class="account-home-link" href="/">← Volver al sitio</a>
+      </aside>
+
+      <section class="account-card account-profile-card" aria-labelledby="account-title">
+        <div class="account-card-heading">
+          <p class="eyebrow">Cuenta personal</p>
+          <h2 id="account-title">Tus datos</h2>
+          <p>La información asociada a tu cuenta Windytech.</p>
+        </div>
+        <dl class="account-details">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{customer.name}</dd>
+          </div>
+          <div>
+            <dt>Correo electrónico</dt>
+            <dd>{customer.email}</dd>
+          </div>
+        </dl>
+        <p class="account-message" data-auth-message role="alert" hidden></p>
+        <button class="btn btn-primary account-submit" type="button" data-logout-button>
+          Cerrar sesión
+        </button>
+      </section>
+    </div>
+  </section>
+
+    <script>
+      import '../../scripts/customer-auth';
+    </script>
+</BaseLayout>

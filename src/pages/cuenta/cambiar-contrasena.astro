@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/account.css';
+import { customerSessionFromRequest } from '../../lib/customer-auth';
+
+export const prerender = false;
+
+const customer = await customerSessionFromRequest(Astro.request);
+if (!customer) return Astro.redirect('/cuenta/login/', 302);
+---
+
+<BaseLayout
+  lang="es"
+  title="Cambiar contraseña | Windytech"
+  description="Actualiza la contraseña de tu cuenta Windytech."
+  path="/cuenta/cambiar-contrasena/"
+  altPath="/cuenta/cambiar-contrasena/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout account-layout--profile">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">Tu espacio Windytech</p>
+        <h1>Cambiar <span>contraseña.</span></h1>
+        <p class="account-intro-copy">
+          Mantén tu cuenta segura actualizando tu contraseña periódicamente.
+        </p>
+        <a class="account-home-link" href="/cuenta/perfil/">← Volver a mi cuenta</a>
+      </aside>
+
+      <section class="account-card account-profile-card" aria-labelledby="account-title">
+        <div class="account-card-heading">
+          <p class="eyebrow">Seguridad</p>
+          <h2 id="account-title">Cambiar contraseña</h2>
+          <p>Ingresa tu contraseña actual y la nueva contraseña.</p>
+        </div>
+        <form class="account-form" id="change-password-form">
+          <div class="account-field">
+            <label for="current-password">Contraseña actual</label>
+            <input
+              id="current-password"
+              name="currentPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="8"
+              maxlength="72"
+              placeholder="Tu contraseña actual"
+            />
+          </div>
+          <div class="account-field">
+            <label for="new-password">Nueva contraseña</label>
+            <input
+              id="new-password"
+              name="newPassword"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              maxlength="72"
+              placeholder="Mínimo 8 caracteres"
+            />
+            <span class="account-field-hint">Usa al menos 8 caracteres.</span>
+          </div>
+          <p class="account-message" data-auth-message role="alert" hidden></p>
+          <button class="btn btn-primary account-submit" type="submit">Cambiar contraseña</button>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <script>
+    import '../../scripts/change-password';
+  </script>
+</BaseLayout>

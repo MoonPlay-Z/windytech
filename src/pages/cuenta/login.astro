@@ -1,81 +1,85 @@
 ---
-import '../../styles/global.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/account.css';
+import { customerSessionFromRequest } from '../../lib/customer-auth';
 
 export const prerender = false;
 
-// Verificar si el usuario ya está logueado haciendo una petición fetch
-const profileRes = await (await fetch('/api/auth/me', { credentials: 'include' })).json();
-const { user } = profileRes;
-
-if (user) {
-  // Ya está logueado, redirigir al perfil
-  window.location.href = '/cuenta/perfil/';
+if (await customerSessionFromRequest(Astro.request)) {
+  return Astro.redirect('/cuenta/perfil/', 302);
 }
 ---
 
-<main class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg shadow-md w-full max-w-md p-8">
-    <h1 class="text-2xl font-bold text-center mb-6">Iniciar Sesión</h1>
-    
-    <form class="space-y-4" id="login-form">
-      <div>
-        <label class="block text-gray-700 text-sm font-medium mb-2">Correo electrónico</label>
-        <input 
-          type="email" 
-          required 
-          class="shadow appearance-none rounded border border-gray-400 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-primary-600 focus:shadow-outline"
-          placeholder="usuario@windytech.studio"
-          id="login-email"
+<BaseLayout
+  lang="es"
+  title="Iniciar sesión | Windytech"
+  description="Accede a tu cuenta de Windytech."
+  path="/cuenta/login/"
+  altPath="/cuenta/login/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
         />
-      </div>
-      <div>
-        <label class="block text-gray-700 text-sm font-medium mb-2">Contraseña</label>
-        <input 
-          type="password" 
-          required 
-          class="shadow appearance-none rounded border border-gray-400 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-primary-600 focus:shadow-outline"
-          placeholder="••••••••"
-          id="login-password"
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <button 
-          type="submit" 
-          class="w-full bg-primary-600 text-white py-2 px-4 rounded hover:bg-primary-700 focus:outline-none focus:bg-primary-700"
-        >
-          Entrar
-        </button>
-      </div>
-    </form>
-    
-    <p class="text-center mt-4 text-sm text-gray-600">
-      No tienes cuenta? <a href="/cuenta/registro/" class="text-primary-600 underline ml-2" id="register-link">Regístrate</a>
-    </p>
-  </div>
+        <p class="eyebrow">Tu espacio Windytech</p>
+        <h1>Qué bueno <span>verte de nuevo.</span></h1>
+        <p class="account-intro-copy">
+          Inicia sesión para continuar con tu experiencia y mantener todo a mano.
+        </p>
+        <a class="account-home-link" href="/">← Volver al sitio</a>
+      </aside>
 
-  <script>
-    const form = document.getElementById('login-form');
-    if (form) {
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-          credentials: 'include'
-        });
-        
-        const data = await res.json();
-        
-        if (data?.user) {
-          window.location.href = '/cuenta/perfil/';
-        } else {
-          alert(data?.error || 'Login failed');
-        }
-      });
-    }
-  </script>
-</main>
+      <div class="account-card">
+        <div class="account-card-heading">
+          <p class="eyebrow">Bienvenido de vuelta</p>
+          <h2>Iniciar sesión</h2>
+          <p>Ingresa tus datos para acceder a tu cuenta.</p>
+        </div>
+        <form class="account-form" data-auth-form action="/api/auth/login">
+          <div class="account-field">
+            <label for="login-email">Correo electrónico</label>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="200"
+              placeholder="tu@correo.com"
+            />
+          </div>
+          <div class="account-field">
+            <label for="login-password">Contraseña</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="8"
+              maxlength="72"
+              placeholder="Tu contraseña"
+            />
+          </div>
+          <p class="account-message" data-auth-message role="alert" hidden></p>
+          <button class="btn btn-primary account-submit" type="submit">Entrar a mi cuenta</button>
+        </form>
+        <p class="account-switch">
+          ¿Aún no tienes cuenta? <a href="/cuenta/registro/">Regístrate</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+    <script>
+      import '../../scripts/customer-auth';
+    </script>
+</BaseLayout>

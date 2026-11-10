@@ -10,6 +10,7 @@ export function getStaticPaths() {
 }
 
 const { service } = Astro.props;
+if (!service) return Astro.redirect('/404/', 302);
 ---
 
 <ServicePage

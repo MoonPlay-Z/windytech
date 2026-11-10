@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/account.css';
+import { customerSessionFromRequest } from '../../lib/customer-auth';
+
+export const prerender = false;
+
+const customer = await customerSessionFromRequest(Astro.request);
+if (!customer) return Astro.redirect('/cuenta/login/', 302);
+---
+
+<BaseLayout
+  lang="es"
+  title="Editar perfil | Windytech"
+  description="Actualiza los datos de tu cuenta Windytech."
+  path="/cuenta/editar-perfil/"
+  altPath="/cuenta/editar-perfil/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout account-layout--profile">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">Tu espacio Windytech</p>
+        <h1>Editar <span>perfil.</span></h1>
+        <p class="account-intro-copy">
+          Actualiza tu nombre y correo electrónico cuando lo necesites.
+        </p>
+        <a class="account-home-link" href="/cuenta/perfil/">← Volver a mi cuenta</a>
+      </aside>
+
+      <section class="account-card account-profile-card" aria-labelledby="account-title">
+        <div class="account-card-heading">
+          <p class="eyebrow">Cuenta personal</p>
+          <h2 id="account-title">Tus datos</h2>
+          <p>La información asociada a tu cuenta Windytech.</p>
+        </div>
+        <form class="account-form" id="edit-profile-form">
+          <div class="account-field">
+            <label for="edit-name">Nombre</label>
+            <input
+              id="edit-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              minlength="2"
+              maxlength="120"
+              placeholder="Tu nombre"
+              value={customer.name}
+            />
+          </div>
+          <div class="account-field">
+            <label for="edit-email">Correo electrónico</label>
+            <input
+              id="edit-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="200"
+              placeholder="tu@correo.com"
+              value={customer.email}
+            />
+          </div>
+          <p class="account-message" data-auth-message role="alert" hidden></p>
+          <button class="btn btn-primary account-submit" type="submit">Guardar cambios</button>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <script>
+    import '../../scripts/edit-profile';
+  </script>
+</BaseLayout>

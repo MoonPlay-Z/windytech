@@ -1,19 +1,22 @@
 ---
 import Icon from './Icon.astro';
 import { content, site, whatsappLink, type Lang } from '../data/site';
+import type { CustomerSession } from '../lib/customer-auth';
 
 interface Props {
   lang: Lang;
   altHref: string;
+  customer?: CustomerSession | null;
 }
 
-const { lang, altHref } = Astro.props;
+const { lang, altHref, customer } = Astro.props;
 const t = content[lang];
 const homeHref = lang === 'es' ? '/' : '/en/';
 const navAria = lang === 'es' ? 'Navegación principal' : 'Main navigation';
 const markAlt = lang === 'es'
     ? 'Windytech — desarrollo de software y automatización'
     : 'Windytech — software development and automation';
+const isLoggedIn = Boolean(customer);
 ---
 
 <div class="campaign-bar">
@@ -62,20 +65,63 @@ const markAlt = lang === 'es'
     </nav>
 
     <div class="header-actions">
-      <a
-        class="btn btn-sm btn-outline"
-        href="/cuenta/login/"
-        aria-label="Iniciar sesión"
-      >
-        Iniciar sesión
-      </a>
-      <a
-        class="btn btn-sm btn-outline ml-2"
-        href="/cuenta/registro/"
-        aria-label="Registrarse"
-      >
-        Registrarse
-      </a>
+      {isLoggedIn && customer ? (
+        <>
+          <div class="profile-menu" data-profile-menu>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline profile-trigger"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-label="Menú de cuenta de {customer.name}"
+              data-profile-toggle
+            >
+              <span class="profile-name">{customer.name}</span>
+              <Icon name="chevron-down" size={14} />
+            </button>
+            <div class="profile-dropdown" data-profile-dropdown hidden>
+              <a class="dropdown-item" href="/cuenta/perfil/" data-profile-close>
+                <Icon name="user" size={14} />
+                <span>Mi perfil</span>
+              </a>
+              <a class="dropdown-item" href="/cuenta/editar-perfil/" data-profile-close>
+                <Icon name="edit" size={14} />
+                <span>Modificar perfil</span>
+              </a>
+              <a class="dropdown-item" href="/cuenta/cambiar-contrasena/" data-profile-close>
+                <Icon name="lock" size={14} />
+                <span>Cambiar contraseña</span>
+              </a>
+              <hr class="dropdown-divider" />
+              <button
+                class="dropdown-item dropdown-item--danger"
+                type="button"
+                data-logout-button
+              >
+                <Icon name="log-out" size={14} />
+                <span>Salir</span>
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <a
+            class="btn btn-sm btn-outline"
+            href="/cuenta/login/"
+            aria-label="Iniciar sesión"
+          >
+            Iniciar sesión
+          </a>
+          <a
+            class="btn btn-sm btn-outline ml-2"
+            href="/cuenta/registro/"
+            aria-label="Registrarse"
+          >
+            Registrarse
+          </a>
+        </>
+      )}
       <a
         class="cart-link"
         href={lang === 'es' ? '/carrito/' : '/en/cart/'}
@@ -110,6 +156,68 @@ const markAlt = lang === 'es'
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setOpen(false);
+    });
+  }
+
+  /* --- Menú de perfil desplegable --- */
+  const profileToggle = document.querySelector<HTMLButtonElement>('[data-profile-toggle]');
+  const profileMenu = document.querySelector<HTMLElement>('[data-profile-menu]');
+  const profileDropdown = document.querySelector<HTMLElement>('[data-profile-dropdown]');
+
+  if (profileToggle && profileMenu && profileDropdown) {
+    const closeDropdown = () => {
+      profileToggle.setAttribute('aria-expanded', 'false');
+      profileDropdown.hidden = true;
+      profileMenu.removeAttribute('data-open');
+    };
+
+    profileToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isOpen = profileToggle.getAttribute('aria-expanded') === 'true';
+      if (isOpen) {
+        closeDropdown();
+      } else {
+        profileToggle.setAttribute('aria-expanded', 'true');
+        profileDropdown.hidden = false;
+        profileMenu.setAttribute('data-open', 'true');
+      }
+    });
+
+    // Cerrar al hacer clic en cualquier opción del menú
+    profileDropdown.querySelectorAll('[data-profile-close]').forEach((link) => {
+      link.addEventListener('click', () => closeDropdown());
+    });
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (event) => {
+      if (!profileMenu.contains(event.target as Node)) {
+        closeDropdown();
+      }
+    });
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeDropdown();
+    });
+  }
+
+  /* --- Cerrar sesión desde el menú de perfil --- */
+  const logoutButton = document.querySelector<HTMLButtonElement>('[data-logout-button]');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', async () => {
+      logoutButton.disabled = true;
+      try {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'same-origin',
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No se pudo cerrar la sesión.');
+        window.location.assign('/cuenta/login/');
+      } catch (error) {
+        logoutButton.disabled = false;
+        alert(error instanceof Error ? error.message : 'No se pudo cerrar la sesión.');
+      }
     });
   }
 </script>
