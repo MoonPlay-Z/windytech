@@ -1,0 +1,27 @@
+{
+  "name": "windytech-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "build": "npm ci"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.5.0",
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.45.4",
+    "dotenv": "^18.0.10",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.23.1",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.11",
+    "typescript": "^5.9.3"
+  }
+}

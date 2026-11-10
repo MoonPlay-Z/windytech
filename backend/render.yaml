@@ -1,0 +1,23 @@
+services:
+  - type: backend
+    name: windytech-backend
+    env: node
+    plan: free
+    region: ohio
+    buildCommand: npm ci
+    startCommand: node dist/server/entry.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: PUBLIC_API_URL
+        fromService:
+          name: windytech-web
+          property: url
+      - key: BACKEND_URL
+        value: https://windytech-backend.onrender.com
+      - key: NEON_DATABASE_URL
+        fromSecret: neon_database_url

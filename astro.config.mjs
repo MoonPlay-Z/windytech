@@ -9,7 +9,7 @@ export default defineConfig({
   site: 'https://www.windytech.studio',
   integrations: [icon()],
   adapter: node({ mode: 'standalone' }),
-  output: 'static',
+  output: 'server',
   build: {
     format: 'directory',
     inlineStylesheets: 'always',
