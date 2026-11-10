@@ -64,6 +64,7 @@ async function submitJson(url: string, method: string, body?: unknown) {
   const response = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = (await response.json().catch(() => ({}))) as { error?: string; ok?: boolean; id?: number };
@@ -290,7 +291,7 @@ function setupQuoteStatus() {
   });
 }
 
-function setup() {
+function initAdmin() {
   setupLogin();
   setupLogout();
   setupForms();
@@ -299,5 +300,5 @@ function setup() {
   setupQuoteStatus();
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup);
-else setup();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAdmin);
+else initAdmin();

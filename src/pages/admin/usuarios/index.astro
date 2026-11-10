@@ -60,7 +60,7 @@ const users = await listAdmins();
 </AdminLayout>
 
 <script>
-  document.querySelectorAll('[data-reset-password]').forEach((button) => {
+  document.querySelectorAll<HTMLButtonElement>('[data-reset-password]').forEach((button) => {
     button.addEventListener('click', async () => {
       const userId = button.dataset.userId;
       const userEmail = button.dataset.userEmail;
