@@ -42,8 +42,16 @@ const { title, admin, active } = Astro.props;
 
       <div class="admin-main">
         <header class="admin-topbar">
-          <h1>{title}</h1>
-          <a class="admin-btn admin-btn--ghost" href={site.url} target="_blank" rel="noopener">Ver sitio</a>
+          <div class="admin-topbar-title">
+            <span class="admin-overline">WINDYTECH / ADMINISTRACIÓN</span>
+            <h1>{title}</h1>
+          </div>
+          <div class="admin-topbar-actions">
+            <span class="admin-online"><span></span> Sesión segura</span>
+            <a class="admin-btn admin-btn--ghost" href={site.url} target="_blank" rel="noopener">
+              Ver sitio <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </header>
         <slot />
       </div>

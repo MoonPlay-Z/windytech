@@ -1,4 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { serverEnv } from './env';
 
 /** Hash SHA-256 en hexadecimal (tokens de sesión, huellas de IP). */
 export function sha256(value: string): string {
@@ -22,18 +23,18 @@ export function sameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   if (!origin) return true; // peticiones same-origin sin Origin (curl, tests)
   try {
-    const url = new URL(request.url);
     const source = new URL(origin);
-    const normalize = (host: string) =>
-      host.replace(/^www\./, '').replace(/:\d+$/, '').toLowerCase();
-    const sourceHost = normalize(source.host);
-    const urlHost = normalize(url.host);
+    const requestUrl = new URL(request.url);
+    const configuredSite = new URL(serverEnv.siteUrl);
+    const normalizeHost = (host: string) => host.replace(/^www\./i, '').toLowerCase();
+    const sameHost = (left: URL, right: URL) =>
+      normalizeHost(left.hostname) === normalizeHost(right.hostname) &&
+      left.port === right.port;
 
-    // Mismo host exacto, o uno es subdominio del otro (www.dominio.com vs dominio.com).
+    // Proxies can give the app an internal request URL; also trust the configured public origin.
     return (
-      sourceHost === urlHost ||
-      sourceHost.endsWith('.' + urlHost) ||
-      urlHost.endsWith('.' + sourceHost)
+      (source.origin === requestUrl.origin && sameHost(source, requestUrl)) ||
+      (source.protocol === configuredSite.protocol && sameHost(source, configuredSite))
     );
   } catch {
     return false;

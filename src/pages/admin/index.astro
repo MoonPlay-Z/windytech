@@ -20,55 +20,91 @@ const [products, projects, posts, quotes] = await Promise.all([
 ---
 
 <AdminLayout title="Resumen" admin={admin} active="dashboard">
+  <section class="admin-welcome">
+    <div>
+      <p class="admin-welcome-kicker">CENTRO DE OPERACIONES</p>
+      <h2>Hola, {admin.email.split('@')[0]}</h2>
+      <p>Este es el resumen de actividad de tu tienda.</p>
+    </div>
+    <a class="admin-btn" href="/admin/productos/nuevo/">+ Añadir producto</a>
+  </section>
+
   <div class="admin-grid">
-    <div class="admin-stat">
+    <a class="admin-stat admin-stat--products" href="/admin/productos/">
+      <span class="admin-stat-icon" aria-hidden="true">▦</span>
+      <span class="admin-stat-label">CATÁLOGO</span>
       <strong>{products.length}</strong>
-      <span>Productos registrados</span>
-    </div>
-    <div class="admin-stat">
+      <span class="admin-stat-caption">Productos registrados</span>
+      <span class="admin-stat-link">Ver productos <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="admin-stat admin-stat--quotes" href="/admin/cotizaciones/">
+      <span class="admin-stat-icon" aria-hidden="true">◷</span>
+      <span class="admin-stat-label">PENDIENTES</span>
       <strong>{quotes.NEW ?? 0}</strong>
-      <span>Cotizaciones nuevas</span>
-    </div>
-    <div class="admin-stat">
+      <span class="admin-stat-caption">Cotizaciones nuevas</span>
+      <span class="admin-stat-link">Revisar solicitudes <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="admin-stat admin-stat--projects" href="/admin/proyectos/">
+      <span class="admin-stat-icon" aria-hidden="true">◇</span>
+      <span class="admin-stat-label">PORTAFOLIO</span>
       <strong>{projects.length}</strong>
-      <span>Proyectos</span>
-    </div>
-    <div class="admin-stat">
+      <span class="admin-stat-caption">Proyectos registrados</span>
+      <span class="admin-stat-link">Ver proyectos <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="admin-stat admin-stat--posts" href="/admin/publicaciones/">
+      <span class="admin-stat-icon" aria-hidden="true">▤</span>
+      <span class="admin-stat-label">CONTENIDO</span>
       <strong>{posts.length}</strong>
-      <span>Publicaciones</span>
-    </div>
+      <span class="admin-stat-caption">Publicaciones</span>
+      <span class="admin-stat-link">Gestionar contenido <span aria-hidden="true">→</span></span>
+    </a>
   </div>
 
   <section class="admin-card">
-    <h2>Accesos rápidos</h2>
-    <div class="admin-actions">
-      <a class="admin-btn" href="/admin/productos/nuevo/">Añadir producto</a>
-      <a class="admin-btn admin-btn--ghost" href="/admin/productos/">Gestionar catálogo</a>
-      <a class="admin-btn admin-btn--ghost" href="/admin/cotizaciones/">Ver cotizaciones</a>
-      <a class="admin-btn admin-btn--ghost" href="/admin/proyectos/">Proyectos</a>
-      <a class="admin-btn admin-btn--ghost" href="/admin/publicaciones/">Publicaciones</a>
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">ATAJOS</p>
+        <h2>Accesos rápidos</h2>
+      </div>
+    </div>
+    <div class="admin-quick-links">
+      <a href="/admin/productos/nuevo/"><span>＋</span><strong>Añadir producto</strong><small>Incorpora un artículo al catálogo</small></a>
+      <a href="/admin/cotizaciones/"><span>↗</span><strong>Ver cotizaciones</strong><small>Responde solicitudes de clientes</small></a>
+      <a href="/admin/publicaciones/"><span>✎</span><strong>Crear publicación</strong><small>Actualiza el contenido del sitio</small></a>
     </div>
   </section>
 
   <section class="admin-card">
-    <h2>Estado del catálogo</h2>
-    <table class="admin-table">
-      <thead>
-        <tr><th>Producto</th><th>Precio</th><th>Estado</th><th>Activo</th></tr>
-      </thead>
-      <tbody>
-        {products.slice(0, 8).map((product) => (
-          <tr>
-            <td><a href={`/admin/productos/${product.id}/`}>{product.name}</a></td>
-            <td>${(product.priceCents / 100).toFixed(2)}</td>
-            <td>{product.availability}</td>
-            <td>{product.isActive ? 'Sí' : 'No'}</td>
-          </tr>
-        ))}
-        {products.length === 0 && (
-          <tr><td colspan="4">Aún no hay productos. <a href="/admin/productos/nuevo/">Crea el primero</a>.</td></tr>
-        )}
-      </tbody>
-    </table>
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">INVENTARIO</p>
+        <h2>Estado del catálogo</h2>
+      </div>
+      <a class="admin-text-link" href="/admin/productos/">Ver todo <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr><th>Producto</th><th>Precio</th><th>Disponibilidad</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          {products.slice(0, 8).map((product) => (
+            <tr>
+              <td><a href={`/admin/productos/${product.id}/`}>{product.name}</a></td>
+              <td>${(product.priceCents / 100).toFixed(2)}</td>
+              <td><span class="admin-badge">{product.availability.replaceAll('_', ' ')}</span></td>
+              <td>
+                <span class:list={['admin-active-state', { 'is-inactive': !product.isActive }]}>
+                  <span></span>{product.isActive ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+            </tr>
+          ))}
+          {products.length === 0 && (
+            <tr><td colspan="4">Aún no hay productos. <a href="/admin/productos/nuevo/">Crea el primero</a>.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   </section>
 </AdminLayout>
