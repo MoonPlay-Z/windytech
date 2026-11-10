@@ -24,8 +24,17 @@ export function sameOrigin(request: Request): boolean {
   try {
     const url = new URL(request.url);
     const source = new URL(origin);
-    const normalize = (host: string) => host.replace(/^www\./, '');
-    return normalize(source.host) === normalize(url.host);
+    const normalize = (host: string) =>
+      host.replace(/^www\./, '').replace(/:\d+$/, '').toLowerCase();
+    const sourceHost = normalize(source.host);
+    const urlHost = normalize(url.host);
+
+    // Mismo host exacto, o uno es subdominio del otro (www.dominio.com vs dominio.com).
+    return (
+      sourceHost === urlHost ||
+      sourceHost.endsWith('.' + urlHost) ||
+      urlHost.endsWith('.' + sourceHost)
+    );
   } catch {
     return false;
   }
