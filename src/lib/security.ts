@@ -24,7 +24,8 @@ export function sameOrigin(request: Request): boolean {
   try {
     const url = new URL(request.url);
     const source = new URL(origin);
-    return source.host === url.host;
+    const normalize = (host: string) => host.replace(/^www\./, '');
+    return normalize(source.host) === normalize(url.host);
   } catch {
     return false;
   }
