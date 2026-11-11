@@ -17,8 +17,15 @@ export function fieldErrors(error: z.ZodError): Record<string, string[]> {
   return fields;
 }
 
-function translateIssue(issue: z.core.$ZodIssue): string {
-  switch (issue.code) {
+/** Mensaje propio del esquema (en español) si lo hay. */
+function custom(issue: z.core.$ZodIssue): string | null {
+  const message = issue.message ?? '';
+  return message && !/^Too |^Invalid |^Expected |^Unrecognized/i.test(message)
+    ? message
+    : null;
+}
+
+function translateIssue(issue: z.core.$ZodIssue): string {  switch (issue.code) {
     case 'invalid_type':
       if (issue.input === undefined || issue.input === null) {
         return 'Este campo es obligatorio.';
@@ -33,9 +40,9 @@ function translateIssue(issue: z.core.$ZodIssue): string {
       return 'Valor no válido.';
     case 'too_small':
       if (issue.minimum === 1) return 'Este campo es obligatorio.';
-      return `El valor mínimo es ${issue.minimum}.`;
+      return custom(issue) ?? `El valor mínimo es ${issue.minimum}.`;
     case 'too_big':
-      return `El valor máximo es ${issue.maximum}.`;
+      return custom(issue) ?? `El valor máximo es ${issue.maximum}.`;
     default:
       return issue.message || 'Valor no válido.';
   }
@@ -109,6 +116,7 @@ export const productSchema = z.object({
         position: z.coerce.number().int().min(0).default(0),
       }),
     )
+    .max(4, 'Máximo 4 imágenes por producto.')
     .default([]),
   variants: z
     .array(

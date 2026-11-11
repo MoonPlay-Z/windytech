@@ -14,9 +14,11 @@ interface Props {
   images?: UploadImage[];
   publicId?: string | null;
   label: string;
+  /** Máximo de imágenes en modo multi (por defecto 4). */
+  max?: number;
 }
 
-const { mode, folder, field, images = [], publicId = null, label } = Astro.props;
+const { mode, folder, field, images = [], publicId = null, label, max = 4 } = Astro.props;
 const cloud = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'cxy5wtgr';
 const dataType = mode === 'multi' ? 'json' : 'string';
 const serialized =
@@ -31,6 +33,7 @@ const serialized =
   data-mode={mode}
   data-folder={folder}
   data-cloud={cloud}
+  data-max={mode === 'multi' ? String(max) : '1'}
 >
   <label class="uploader-label">
     <span>{label}</span>
@@ -55,6 +58,10 @@ const serialized =
     value={serialized}
   />
   <p class="admin-hint">
-    Sube imágenes JPG, PNG o WebP de hasta 10 MB. La entrega usa Cloudinary con <code>f_auto,q_auto</code>.
+    {
+      mode === 'multi'
+        ? `Hasta ${max} imágenes JPG, PNG o WebP de 10 MB cada una. La marcada como «Principal» es la que se ve en el catálogo.`
+        : 'Sube imágenes JPG, PNG o WebP de hasta 10 MB. La entrega usa Cloudinary con f_auto, q_auto.'
+    }
   </p>
 </div>

@@ -230,7 +230,6 @@ const productSchema: Record<string, unknown> = {
             >
               ${(basePrice.unitCents / 100).toFixed(2)}
             </span>
-            <span class="product-price-note">{es ? 'sin IVA' : 'VAT excluded'}</span>
             {Math.max(basePrice.compareAtCents, basePrice.listCents) > basePrice.unitCents && (
               <span class="product-price-old" data-price-old data-usd={Math.max(basePrice.compareAtCents, basePrice.listCents)} data-ves={vesCompare}>
                 ${(Math.max(basePrice.compareAtCents, basePrice.listCents) / 100).toFixed(2)}

@@ -211,6 +211,7 @@ function setupUploaders() {
 
     const folder = root.dataset.folder ?? 'windytech/media';
     const mode = root.dataset.mode === 'single' ? 'single' : 'multi';
+    const max = Number(root.dataset.max ?? (mode === 'single' ? 1 : 4));
     const hidden = root.querySelector<HTMLInputElement>('[data-upload-value]');
     const list = root.querySelector<HTMLElement>('[data-upload-list]');
     const fileInput = root.querySelector<HTMLInputElement>('[data-upload-input]');
@@ -273,8 +274,41 @@ function setupUploaders() {
     };
 
     fileInput.addEventListener('change', async () => {
-      const files = [...(fileInput.files ?? [])].slice(0, mode === 'single' ? 1 : 10);
+      const errorNode = root.querySelector<HTMLElement>('[data-upload-error]');
+      const selected = [...(fileInput.files ?? [])];
+
+      if (fileInput.disabled) {
+        fileInput.value = '';
+        return;
+      }
+      fileInput.disabled = true;
+
+      if (items.length >= max) {
+        if (errorNode) {
+          errorNode.hidden = false;
+          errorNode.textContent = `Ya tienes el máximo de ${max} imágenes. Quita alguna para añadir otra.`;
+        }
+        fileInput.value = '';
+        return;
+      }
+
+      const room = max - items.length;
+      const files = selected.slice(0, room);
+      if (selected.length > room && errorNode) {
+        errorNode.hidden = false;
+        errorNode.textContent = `Solo caben ${room} imágenes más (máximo ${max}). Se descartaron ${selected.length - room}.`;
+      }
+
       for (const file of files) {
+        // El cupo se comprueba en cada archivo: si otra subida ya lo llenó,
+        // se detiene aquí y no se supera el máximo.
+        if (items.length >= max) {
+          if (errorNode) {
+            errorNode.hidden = false;
+            errorNode.textContent = `Máximo ${max} imágenes por producto.`;
+          }
+          break;
+        }
         try {
           const sign = await submitJson('/api/admin/uploads/sign', 'POST', { folder });
           const signature = sign as unknown as {
@@ -307,16 +341,16 @@ function setupUploaders() {
           if (mode === 'single') items = items.slice(-1);
           sync();
           render();
-          root.querySelector<HTMLElement>('[data-upload-error]')?.setAttribute('hidden', '');
         } catch (error) {
-          const errorNode = root.querySelector<HTMLElement>('[data-upload-error]');
-          if (errorNode) {
-            errorNode.hidden = false;
-            errorNode.textContent = error instanceof Error ? error.message : 'Error al subir.';
+          const node = root.querySelector<HTMLElement>('[data-upload-error]');
+          if (node) {
+            node.hidden = false;
+            node.textContent = error instanceof Error ? error.message : 'Error al subir.';
           }
         }
       }
       fileInput.value = '';
+      fileInput.disabled = false;
     });
 
     render();

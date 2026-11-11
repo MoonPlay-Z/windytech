@@ -146,7 +146,13 @@ const categories = await listCategoriesAdmin();
         </div>
       </fieldset>
 
-      <ImageUploader mode="multi" folder="windytech/productos/nuevo" field="images" label="Imágenes del producto" />
+      <ImageUploader
+        mode="multi"
+        folder="windytech/productos/nuevo"
+        field="images"
+        label="Imágenes del producto"
+        max={4}
+      />
 
       <p class="admin-message" data-form-message hidden></p>
       <div class="admin-actions">
