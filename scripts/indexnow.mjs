@@ -8,7 +8,7 @@
  */
 import { readFile } from 'node:fs/promises';
 
-const HOST = 'www.windytech.studio';
+const HOST = 'windytech.studio';
 const KEY = '3912b45e618c49a3694bc4c10ff020f4';
 const ENDPOINT = 'https://api.indexnow.org/indexnow';
 const dryRun = process.argv.includes('--dry-run');

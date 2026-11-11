@@ -26,7 +26,7 @@ npm run db:studio # abre Drizzle Studio
 ```
 
 `npm run seo:check` necesita HTML estático en `dist/` o el sitio publicado:
-`node scripts/check-seo.mjs --site=https://www.windytech.studio`. Como el sitio se
+`node scripts/check-seo.mjs --site=https://windytech.studio`. Como el sitio se
 sirve con SSR (`@astrojs/node`), el build de producción no genera HTML estático y el
 chequeo automático se hace contra el sitio desplegado, no en el CI.
 
@@ -114,7 +114,7 @@ npx tsx scripts/bootstrap-admin.ts
 4. Start command: `node dist/server/entry.mjs`
 5. Configura las variables de `.env.example` en el panel de Render. `DATABASE_URL`
    debe apuntar a la base PostgreSQL de Neon.
-6. Añade `www.windytech.studio` como dominio canónico y verifica `/api/health`.
+6. Añade `windytech.studio` como dominio canónico y verifica `/api/health`.
 7. Ejecuta `npm run db:push` una vez contra la base y envía `/sitemap.xml` en Google
    Search Console y Bing Webmaster Tools.
 
@@ -135,7 +135,7 @@ acción para copiar el enlace; son enlaces directos y no cargan widgets externos
 
 - [ ] Revisar el número de WhatsApp y el correo en `src/data/site.ts`.
 - [ ] Revisar los textos legales con un abogado/contador.
-- [ ] Confirmar que el dominio `www.windytech.studio` apunta al deploy.
+- [ ] Confirmar que el dominio `windytech.studio` apunta al deploy.
 - [ ] Configurar correo profesional (`hola@windytech.studio`) y redirigirlo si hace falta.
 - [ ] Añadir analítica (GA4 o Plausible) cuando exista una cuenta.
 - [ ] Verificar el sitio en Google Search Console y Bing Webmaster Tools y pegar los códigos en `site.verification`.

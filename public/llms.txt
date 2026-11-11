@@ -4,11 +4,11 @@
 
 El nombre de la empresa es Windytech. `windytech.studio` es su dominio web, no parte del nombre.
 
-- Sitio web: https://www.windytech.studio/
-- Inglés: https://www.windytech.studio/en/
-- Servicios: https://www.windytech.studio/servicios/
-- Acerca de la empresa: https://www.windytech.studio/nosotros/
-- Contacto: https://www.windytech.studio/#contacto
+- Sitio web: https://windytech.studio/
+- Inglés: https://windytech.studio/en/
+- Servicios: https://windytech.studio/servicios/
+- Acerca de la empresa: https://windytech.studio/nosotros/
+- Contacto: https://windytech.studio/#contacto
 - Última actualización: 2026-11-09
 
 ## Perfil de la empresa
@@ -24,12 +24,12 @@ El nombre de la empresa es Windytech. `windytech.studio` es su dominio web, no p
 
 ## Servicios
 
-- **Desarrollo de software a medida:** paneles, aplicaciones web, integraciones y herramientas internas. https://www.windytech.studio/servicios/desarrollo-de-software/
-- **Automatización de WhatsApp Business:** respuestas automáticas, toma de pedidos, agenda de citas y seguimiento. https://www.windytech.studio/servicios/automatizacion-whatsapp/
-- **Landing pages y sitios web:** páginas rápidas, claras y optimizadas para móvil, enfocadas en generar contactos y ventas. https://www.windytech.studio/servicios/paginas-web/
-- **Marketing, SEO y publicidad:** posicionamiento en buscadores, contenido, campañas y medición de resultados. https://www.windytech.studio/servicios/marketing-seo/
-- **Redes e infraestructura:** configuración de redes, conectividad y equipos para oficinas y locales (Venezuela). https://www.windytech.studio/servicios/redes-e-infraestructura/
-- **Equipos informáticos:** venta y asesoría de computadoras, monitores, impresoras y accesorios. https://www.windytech.studio/servicios/equipos-informaticos/
+- **Desarrollo de software a medida:** paneles, aplicaciones web, integraciones y herramientas internas. https://windytech.studio/servicios/desarrollo-de-software/
+- **Automatización de WhatsApp Business:** respuestas automáticas, toma de pedidos, agenda de citas y seguimiento. https://windytech.studio/servicios/automatizacion-whatsapp/
+- **Landing pages y sitios web:** páginas rápidas, claras y optimizadas para móvil, enfocadas en generar contactos y ventas. https://windytech.studio/servicios/paginas-web/
+- **Marketing, SEO y publicidad:** posicionamiento en buscadores, contenido, campañas y medición de resultados. https://windytech.studio/servicios/marketing-seo/
+- **Redes e infraestructura:** configuración de redes, conectividad y equipos para oficinas y locales (Venezuela). https://windytech.studio/servicios/redes-e-infraestructura/
+- **Equipos informáticos:** venta y asesoría de computadoras, monitores, impresoras y accesorios. https://windytech.studio/servicios/equipos-informaticos/
 
 ## Preguntas frecuentes
 
@@ -62,14 +62,14 @@ Los proyectos inician con el 50% de anticipo y el saldo se paga contra avance y 
 - WhatsApp: https://wa.me/584127723148
 - Teléfono: +58 412-7723148
 - Correo: windytechestudio@gmail.com
-- Formulario: https://www.windytech.studio/#contacto
+- Formulario: https://windytech.studio/#contacto
 
 ## English summary
 
 Windytech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It builds custom software, automates WhatsApp Business support, creates websites and landing pages, and supports businesses with SEO, advertising, networks and IT equipment. Digital services are delivered remotely worldwide; on-site network and equipment work is available in Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal.
 
-- Services: https://www.windytech.studio/en/services/
-- About: https://www.windytech.studio/en/about/
-- Contact: https://www.windytech.studio/en/#contacto
+- Services: https://windytech.studio/en/services/
+- About: https://windytech.studio/en/about/
+- Contact: https://windytech.studio/en/#contacto
 
 Las páginas en español e inglés son la fuente de verdad sobre alcance, disponibilidad y condiciones de los servicios.

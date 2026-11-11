@@ -33,7 +33,7 @@ export async function fetchBcvRate(): Promise<RateResult | null> {
       const timer = setTimeout(() => controller.abort(), 8_000);
       const response = await fetch(url, {
         signal: controller.signal,
-        headers: { accept: 'application/json', 'user-agent': 'Windytech/1.0 (+https://www.windytech.studio)' },
+        headers: { accept: 'application/json', 'user-agent': 'Windytech/1.0 (+https://windytech.studio)' },
       });
       clearTimeout(timer);
       if (!response.ok) continue;

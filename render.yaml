@@ -11,7 +11,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PUBLIC_SITE_URL
-        value: https://www.windytech.studio
+        value: https://windytech.studio
       - key: SESSION_SECRET
         generateValue: true
       # Neon PostgreSQL: pega la cadena de conexión en el panel de Render.

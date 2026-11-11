@@ -4,7 +4,7 @@
  *
  * Uso:
  *   npm run build && npm run seo:check
- *   node scripts/check-seo.mjs --site=https://www.windytech.studio   # valida el sitio live
+ *   node scripts/check-seo.mjs --site=https://windytech.studio   # valida el sitio live
  *
  * Revisa: sitemap generado, canonical, hreflang, títulos y descripciones únicos,
  * un solo H1 por página, JSON-LD parseable, imágenes y enlaces internos rotos.

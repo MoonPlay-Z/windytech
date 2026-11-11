@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-process.env.PUBLIC_SITE_URL = 'https://www.windytech.studio';
+process.env.PUBLIC_SITE_URL = 'https://windytech.studio';
 const { sameOrigin } = await import('./security');
 
 test('sameOrigin accepts the configured public origin behind a proxy', () => {
@@ -40,6 +40,15 @@ test('sameOrigin accepts apex and www as the same site', () => {
   const request = new Request('http://127.0.0.1:4321/api/auth/logout', {
     method: 'POST',
     headers: { origin: 'https://windytech.studio' },
+  });
+
+  assert.equal(sameOrigin(request), true);
+});
+
+test('sameOrigin accepts the www alias of the canonical apex', () => {
+  const request = new Request('http://127.0.0.1:4321/api/auth/logout', {
+    method: 'POST',
+    headers: { origin: 'https://www.windytech.studio' },
   });
 
   assert.equal(sameOrigin(request), true);

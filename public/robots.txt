@@ -1,4 +1,4 @@
-# Windytech — https://www.windytech.studio
+# Windytech — https://windytech.studio
 # Todos los contenidos públicos pueden indexarse.
 
 User-agent: *
@@ -92,4 +92,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://www.windytech.studio/sitemap.xml
+Sitemap: https://windytech.studio/sitemap.xml

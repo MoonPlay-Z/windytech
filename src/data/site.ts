@@ -6,8 +6,8 @@ export const site = {
   /* Nombre anterior de la marca: alias para buscadores, nunca nombre principal. */
   alternateName: ['Windy Tech'] as string[],
   slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
-  url: 'https://www.windytech.studio',
-  domain: 'www.windytech.studio',
+  url: 'https://windytech.studio',
+  domain: 'windytech.studio',
   whatsappNumber: '584127723148',
   whatsappDisplay: '+58 412-7723148',
   email: 'windytechestudio@gmail.com',

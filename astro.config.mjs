@@ -6,7 +6,7 @@ import node from '@astrojs/node';
 // Las páginas de marketing siguen siendo estáticas; /api, /admin y las
 // páginas de catálogo se renderizan bajo demanda (prerender = false).
 export default defineConfig({
-  site: 'https://www.windytech.studio',
+  site: 'https://windytech.studio',
   integrations: [icon()],
   adapter: node({ mode: 'standalone' }),
   output: 'server',

@@ -32,7 +32,7 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
   `og:image:alt`, `og:locale` y `og:locale:alternate`.
 - Twitter/X con `summary_large_image`.
 - Imágenes `og.png` (español) y `og-en.png` (inglés) de 1200×630 px y menos de 300 KB.
-- URLs absolutas con el dominio canónico `https://www.windytech.studio`.
+- URLs absolutas con el dominio canónico `https://windytech.studio`.
 
 ### Entidad de empresa ("Acerca de")
 
@@ -106,9 +106,9 @@ Después de editar, ejecuta `npm run build` y vuelve a desplegar.
 
 1. Entra a <https://search.google.com/search-console>.
 2. Añade la propiedad de **dominio** `windytech.studio` (verificación por DNS) o la
-   propiedad de prefijo `https://www.windytech.studio/` (verificación por meta tag).
+   propiedad de prefijo `https://windytech.studio/` (verificación por meta tag).
 3. Si usas meta tag, pega el código en `site.verification.google`, despliega y verifica.
-4. Envía `https://www.windytech.studio/sitemap.xml`.
+4. Envía `https://windytech.studio/sitemap.xml`.
 5. Usa **Inspección de URLs** → *Solicitar indexación* en `/`, `/servicios/`, cada página
    de servicio, `/nosotros/` y `/en/`.
 
@@ -174,7 +174,7 @@ coherentes: mismo nombre, misma descripción, mismo dominio y mismo teléfono.
 Usa siempre estos datos; el dominio web no es parte del nombre de la empresa:
 
 - **Nombre:** Windytech
-- **Web:** https://www.windytech.studio
+- **Web:** https://windytech.studio
 - **WhatsApp:** +58 412-7723148
 - **Correo:** windytechestudio@gmail.com
 - **Cobertura:** servicios digitales en todo el mundo; redes y equipos en Venezuela.
@@ -210,14 +210,14 @@ Si la imagen no cambia, agrega un parámetro temporal al compartir
 
 ## 6. Checklist después de desplegar
 
-- [ ] `https://www.windytech.studio/favicon.ico` responde 200.
-- [ ] `https://www.windytech.studio/assets/logo-mark-large-56.webp` responde 200.
-- [ ] `https://www.windytech.studio/assets/og.png` responde 200 y mide 1200×630.
-- [ ] `https://www.windytech.studio/sitemap.xml` incluye las 22 URLs y los `hreflang`.
-- [ ] `https://www.windytech.studio/servicios/` y las 6 páginas de servicio responden 200.
-- [ ] `https://www.windytech.studio/robots.txt` permite Bingbot y Bravebot.
-- [ ] `https://www.windytech.studio/llms.txt` y `/llms-full.txt` responden 200.
-- [ ] `https://www.windytech.studio/3912b45e618c49a3694bc4c10ff020f4.txt` devuelve la clave.
+- [ ] `https://windytech.studio/favicon.ico` responde 200.
+- [ ] `https://windytech.studio/assets/logo-mark-large-56.webp` responde 200.
+- [ ] `https://windytech.studio/assets/og.png` responde 200 y mide 1200×630.
+- [ ] `https://windytech.studio/sitemap.xml` incluye las 22 URLs y los `hreflang`.
+- [ ] `https://windytech.studio/servicios/` y las 6 páginas de servicio responden 200.
+- [ ] `https://windytech.studio/robots.txt` permite Bingbot y Bravebot.
+- [ ] `https://windytech.studio/llms.txt` y `/llms-full.txt` responden 200.
+- [ ] `https://windytech.studio/3912b45e618c49a3694bc4c10ff020f4.txt` devuelve la clave.
 - [ ] La home incluye `<meta name="msvalidate.01" ...>`.
 - [ ] Cabeceras `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy` presentes.
 - [ ] `npm run seo:check` sin errores antes de desplegar.

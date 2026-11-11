@@ -12,7 +12,7 @@ export const serverEnv = {
     return read('SESSION_SECRET') || 'windytech-dev-session-secret-change-me';
   },
   get siteUrl() {
-    return (read('PUBLIC_SITE_URL') || 'https://www.windytech.studio').replace(/\/$/, '');
+    return (read('PUBLIC_SITE_URL') || 'https://windytech.studio').replace(/\/$/, '');
   },
   get cloudName() {
     return read('PUBLIC_CLOUDINARY_CLOUD_NAME');

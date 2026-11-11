@@ -1,6 +1,6 @@
 # Manual de Google Search Console — Windytech
 
-Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windytech: Astro, deploy en Vercel, dominio canónico `www.windytech.studio`, contenido bilingüe y 22 URLs en el sitemap.
+Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windytech: Astro, deploy en Vercel, dominio canónico `windytech.studio`, contenido bilingüe y 22 URLs en el sitemap.
 
 ---
 
@@ -10,9 +10,9 @@ Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windy
 |---|---|
 | Nombre de la empresa | Windytech |
 | Propiedad recomendada | Dominio: `windytech.studio` (incluye `www`, apex, http y https) |
-| URL canónica | `https://www.windytech.studio/` |
+| URL canónica | `https://windytech.studio/` |
 | Apex | `https://windytech.studio/` → 308 a `www` |
-| Sitemap | `https://www.windytech.studio/sitemap.xml` |
+| Sitemap | `https://windytech.studio/sitemap.xml` |
 | Códigos de verificación | `src/data/site.ts` → `site.verification` |
 | Script IndexNow | `npm run indexnow` |
 | Guía SEO/GEO | `SEO-GEO.md` |
@@ -99,7 +99,7 @@ Ventajas: cubre `http`, `https`, `www`, apex y subdominios. **No borres el regis
 
 Úsala solo si no tienes acceso al DNS.
 
-1. **Añadir propiedad → Prefijo de URL** → `https://www.windytech.studio/`.
+1. **Añadir propiedad → Prefijo de URL** → `https://windytech.studio/`.
 2. Elige **Etiqueta HTML**.
 3. Google da algo como:
 
@@ -130,7 +130,7 @@ Ventajas: cubre `http`, `https`, `www`, apex y subdominios. **No borres el regis
 7. Comprueba que la etiqueta está publicada:
 
    ```bash
-   curl -s https://www.windytech.studio/ | grep google-site-verification
+   curl -s https://windytech.studio/ | grep google-site-verification
    ```
 
 8. Vuelve a Search Console y pulsa **Verificar**.
@@ -142,7 +142,7 @@ No pegues la etiqueta completa dentro del valor: el campo espera solo el token. 
 | Situación | Propiedad |
 |---|---|
 | Tienes acceso al DNS | Dominio `windytech.studio` |
-| No tienes DNS, pero sí el código | Prefijo `https://www.windytech.studio/` |
+| No tienes DNS, pero sí el código | Prefijo `https://windytech.studio/` |
 
 No necesitas las dos. Si creas la de dominio, la meta de Google no hace falta.
 
@@ -225,7 +225,7 @@ Aquí ves qué URLs están indexadas y por qué otras no.
 ### 5.3. Sitemaps
 
 1. **Sitemaps → Añadir sitemap**.
-2. Escribe `sitemap.xml` (la URL completa sería `https://www.windytech.studio/sitemap.xml`).
+2. Escribe `sitemap.xml` (la URL completa sería `https://windytech.studio/sitemap.xml`).
 3. Enviar.
 
 Qué revisar:
@@ -237,7 +237,7 @@ Qué revisar:
 
 Si aparece *No se pudo obtener*:
 
-- Abre `https://www.windytech.studio/sitemap.xml` y confirma 200 y XML válido.
+- Abre `https://windytech.studio/sitemap.xml` y confirma 200 y XML válido.
 - Comprueba que `robots.txt` no lo bloquea.
 - Reenvíalo; a veces es un fallo temporal de lectura.
 
@@ -266,7 +266,7 @@ Mide LCP, INP y CLS con datos de usuarios reales (CrUX).
 
 Debe estar correcto. Vercel gestiona el certificado. Si aparece un problema:
 
-- Comprueba que `https://www.windytech.studio/` carga sin avisos.
+- Comprueba que `https://windytech.studio/` carga sin avisos.
 - Busca contenido mixto (`http://` en imágenes, scripts o CSS).
 - Revisa que el apex redirija a `www` por HTTPS.
 
@@ -386,7 +386,7 @@ No es un error de código. Google aún no ha procesado el favicon.
 
    ```bash
    curl -sSL -o /dev/null -w "%{http_code}\n" \
-     "https://www.google.com/s2/favicons?domain=www.windytech.studio&sz=128"
+     "https://www.google.com/s2/favicons?domain=windytech.studio&sz=128"
    ```
 
    Mientras devuelva `404`, Google sigue mostrando el globo.
@@ -503,12 +503,12 @@ Métricas a seguir:
 | Recurso | URL |
 |---|---|
 | Search Console | https://search.google.com/search-console |
-| Sitemap | https://www.windytech.studio/sitemap.xml |
+| Sitemap | https://windytech.studio/sitemap.xml |
 | Rich Results Test | https://search.google.com/test/rich-results |
 | Validador de schema | https://validator.schema.org/ |
 | PageSpeed Insights | https://pagespeed.web.dev/ |
 | Bing Webmaster Tools | https://www.bing.com/webmasters |
-| Favicon cache de Google | https://www.google.com/s2/favicons?domain=www.windytech.studio&sz=128 |
+| Favicon cache de Google | https://www.google.com/s2/favicons?domain=windytech.studio&sz=128 |
 
 Comandos del proyecto:
 
@@ -607,14 +607,14 @@ Para este proyecto, el stack gratuito es suficiente durante los primeros 3–6 m
 
 1. **Search Console:** Rendimiento + Indexación + Sitemaps.
 2. **GA4:** sesiones, fuentes y conversiones (WhatsApp, formulario).
-3. **Screaming Frog:** crawl de `https://www.windytech.studio` (22 URLs).
+3. **Screaming Frog:** crawl de `https://windytech.studio` (22 URLs).
    - Revisa títulos duplicados, metas largas, 404, redirecciones y canonical.
 4. **PageSpeed Insights:** `/`, `/nosotros/`, `/en/`.
 5. **Rich Results Test:** home, `/nosotros/` y `/en/about/`.
 6. **Ahrefs Webmaster Tools:** enlaces nuevos y errores técnicos.
 7. **Clarity:** grabaciones de la home y de la página de contacto.
 8. **Looker Studio:** un dashboard con GSC + GA4 para ver la evolución.
-9. **UptimeRobot:** monitor de `https://www.windytech.studio/` cada 5 minutos.
+9. **UptimeRobot:** monitor de `https://windytech.studio/` cada 5 minutos.
 
 ### 11.5. Herramientas que ya están integradas en el proyecto
 
