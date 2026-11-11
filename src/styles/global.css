@@ -2660,45 +2660,101 @@ a.contact-card:hover {
    Transiciones entre páginas (ClientRouter)
    --------------------------------------------------------------------------- */
 
-/* El encabezado y el pie quedan estables; solo se anima el contenido. */
+/* El marco de la web (cabecera, barra de campaña, botón de WhatsApp y pie)
+   queda estable; solo se anima el contenido de la página. */
 .site-header {
   view-transition-name: site-header;
+}
+
+/* La barra de campaña y el botón flotante forman parte del marco fijo. */
+.campaign-bar {
+  view-transition-name: site-campaign;
+}
+
+.wa-float {
+  view-transition-name: site-whatsapp;
 }
 
 .site-footer {
   view-transition-name: site-footer;
 }
 
+/* Variables de dirección: los pseudo-elementos de View Transitions heredan
+   las custom properties del elemento raíz. */
+:root {
+  --wt-page-out-name: wt-page-turn-out;
+  --wt-page-out-origin: left center;
+  --wt-page-shadow: 40px 0 80px rgba(10, 30, 45, 0.32);
+}
+
+html[data-astro-transition='back'] {
+  --wt-page-out-name: wt-page-turn-out-back;
+  --wt-page-out-origin: right center;
+  --wt-page-shadow: -40px 0 80px rgba(10, 30, 45, 0.32);
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* La página saliente se desliza lateralmente mientras gira sobre su borde,
+     como una hoja que se pasa; la entrante espera quieta debajo y queda al
+     descubierto. El marco (cabecera, barra, WhatsApp y pie) no se mueve. */
   ::view-transition-old(root) {
-    animation: wt-page-out 160ms cubic-bezier(0.4, 0, 0.2, 1) both;
+    z-index: 2;
+    backface-visibility: hidden;
+    transform-origin: var(--wt-page-out-origin, left center);
+    animation-name: var(--wt-page-out-name, wt-page-turn-out);
+    animation-duration: 520ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+    box-shadow: var(--wt-page-shadow, 40px 0 80px rgba(10, 30, 45, 0.32));
   }
 
   ::view-transition-new(root) {
-    animation: wt-page-in 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  }
-
-  ::view-transition-old(site-header),
-  ::view-transition-new(site-header) {
+    z-index: 1;
+    backface-visibility: hidden;
     animation: none;
   }
 
+  /* El encabezado, la barra de campaña, el botón flotante y el pie no
+     participan en el giro: el marco de la web permanece fijo. */
+  ::view-transition-old(site-header),
+  ::view-transition-new(site-header),
+  ::view-transition-old(site-campaign),
+  ::view-transition-new(site-campaign),
+  ::view-transition-old(site-whatsapp),
+  ::view-transition-new(site-whatsapp),
   ::view-transition-old(site-footer),
   ::view-transition-new(site-footer) {
     animation: none;
   }
 }
 
-@keyframes wt-page-out {
-  to {
+/* Avanzar: la hoja se retira hacia la izquierda con un giro suave. La
+   opacidad solo baja cuando ya salió, para que su sombra no quede colgada. */
+@keyframes wt-page-turn-out {
+  0% {
+    opacity: 1;
+    transform: perspective(1800px) rotateY(0deg) translateX(0);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    transform: translateY(-8px) scale(0.995);
+    transform: perspective(1800px) rotateY(-22deg) translateX(-112%);
   }
 }
 
-@keyframes wt-page-in {
-  from {
+/* Retroceder: la hoja vuelve hacia la derecha. */
+@keyframes wt-page-turn-out-back {
+  0% {
+    opacity: 1;
+    transform: perspective(1800px) rotateY(0deg) translateX(0);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    transform: translateY(12px) scale(0.998);
+    transform: perspective(1800px) rotateY(22deg) translateX(112%);
   }
 }
