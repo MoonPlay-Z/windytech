@@ -17,7 +17,7 @@ interface Props {
 }
 
 const { mode, folder, field, images = [], publicId = null, label } = Astro.props;
-const cloud = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '';
+const cloud = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'cxy5wtgr';
 const dataType = mode === 'multi' ? 'json' : 'string';
 const serialized =
   mode === 'multi'

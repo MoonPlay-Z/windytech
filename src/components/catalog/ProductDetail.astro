@@ -77,6 +77,8 @@ const conditionSchema =
       : 'https://schema.org/UsedCondition';
 
 const imageUrl = image ? ogImage(image.cloudinaryPublicId) : new URL(site.ogImage, site.url).toString();
+/** URL de la foto principal; vacía si Cloudinary no responde. */
+const mainImageSrc = image ? productImage(image.cloudinaryPublicId, 1200) : '';
 
 const offer = (variant: CatalogProduct['variants'][number] | null) => {
   const price = priceFor(product, variant?.id ?? null, locale);
@@ -169,9 +171,9 @@ const productSchema: Record<string, unknown> = {
       <div class="product-detail">
         <div class="product-gallery" data-product-gallery>
           <div class="product-gallery-main">
-            {image ? (
+            {image && mainImageSrc ? (
               <img
-                src={productImage(image.cloudinaryPublicId, 1200)}
+                src={mainImageSrc}
                 srcset={productSrcSet(image.cloudinaryPublicId)}
                 sizes="(max-width: 900px) 100vw, 55vw"
                 alt={image.alt || product.name}

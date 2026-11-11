@@ -8,8 +8,16 @@ import { createHash } from 'node:crypto';
 
 const BASE = 'https://res.cloudinary.com';
 
+/**
+ * El nombre del cloud es público (aparece en cada URL de imagen), así que
+ * puede tener valor por defecto: si el entorno no lo define, las imágenes ya
+ * guardadas en la base siguen mostrándose. Las claves y el secret sí son
+ * secretos y deben venir del entorno para poder subir y borrar archivos.
+ */
+const DEFAULT_CLOUD_NAME = 'cxy5wtgr';
+
 export function cloudName(): string {
-  return (process.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '').trim();
+  return (process.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '').trim() || DEFAULT_CLOUD_NAME;
 }
 
 export type ImageOptions = {
