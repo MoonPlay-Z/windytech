@@ -1,14 +1,12 @@
 ---
-import type { Lang } from '../../data/site';
 import type { RateResult } from '../../lib/rate';
 
 interface Props {
-  locale: Lang;
   rate: RateResult | null;
 }
 
-const { locale, rate } = Astro.props;
-const es = locale === 'es';
+const { rate } = Astro.props;
+const es = true;
 ---
 
 <div class="currency-switch" role="group" aria-label={es ? 'Moneda de exhibición' : 'Display currency'}>

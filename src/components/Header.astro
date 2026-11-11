@@ -1,21 +1,17 @@
 ---
 import Icon from './Icon.astro';
-import { content, site, whatsappLink, type Lang } from '../data/site';
+import { content, site, whatsappLink } from '../data/site';
 import type { CustomerSession } from '../lib/customer-auth';
 
 interface Props {
-  lang: Lang;
-  altHref: string;
   customer?: CustomerSession | null;
 }
 
-const { lang, altHref, customer } = Astro.props;
-const t = content[lang];
-const homeHref = lang === 'es' ? '/' : '/en/';
-const navAria = lang === 'es' ? 'Navegación principal' : 'Main navigation';
-const markAlt = lang === 'es'
-    ? 'Windytech — desarrollo de software y automatización'
-    : 'Windytech — software development and automation';
+const { customer } = Astro.props;
+const t = content;
+const homeHref = '/';
+const navAria = 'Navegación principal';
+const markAlt = 'Windytech — desarrollo de software y automatización';
 const isLoggedIn = Boolean(customer);
 ---
 
@@ -140,8 +136,8 @@ const isLoggedIn = Boolean(customer);
       )}
       <a
         class="cart-link"
-        href={lang === 'es' ? '/carrito/' : '/en/cart/'}
-        aria-label={lang === 'es' ? 'Ver carrito' : 'View cart'}
+        href={'/carrito/'}
+        aria-label={'Ver carrito'}
       >
         <Icon name="shopping-cart" size={20} />
         <span class="cart-count" data-cart-count hidden>0</span>
@@ -150,11 +146,11 @@ const isLoggedIn = Boolean(customer);
         type="button"
         class="menu-toggle"
         data-menu-toggle
-        data-open-label={lang === 'es' ? 'Abrir menú' : 'Open menu'}
-        data-close-label={lang === 'es' ? 'Cerrar menú' : 'Close menu'}
+        data-open-label={'Abrir menú'}
+        data-close-label={'Cerrar menú'}
         aria-expanded="false"
         aria-controls="primary-nav"
-        aria-label={lang === 'es' ? 'Abrir menú' : 'Open menu'}
+        aria-label={'Abrir menú'}
       >
         <span class="menu-box" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>

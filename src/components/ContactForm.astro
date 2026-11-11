@@ -1,27 +1,24 @@
 ---
 import Icon from './Icon.astro';
-import { content, site, whatsappLink, type Lang } from '../data/site';
+import { content, site, whatsappLink } from '../data/site';
 
 interface Props {
-  lang: Lang;
 }
 
-const { lang } = Astro.props;
-const t = content[lang];
+const t = content;
 const f = t.contact.form;
 ---
 
 <form
   class="contact-form"
   data-contact-form
-  data-lang={lang}
   data-wa-number={site.whatsappNumber}
 >
   <div class="form-row">
     <div class="field">
-      <label for={`name-${lang}`}>{f.name}</label>
+      <label for="nombre">{f.name}</label>
       <input
-        id={`name-${lang}`}
+        id="nombre"
         name="name"
         type="text"
         placeholder={f.namePlaceholder}
@@ -30,9 +27,9 @@ const f = t.contact.form;
       />
     </div>
     <div class="field">
-      <label for={`business-${lang}`}>{f.business}</label>
+      <label for="empresa">{f.business}</label>
       <input
-        id={`business-${lang}`}
+        id="empresa"
         name="business"
         type="text"
         placeholder={f.businessPlaceholder}
@@ -42,16 +39,16 @@ const f = t.contact.form;
   </div>
 
   <div class="field">
-    <label for={`service-${lang}`}>{f.service}</label>
-    <select id={`service-${lang}`} name="service" required>
+    <label for="servicio">{f.service}</label>
+    <select id="servicio" name="service" required>
       {f.options.map((option) => <option value={option}>{option}</option>)}
     </select>
   </div>
 
   <div class="field">
-    <label for={`message-${lang}`}>{f.message}</label>
+    <label for="mensaje">{f.message}</label>
     <textarea
-      id={`message-${lang}`}
+      id="mensaje"
       name="message"
       placeholder={f.messagePlaceholder}
       rows="4"
@@ -73,9 +70,7 @@ const f = t.contact.form;
 
   <noscript>
     <p class="form-note">
-      {lang === 'es'
-        ? 'Para enviar el formulario, activa JavaScript o escríbenos directamente por '
-        : 'To submit the form, enable JavaScript or message us directly on '}
+      {'Para enviar el formulario, activa JavaScript o escríbenos directamente por '}
       <a href={whatsappLink(t.whatsapp.general)}>WhatsApp</a>.
     </p>
   </noscript>
@@ -95,13 +90,9 @@ const f = t.contact.form;
         const business = String(data.get('business') ?? '').trim();
         const service = String(data.get('service') ?? '').trim();
         const message = String(data.get('message') ?? '').trim();
-        const lang = form.dataset.lang ?? 'es';
         const number = form.dataset.waNumber ?? '584127723148';
 
-        const intro =
-          lang === 'en'
-            ? `Hello Windytech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
-            : `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
+        const intro = `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
 
         const text = `${intro}${message ? `\n\n${message}` : ''}`;
         const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;

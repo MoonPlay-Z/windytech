@@ -37,7 +37,7 @@ const price = (plan.priceCents / 100).toFixed(2);
           <select name="serviceKey" data-field="serviceKey">
             <option value="">Sin vincular</option>
             {services.map((service) => (
-              <option value={service.id} selected={service.id === plan.serviceKey}>{service.es.title}</option>
+              <option value={service.id} selected={service.id === plan.serviceKey}>{service.content.title}</option>
             ))}
           </select>
         </label>

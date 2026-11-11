@@ -2,7 +2,7 @@ import { randomToken } from './security';
 import { computeTotals, resolvePrice } from './pricing';
 import { getProductsByIds, createQuote } from './db/queries';
 import { currentRate } from './rate';
-import { quotePath, type Locale } from './catalog';
+import { quotePath } from './catalog';
 import { site } from '../data/site';
 import type { QuoteInput } from './validation';
 
@@ -21,38 +21,30 @@ export type QuoteBuildResult =
 
 const QUOTE_VALID_DAYS = 7;
 
-function whatsappText(number: string, url: string, locale: Locale): string {
-  return locale === 'es'
-    ? `Hola Windytech, quiero cotizar ${number}:\n${url}`
-    : `Hello Windytech, I would like a quote for ${number}:\n${url}`;
+function whatsappText(number: string, url: string): string {
+  return `Hola Windytech, quiero cotizar ${number}:\n${url}`;
 }
 
 /** Recalcula una cotización completa desde la base. El navegador solo envía ids y cantidades. */
 export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<QuoteBuildResult> {
-  const locale = input.locale as Locale;
+  const locale = 'es';
 
   const rate = input.currency === 'VES' ? await currentRate() : null;
   if (input.currency === 'VES' && !rate) {
     return {
       ok: false,
       status: 409,
-      error:
-        locale === 'es'
-          ? 'No hay una tasa de cambio disponible en este momento. Intenta de nuevo en unos minutos.'
-          : 'No exchange rate is available right now. Please try again in a few minutes.',
+      error: 'No hay una tasa de cambio disponible en este momento. Intenta de nuevo en unos minutos.',
     };
   }
 
   const ids = [...new Set(input.items.map((item) => item.productId))];
-  const products = await getProductsByIds(locale, ids);
+  const products = await getProductsByIds(ids);
   if (products.length === 0) {
     return {
       ok: false,
       status: 409,
-      error:
-        locale === 'es'
-          ? 'Los productos de la cotización ya no están disponibles.'
-          : 'The products in this quote are no longer available.',
+      error: 'Los productos de la cotización ya no están disponibles.',
     };
   }
 
@@ -73,10 +65,7 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
       return {
         ok: false,
         status: 409,
-        error:
-          locale === 'es'
-            ? 'Uno de los productos ya no está disponible. Actualiza el carrito.'
-            : 'One of the products is no longer available. Please refresh your cart.',
+        error: 'Uno de los productos ya no está disponible. Actualiza el carrito.',
       };
     }
 
@@ -86,14 +75,11 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
       return {
         ok: false,
         status: 409,
-        error:
-          locale === 'es'
-            ? 'La opción seleccionada ya no existe. Actualiza el carrito.'
-            : 'The selected option no longer exists. Please refresh your cart.',
+        error: 'La opción seleccionada ya no existe. Actualiza el carrito.',
       };
     }
 
-    const price = resolvePrice(product, variant ?? null, product.rules, now, locale);
+    const price = resolvePrice(product, variant ?? null, product.rules, now);
     const quantity = Math.min(Math.max(1, Math.trunc(item.quantity)), 20);
     items.push({
       productId: product.id,
@@ -144,21 +130,18 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
     return {
       ok: false,
       status: 503,
-      error:
-        locale === 'es'
-          ? 'No pudimos guardar la cotización. Escríbenos por WhatsApp mientras lo solucionamos.'
-          : 'We could not save the quote. Please message us on WhatsApp while we fix it.',
+      error: 'No pudimos guardar la cotización. Escríbenos por WhatsApp mientras lo solucionamos.',
     };
   }
 
-  const url = `${siteUrl}${quotePath(locale, created.token)}`;
+  const url = `${siteUrl}${quotePath(created.token)}`;
   return {
     ok: true,
     number: created.number,
     token: created.token,
-    path: quotePath(locale, created.token),
+    path: quotePath(created.token),
     whatsappUrl: `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(
-      whatsappText(created.number, url, locale),
+      whatsappText(created.number, url),
     )}`,
     totalCents: totals.totalCents,
     totalVesCents,

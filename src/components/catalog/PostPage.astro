@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareBar from '../ShareBar.astro';
-import { site, type Lang } from '../../data/site';
+import { site } from '../../data/site';
 import { blogPath, type PostSummary } from '../../lib/catalog';
 import { imageUrl } from '../../lib/cloudinary';
 import { renderMarkdown } from '../../lib/markdown';
@@ -9,13 +9,12 @@ import '../../styles/catalog.css';
 import '../../styles/detail.css';
 
 interface Props {
-  locale: Lang;
   post: PostSummary;
 }
 
-const { locale, post } = Astro.props;
-const es = locale === 'es';
-const listHref = blogPath(locale);
+const { post } = Astro.props;
+const es = true;
+const listHref = blogPath();
 const href = `${listHref}${post.slug}/`;
 const cover = post.coverPublicId
   ? imageUrl(post.coverPublicId, { width: 1600, crop: 'fill', aspectRatio: '16:9', gravity: 'auto' })
@@ -28,7 +27,7 @@ const schema = {
   headline: post.title,
   description: post.excerpt,
   url: new URL(href, site.url).toString(),
-  inLanguage: locale,
+  inLanguage: 'es',
   author: { '@type': 'Person', name: post.author || site.name },
   publisher: { '@id': `${site.url}/#organization` },
   ...(published ? { datePublished: published.toISOString(), dateModified: published.toISOString() } : {}),
@@ -52,11 +51,9 @@ const articleMeta = [
 ---
 
 <BaseLayout
-  lang={locale}
   title={`${post.title} | ${site.name}`}
   description={post.excerpt}
   path={href}
-  altPath={`${es ? '/en/blog/' : '/blog/'}${post.slug}/`}
   ogImage={cover ?? (es ? '/assets/og.png' : '/assets/og-en.png')}
   ogImageAlt={post.title}
   ogType="article"
@@ -100,7 +97,6 @@ const articleMeta = [
         path={href}
         title={post.title}
         text={post.excerpt}
-        lang={locale}
         label={es ? 'Comparte este artículo y consigue clientes' : 'Share this article and win customers'}
         campaign="post"
         variant="card"

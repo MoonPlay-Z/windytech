@@ -2,7 +2,6 @@
 import { catalogCopy, conditionLabels, type Category, type Locale } from '../../lib/catalog';
 
 interface Props {
-  locale: Locale;
   categories: Category[];
   brands: string[];
   action: string;
@@ -16,10 +15,10 @@ interface Props {
   };
 }
 
-const { locale, categories, brands, action, values } = Astro.props;
-const t = catalogCopy[locale];
-const es = locale === 'es';
-const conditions = Object.entries(conditionLabels[locale]) as [string, string][];
+const { categories, brands, action, values } = Astro.props;
+const t = catalogCopy;
+const es = true;
+const conditions = Object.entries(conditionLabels) as [string, string][];
 ---
 
 <form class="catalog-filters" method="get" action={action} data-catalog-filters>

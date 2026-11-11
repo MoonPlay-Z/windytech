@@ -9,4 +9,4 @@ const quote = await getQuoteByToken(token);
 if (!quote) return Astro.redirect('/carrito/', 302);
 ---
 
-<QuoteView quote={quote} locale="es" />
+<QuoteView quote={quote} />

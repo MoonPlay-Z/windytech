@@ -29,8 +29,7 @@ export type ShareCopy = {
   copyError: string;
 };
 
-export const shareCopy: Record<'es' | 'en', ShareCopy> = {
-  es: {
+export const shareCopy: ShareCopy = {
     label: 'Comparte y consigue clientes',
     navLabel: 'Compartir en redes sociales',
     whatsapp: 'WhatsApp',
@@ -42,20 +41,6 @@ export const shareCopy: Record<'es' | 'en', ShareCopy> = {
     copy: 'Copiar enlace',
     copied: 'Enlace copiado',
     copyError: 'No se pudo copiar. Copia la dirección desde el navegador.',
-  },
-  en: {
-    label: 'Share and get customers',
-    navLabel: 'Share on social media',
-    whatsapp: 'WhatsApp',
-    facebook: 'Facebook',
-    linkedin: 'LinkedIn',
-    x: 'X',
-    telegram: 'Telegram',
-    email: 'Email',
-    copy: 'Copy link',
-    copied: 'Link copied',
-    copyError: 'Could not copy. Copy the address from your browser.',
-  },
 };
 
 /**
@@ -91,7 +76,6 @@ export type ShareInput = {
   title: string;
   /** Texto que acompaña al enlace. */
   text?: string;
-  lang: 'es' | 'en';
   /** Campaña UTM (por defecto, el propio recurso). */
   campaign?: string;
 };
@@ -101,8 +85,8 @@ export type ShareInput = {
  * Los enlaces ya salen con UTM para que el tráfico se pueda atribuir.
  */
 export function shareLinks(input: ShareInput): ShareLink[] {
-  const { url, title, text, lang, campaign = 'share' } = input;
-  const copy = shareCopy[lang];
+  const { url, title, text, campaign = 'share' } = input;
+  const copy = shareCopy;
 
   const build = (source: ShareChannel) => {
     const tracked = trackedUrl(url, source, campaign);
@@ -159,12 +143,7 @@ export function shareLinks(input: ShareInput): ShareLink[] {
 }
 
 /** URL con UTM para los botones de WhatsApp (conversión a conversación). */
-export function trackedWhatsappLink(
-  message: string,
-  campaign: string,
-  lang: 'es' | 'en' = 'es',
-): string {
+export function trackedWhatsappLink(message: string, campaign: string): string {
   const base = whatsappShareUrl(message);
-  const suffix = lang === 'es' ? 'es' : 'en';
-  return `${base}${base.includes('?') ? '&' : '?'}utm_source=whatsapp&utm_medium=social&utm_campaign=${encodeURIComponent(campaign)}&lang=${suffix}`;
+  return `${base}${base.includes('?') ? '&' : '?'}utm_source=whatsapp&utm_medium=social&utm_campaign=${encodeURIComponent(campaign)}`;
 }

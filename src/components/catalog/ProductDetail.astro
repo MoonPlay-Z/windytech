@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
 import ShareBar from '../ShareBar.astro';
-import { site, whatsappLink, type Lang } from '../../data/site';
+import { site, whatsappLink } from '../../data/site';
 import {
   attributeLabels,
   availabilityLabels,
@@ -20,22 +20,21 @@ import '../../styles/detail.css';
 
 interface Props {
   product: CatalogProduct;
-  locale: Lang;
   rate: RateResult | null;
   currencyDefault: 'USD' | 'VES';
   categoryName?: string;
   altSlug?: string;
 }
 
-const { product, locale, rate, currencyDefault, categoryName, altSlug } = Astro.props;
-const es = locale === 'es';
-const t = catalogCopy[locale];
-const basePrice = priceFor(product, null, locale);
+const { product, rate, currencyDefault, categoryName } = Astro.props;
+const es = true;
+const t = catalogCopy;
+const basePrice = priceFor(product, null);
 const image = primaryImage(product);
 const catalogHref = es ? '/catalogo/' : '/en/catalog/';
 const href = `${catalogHref}${product.slug}/`;
-const condition = conditionLabels[locale][product.condition];
-const availability = availabilityLabels[locale][product.availability];
+const condition = conditionLabels[product.condition];
+const availability = availabilityLabels[product.availability];
 const vesPrice = rate ? Math.round(basePrice.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(Math.max(basePrice.compareAtCents, basePrice.listCents) * rate.rate) : 0;
 const description = product.seoDescription || product.shortDescription;
@@ -81,7 +80,7 @@ const imageUrl = image ? ogImage(image.cloudinaryPublicId) : new URL(site.ogImag
 const mainImageSrc = image ? productImage(image.cloudinaryPublicId, 1200) : '';
 
 const offer = (variant: CatalogProduct['variants'][number] | null) => {
-  const price = priceFor(product, variant?.id ?? null, locale);
+  const price = priceFor(product, variant?.id ?? null);
   const sku = variant?.sku || product.sku || `WT-${product.id}`;
   return {
     '@type': 'Offer',
@@ -124,7 +123,7 @@ const productSchema: Record<string, unknown> = {
           ...new Set(
             product.variants.flatMap((variant) =>
               Object.keys(variant.attributes ?? {}).map(
-                (key) => (attributeLabels[locale] as Record<string, string>)[key] ?? key,
+                (key) => (attributeLabels as Record<string, string>)[key] ?? key,
               ),
             ),
           ),
@@ -141,11 +140,9 @@ const productSchema: Record<string, unknown> = {
 ---
 
 <BaseLayout
-  lang={locale}
   title={product.seoTitle || `${product.name} | ${site.name}`}
   description={description || t.intro}
   path={href}
-  altPath={`${es ? '/en/catalog/' : '/catalogo/'}${altSlug ?? product.slug}/`}
   ogImage={imageUrl}
   ogImageAlt={image?.alt || product.name}
   ogType="website"
@@ -240,9 +237,9 @@ const productSchema: Record<string, unknown> = {
           <p
             class="product-availability-note"
             data-availability-note
-            data-label-in-stock={availabilityLabels[locale].IN_STOCK}
-            data-label-preorder={availabilityLabels[locale].PREORDER}
-            data-label-out={availabilityLabels[locale].OUT_OF_STOCK}
+            data-label-in-stock={availabilityLabels.IN_STOCK}
+            data-label-preorder={availabilityLabels.PREORDER}
+            data-label-out={availabilityLabels.OUT_OF_STOCK}
           >
             <span class:list={['product-availability', `is-${product.availability.toLowerCase()}`]}>
               {availability}
@@ -254,11 +251,11 @@ const productSchema: Record<string, unknown> = {
               <h2>{t.variants}</h2>
               <div class="variant-list" data-variant-list>
                 {product.variants.map((variant) => {
-                  const variantPrice = priceFor(product, variant.id, locale);
+                  const variantPrice = priceFor(product, variant.id);
                   const label =
                     (es ? variant.labelEs : variant.labelEn) ||
                     Object.entries(variant.attributes ?? {})
-                      .map(([key, value]) => `${(attributeLabels[locale] as Record<string, string>)[key] ?? key}: ${value}`)
+                      .map(([key, value]) => `${(attributeLabels as Record<string, string>)[key] ?? key}: ${value}`)
                       .join(' · ');
                   return (
                     <button
@@ -300,7 +297,7 @@ const productSchema: Record<string, unknown> = {
               <dl>
                 {specs.map(([key, value]) => (
                   <div>
-                    <dt>{attributeLabels[locale][key] ?? key}</dt>
+                    <dt>{attributeLabels[key] ?? key}</dt>
                     <dd>{value}</dd>
                   </div>
                 ))}
@@ -349,7 +346,6 @@ const productSchema: Record<string, unknown> = {
             path={href}
             title={product.name}
             text={product.shortDescription || description}
-            lang={locale}
             label={es ? 'Comparte este equipo y consigue clientes' : 'Share this item and win customers'}
             campaign="product"
             variant="card"

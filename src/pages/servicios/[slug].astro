@@ -7,13 +7,11 @@ import { services } from '../../data/services';
 export const prerender = false;
 
 const slug = Astro.params.slug ?? '';
-const service = services.find((item) => item.es.slug === slug);
+const service = services.find((item) => item.content.slug === slug);
 if (!service) return Astro.redirect('/404/', 302);
 ---
 
 <ServicePage
-  lang="es"
   service={service}
-  path={service.pathEs}
-  altPath={service.pathEn}
+  path={service.path}
 />

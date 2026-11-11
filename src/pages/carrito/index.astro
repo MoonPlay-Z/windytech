@@ -10,18 +10,15 @@ import '../../styles/cart.css';
 
 export const prerender = false;
 
-const locale: Locale = 'es';
-const t = catalogCopy[locale];
+const t = catalogCopy;
 const rate = await currentRate();
 const currencyDefault = isVenezuela(Astro.request) ? 'VES' : 'USD';
 ---
 
 <BaseLayout
-  lang="es"
   title="Carrito y cotización | Windytech"
   description="Revisa tu carrito y solicita una cotización por WhatsApp. Precios sin IVA."
   path="/carrito/"
-  altPath="/en/cart/"
   noindex
   currencyDefault={currencyDefault}
   hideWhatsappFloat
@@ -34,12 +31,12 @@ const currencyDefault = isVenezuela(Astro.request) ? 'VES' : 'USD';
           <h1>{t.cartTitle}</h1>
           <p>{t.noTax}</p>
         </div>
-        <CurrencySwitch locale={locale} rate={rate} />
+        <CurrencySwitch rate={rate} />
       </div>
 
       <div
         data-cart-root
-        data-locale="es"
+        data-
         data-rate={rate?.rate ?? 0}
         data-currency-default={currencyDefault}
       >

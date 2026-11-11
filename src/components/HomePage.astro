@@ -2,34 +2,30 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import ContactForm from './ContactForm.astro';
-import { content, site, whatsappLink, type Lang } from '../data/site';
+import { content, site, whatsappLink } from '../data/site';
 import { aboutContent } from '../data/about';
 import { servicePath, services } from '../data/services';
 
 interface Props {
-  lang: Lang;
 }
 
-const { lang } = Astro.props;
-const t = content[lang];
-const about = aboutContent[lang];
+const t = content;
+const about = aboutContent;
 const aboutHref = t.nav.aboutHref;
-const altPath = lang === 'es' ? '/en/' : '/';
-const path = lang === 'es' ? '/' : '/en/';
+const altPath = '/en/';
+const path = '/';
 const title = t.meta.homeTitle;
 const description = t.meta.homeDescription;
-const markAlt = lang === 'es' ? 'Símbolo gráfico de Windytech' : 'Windytech graphic symbol';
+const markAlt = 'Símbolo gráfico de Windytech';
 const shareUrl = new URL(path, site.url).toString();
 const shareText = `${title} — ${shareUrl}`;
 ---
 
 <BaseLayout
-  lang={lang}
   title={title}
   description={description}
   path={path}
-  altPath={altPath}
-  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImage={'/assets/og.png'}
   ogImageAlt={t.meta.homeOgAlt}
 >
   <section class="hero" id="inicio">
@@ -216,16 +212,16 @@ const shareText = `${title} — ${shareUrl}`;
               <Icon name={service.icon} size={28} />
             </span>
             <h3>
-              <a href={services[index] ? servicePath(lang, services[index]) : `#servicios`}>
+              <a href={services[index] ? servicePath(services[index]) : `#servicios`}>
                 {service.title}
               </a>
             </h3>
             <p>{service.text}</p>
             <a
               class="text-link"
-              href={services[index] ? servicePath(lang, services[index]) : `#servicios`}
+              href={services[index] ? servicePath(services[index]) : `#servicios`}
             >
-              {lang === 'es' ? 'Ver servicio' : 'View service'}
+              {'Ver servicio'}
               <Icon name="arrow-right" size={16} />
             </a>
             <a
@@ -242,8 +238,8 @@ const shareText = `${title} — ${shareUrl}`;
         ))}
       </div>
       <div class="section-foot">
-        <a class="btn btn-dark" href={`${lang === 'es' ? '/servicios/' : '/en/services/'}#paquetes`}>
-          {lang === 'es' ? 'Ver paquetes, costos y tiempos' : 'See packages, prices and timelines'}
+        <a class="btn btn-dark" href={`${'/servicios/'}#paquetes`}>
+          {'Ver paquetes, costos y tiempos'}
           <Icon name="arrow-right" size={16} />
         </a>
       </div>
@@ -420,7 +416,7 @@ const shareText = `${title} — ${shareUrl}`;
             ),
           )}
         </div>
-        <ContactForm lang={lang} />
+        <ContactForm />
       </div>
     </div>
   </section>
@@ -494,10 +490,7 @@ const shareText = `${title} — ${shareUrl}`;
       opacity: number;
     };
 
-    const english = document.documentElement.lang === 'en';
-    const labels = english
-      ? ['Windytech', 'Laptops', 'Mobile apps', 'WhatsApp', 'Instagram', 'Computers', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube', 'Equipment', 'Digital']
-      : ['Windytech', 'Laptops', 'Apps móviles', 'WhatsApp', 'Instagram', 'Computadoras', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube', 'Equipos', 'Digital'];
+    const labels = ['Windytech', 'Laptops', 'Apps móviles', 'WhatsApp', 'Instagram', 'Computadoras', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube', 'Equipos', 'Digital'];
     const nodeSpecs: Omit<NetworkNode, 'element' | 'baseX' | 'baseY' | 'centerX' | 'centerY' | 'width' | 'height' | 'offsetX' | 'offsetY' | 'velocityX' | 'velocityY' | 'phase' | 'radius' | 'pop' | 'hot'>[] = [
       { kind: 'logo', x: 9, y: 80, w: 250, depth: 0.25, tip: 'Windytech', fx: '✦', label: labels[0], color: ['#2fd9b0', '#22e6f5'] },
       { kind: 'laptop', x: 31, y: 87, w: 150, depth: 0.7, tip: 'Laptops', fx: '</>', label: labels[1], color: ['#3b82f6', '#60a5fa'] },

@@ -1,23 +1,19 @@
 ---
-import { content, site, type Lang } from '../data/site';
+import { content, site } from '../data/site';
 import { servicePath, services } from '../data/services';
 
 interface Props {
-  lang: Lang;
 }
 
-const { lang } = Astro.props;
-const t = content[lang];
-const homeHref = lang === 'es' ? '/' : '/en/';
-const navAria = lang === 'es' ? 'Navegación del pie de página' : 'Footer navigation';
-const servicesAria = lang === 'es' ? 'Servicios de Windytech' : 'Windytech services';
-const servicesTitle = lang === 'es' ? 'Servicios' : 'Services';
-const servicesHub = lang === 'es' ? '/servicios/' : '/en/services/';
-const servicesHubLabel = lang === 'es' ? 'Todos los servicios' : 'All services';
+const t = content;
+const homeHref = '/';
+const navAria = 'Navegación del pie de página';
+const servicesAria = 'Servicios de Windytech';
+const servicesTitle = 'Servicios';
+const servicesHub = '/servicios/';
+const servicesHubLabel = 'Todos los servicios';
 const wordmarkAlt =
-  lang === 'es'
-    ? 'Windytech — desarrollo de software y automatización'
-    : 'Windytech — software development and automation';
+  'Windytech — desarrollo de software y automatización';
 ---
 
 <footer class="site-footer">
@@ -37,7 +33,7 @@ const wordmarkAlt =
     <nav class="footer-nav" aria-label={navAria}>
       {t.nav.items.map((item) => (
         <a href={item.href.startsWith('/') ? item.href : `${homeHref}${item.href}`}>
-          {lang === 'es' ? `Ir a ${item.label}` : `Go to ${item.label}`}
+          {`Ir a ${item.label}`}
         </a>
       ))}
       <a href={t.nav.aboutHref}>{t.nav.about}</a>
@@ -49,7 +45,7 @@ const wordmarkAlt =
     <nav class="footer-services-links" aria-label={servicesAria}>
       <a href={servicesHub}>{servicesHubLabel}</a>
       {services.map((service) => (
-        <a href={servicePath(lang, service)}>{service[lang].title}</a>
+        <a href={servicePath(service)}>{service.content.title}</a>
       ))}
     </nav>
   </div>

@@ -1,32 +1,28 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { legalContent, type LegalSection } from '../data/legal';
-import { site, type Lang } from '../data/site';
+import { site } from '../data/site';
 
 interface Props {
-  lang: Lang;
   docType: 'privacy' | 'terms';
   path: string;
-  altPath: string;
 }
 
-const { lang, docType, path, altPath } = Astro.props;
-const doc = legalContent[lang][docType];
+const { docType, path } = Astro.props;
+const doc = legalContent[docType];
 const sections = doc.sections as readonly LegalSection[];
-const homeHref = lang === 'es' ? '/' : '/en/';
-const backLabel = lang === 'es' ? 'Volver al inicio' : 'Back to home';
+const homeHref = '/';
+const backLabel = 'Volver al inicio';
 ---
 
 <BaseLayout
-  lang={lang}
   title={`${doc.title} | ${site.name}`}
   description={doc.intro}
   path={path}
-  altPath={altPath}
-  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImage={'/assets/og.png'}
   ogImageAlt={`${doc.title} — ${site.name}`}
   breadcrumb={[
-    { name: lang === 'es' ? 'Inicio' : 'Home', path: homeHref },
+    { name: 'Inicio', path: homeHref },
     { name: doc.title, path },
   ]}
 >

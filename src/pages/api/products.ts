@@ -9,10 +9,8 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
   const params = url.searchParams;
-  const locale = (params.get('locale') === 'en' ? 'en' : 'es') as Locale;
 
   const products = await getCatalog({
-    locale,
     category: params.get('category') ?? undefined,
     condition: params.get('condition') ?? undefined,
     brand: params.get('brand') ?? undefined,
@@ -24,7 +22,7 @@ export const GET: APIRoute = async ({ url }) => {
   const rate = await currentRate();
   return json(
     {
-      products: products.map((product) => productJson(product, locale, rate)),
+      products: products.map((product) => productJson(product, rate)),
       rate,
       currency: params.get('currency') === 'VES' ? 'VES' : 'USD',
     },

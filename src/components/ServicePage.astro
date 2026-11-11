@@ -3,20 +3,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import PlanCard from './PlanCard.astro';
 import ShareBar from './ShareBar.astro';
-import { site, whatsappLink, type Lang } from '../data/site';
+import { site, whatsappLink } from '../data/site';
 import { servicePath, services, type Service } from '../data/services';
 import { listServicePlans } from '../lib/db/queries';
 
 interface Props {
-  lang: Lang;
   service: Service;
   path: string;
-  altPath: string;
 }
 
-const { lang, service, path, altPath } = Astro.props;
-const s = service[lang];
-const es = lang === 'es';
+const { service, path } = Astro.props;
+const s = service.content;
+const es = true;
 const homeHref = es ? '/' : '/en/';
 const hubHref = es ? '/servicios/' : '/en/services/';
 const homeLabel = es ? 'Inicio' : 'Home';
@@ -45,10 +43,10 @@ const labels = es
 
 const canonical = new URL(path, site.url).toString();
 const related = s.related
-  .map((slug) => services.find((item) => item[lang].slug === slug))
+  .map((slug) => services.find((item) => item.content.slug === slug))
   .filter((item): item is Service => Boolean(item));
 
-const plans = await listServicePlans(lang, service.id);
+const plans = await listServicePlans(service.id);
 
 const serviceSchema = {
   '@type': 'Service',
@@ -116,11 +114,9 @@ const serviceSchema = {
 ---
 
 <BaseLayout
-  lang={lang}
   title={s.metaTitle}
   description={s.metaDescription}
   path={path}
-  altPath={altPath}
   ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
   ogImageAlt={`${s.title} — ${site.name}`}
   pageType="WebPage"
@@ -242,8 +238,8 @@ const serviceSchema = {
             <ul class="service-related">
               {related.map((item) => (
                 <li>
-                  <a href={servicePath(lang, item)}>
-                    {item[lang].title}
+                  <a href={servicePath(item)}>
+                    {item.content.title}
                     <Icon name="arrow-right" size={16} />
                   </a>
                 </li>
@@ -268,7 +264,6 @@ const serviceSchema = {
             {plans.map((plan) => (
               <PlanCard
                 plan={plan}
-                lang={lang}
                 shareUrl={new URL(`${path}#plan-${plan.slug}`, site.url).toString()}
               />
             ))}
@@ -318,7 +313,6 @@ const serviceSchema = {
     path={path}
     title={s.title}
     text={s.metaDescription}
-    lang={lang}
     label={labels.shareLabel}
     campaign="service"
     variant="card"

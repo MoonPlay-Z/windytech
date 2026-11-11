@@ -5,7 +5,7 @@ import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
-import { content, site, whatsappLink, type Lang } from '../data/site';
+import { content, site, whatsappLink } from '../data/site';
 import { aboutContent } from '../data/about';
 import { customerSessionFromRequest } from '../lib/customer-auth';
 
@@ -20,11 +20,9 @@ interface FaqItem {
 }
 
 interface Props {
-  lang: Lang;
   title: string;
   description: string;
   path: string;
-  altPath: string;
   ogImage?: string;
   ogImageAlt?: string;
   noindex?: boolean;
@@ -49,13 +47,11 @@ interface Props {
 }
 
 const {
-  lang,
   title,
   description,
   path,
-  altPath,
   ogImage = site.ogImage,
-  ogImageAlt = content[lang].meta.homeOgAlt,
+  ogImageAlt = content.meta.homeOgAlt,
   noindex = false,
   pageType = 'WebPage',
   breadcrumb = [],
@@ -68,11 +64,11 @@ const {
   hideWhatsappFloat = false,
 } = Astro.props;
 
-const t = content[lang];
+const t = content;
 const canonical = new URL(path, site.url).toString();
 const ogImageUrl = new URL(ogImage, site.url).toString();
 const logoUrl = new URL(site.logo, site.url).toString();
-const skipLabel = lang === 'es' ? 'Saltar al contenido' : 'Skip to content';
+const skipLabel = 'Saltar al contenido';
 const organisationId = `${site.url}/#organization`;
 const websiteId = `${site.url}/#website`;
 const logoId = `${site.url}/#logo`;
@@ -104,7 +100,7 @@ const schemaGraph = {
       name: site.name,
       url: site.url,
       description: site.slogan,
-      inLanguage: ['es', 'en'],
+      inLanguage: ['es'],
       publisher: { '@id': organisationId },
     },
     {
@@ -113,7 +109,7 @@ const schemaGraph = {
       name: title,
       description,
       url: canonical,
-      inLanguage: lang,
+      inLanguage: 'es',
       isPartOf: { '@id': websiteId },
       about: { '@id': organisationId },
       primaryImageOfPage: {
@@ -138,7 +134,7 @@ const schemaGraph = {
       alternateName: site.alternateName,
       url: site.url,
       slogan: site.slogan,
-      description: aboutContent[lang].homeText,
+      description: aboutContent.homeText,
       foundingDate: site.foundingDate,
       logo: {
         '@type': 'ImageObject',
@@ -173,24 +169,14 @@ const schemaGraph = {
       knowsAbout: [
         ...new Set([
           ...t.services.cards.map(({ title: serviceTitle }) => serviceTitle),
-          ...(lang === 'es'
-            ? [
-                'Desarrollo de software a medida',
-                'Automatización de WhatsApp Business',
-                'SEO local en Venezuela',
-                'Desarrollo web para empresas',
-                'Automatización de atención al cliente',
-              ]
-            : [
-                'custom software development',
-                'WhatsApp Business automation',
-                'SEO services in Venezuela',
-                'business website development',
-                'customer support automation',
-              ]),
+          'Desarrollo de software a medida',
+          'Automatización de WhatsApp Business',
+          'SEO local en Venezuela',
+          'Desarrollo web para empresas',
+          'Automatización de atención al cliente',
         ]),
       ],
-      knowsLanguage: ['es', 'en'],
+      knowsLanguage: ['es'],
       currenciesAccepted: site.currenciesAccepted,
       paymentAccepted: site.paymentAccepted,
       priceRange: '$$',
@@ -200,7 +186,7 @@ const schemaGraph = {
         telephone: `+${site.whatsappNumber}`,
         email: site.email,
         contactType: 'sales',
-        availableLanguage: ['Spanish', 'English'],
+        availableLanguage: ['Spanish'],
         url: `https://wa.me/${site.whatsappNumber}`,
       },
       hasOfferCatalog: {
@@ -253,7 +239,7 @@ const schemaGraph = {
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -351,11 +337,11 @@ const schemaGraph = {
   </head>
   <body data-currency-default={currencyDefault}>
     <a class="skip-link" href="#main">{skipLabel}</a>
-    <Header lang={lang} altHref={altPath} customer={customer} />
+    <Header customer={customer} />
     <main id="main">
       <slot />
     </main>
-    <Footer lang={lang} />
+    <Footer />
     {!hideWhatsappFloat && (
       <a
         class="wa-float"

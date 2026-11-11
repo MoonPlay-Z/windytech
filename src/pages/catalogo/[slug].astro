@@ -7,12 +7,12 @@ import { isVenezuela } from '../../lib/security';
 export const prerender = false;
 
 const slug = Astro.params.slug ?? '';
-const product = await getProduct('es', slug);
+const product = await getProduct(slug);
 if (!product) return Astro.redirect('/catalogo/', 302);
 
 const [rate, altSlug] = await Promise.all([
   currentRate(),
-  getProductSlug(product.id, 'en'),
+  getProductSlug(product.id),
 ]);
 
 const currencyDefault = isVenezuela(Astro.request) ? 'VES' : 'USD';
@@ -20,7 +20,6 @@ const currencyDefault = isVenezuela(Astro.request) ? 'VES' : 'USD';
 
 <ProductDetail
   product={product}
-  locale="es"
   rate={rate}
   currencyDefault={currencyDefault}
   altSlug={altSlug ?? undefined}

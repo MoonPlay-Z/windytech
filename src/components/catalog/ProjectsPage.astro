@@ -2,17 +2,16 @@
 import '../../styles/catalog.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
-import { site, whatsappLink, type Lang } from '../../data/site';
+import { site, whatsappLink } from '../../data/site';
 import { projectsPath, type ProjectSummary } from '../../lib/catalog';
 import { projectImage } from '../../lib/cloudinary';
 
 interface Props {
-  locale: Lang;
   projects: ProjectSummary[];
 }
 
-const { locale, projects } = Astro.props;
-const es = locale === 'es';
+const { projects } = Astro.props;
+const es = true;
 
 const copy = es
   ? {
@@ -38,7 +37,7 @@ const copy = es
       services: 'Services',
     };
 
-const href = projectsPath(locale);
+const href = projectsPath();
 const itemList = {
   '@type': 'ItemList',
   name: copy.title,
@@ -52,11 +51,9 @@ const itemList = {
 ---
 
 <BaseLayout
-  lang={locale}
   title={`${copy.title} | ${site.name}`}
   description={copy.intro}
   path={href}
-  altPath={es ? '/en/projects/' : '/proyectos/'}
   ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
   extraSchema={[itemList]}
   breadcrumb={[

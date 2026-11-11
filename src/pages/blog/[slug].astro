@@ -4,8 +4,8 @@ import { getPost } from '../../lib/db/queries';
 
 export const prerender = false;
 
-const post = await getPost('es', Astro.params.slug ?? '');
+const post = await getPost(Astro.params.slug ?? '');
 if (!post) return Astro.redirect('/blog/', 302);
 ---
 
-<PostPage locale="es" post={post} />
+<PostPage post={post} />

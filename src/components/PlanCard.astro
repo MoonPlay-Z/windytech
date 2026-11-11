@@ -1,13 +1,12 @@
 ---
 import Icon from './Icon.astro';
-import { whatsappLink, type Lang } from '../data/site';
+import { whatsappLink } from '../data/site';
 import { formatUsd, formatVes } from '../lib/money';
 import { shareCopy } from '../lib/social';
 import type { ServicePlan } from '../lib/catalog';
 
 interface Props {
   plan: ServicePlan;
-  lang: Lang;
   /** Enlace al servicio relacionado (página de detalle). */
   serviceHref?: string;
   /** URL absoluta que se copia al compartir este paquete. */
@@ -18,9 +17,9 @@ interface Props {
   viewServiceLabel?: string;
 }
 
-const { plan, lang, serviceHref = '', shareUrl = '', ctaLabel, viewServiceLabel } = Astro.props;
-const es = lang === 'es';
-const copy = shareCopy[lang];
+const { plan, serviceHref = '', shareUrl = '', ctaLabel, viewServiceLabel } = Astro.props;
+const es = true;
+const copy = shareCopy;
 
 const money = (value: ServicePlan) =>
   value.currency === 'VES' ? formatVes(value.priceCents) : formatUsd(value.priceCents);

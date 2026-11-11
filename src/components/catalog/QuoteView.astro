@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
-import { site, whatsappLink, type Lang } from '../../data/site';
+import { site, whatsappLink } from '../../data/site';
 import { catalogCopy, type PublicQuote, type QuoteStatus } from '../../lib/catalog';
 import { formatUsd, formatVes } from '../../lib/money';
 import '../../styles/catalog.css';
@@ -9,12 +9,11 @@ import '../../styles/detail.css';
 
 interface Props {
   quote: PublicQuote;
-  locale: Lang;
 }
 
-const { quote, locale } = Astro.props;
-const es = locale === 'es';
-const t = catalogCopy[locale];
+const { quote } = Astro.props;
+const es = true;
+const t = catalogCopy;
 const expired = new Date(quote.validUntil).getTime() < Date.now();
 const path = es ? `/cotizacion/${quote.publicToken}/` : `/en/quote/${quote.publicToken}/`;
 const url = new URL(path, site.url).toString();
@@ -36,11 +35,9 @@ const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
 ---
 
 <BaseLayout
-  lang={locale}
   title={`${t.quotePage} ${quote.number} | ${site.name}`}
-  description={es ? 'Resumen privado de tu cotización en Windytech.' : 'Private summary of your Windytech quote.'}
+  description="Resumen privado de tu cotización en Windytech."
   path={path}
-  altPath={es ? `/en/quote/${quote.publicToken}/` : `/cotizacion/${quote.publicToken}/`}
   noindex
   hideWhatsappFloat
 >
@@ -51,7 +48,7 @@ const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
         <h1>{quote.number}</h1>
         <div class="quote-meta">
           <span class:list={['quote-status', `is-${quote.status.toLowerCase()}`]}>
-            {statusLabels[quote.status][locale]}
+            {statusLabels[quote.status]}
           </span>
           <span>{t.quoteValid}: {validUntil}</span>
         </div>

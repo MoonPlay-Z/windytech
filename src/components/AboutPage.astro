@@ -2,32 +2,25 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import { aboutContent } from '../data/about';
-import { site, whatsappLink, type Lang } from '../data/site';
+import { site, whatsappLink } from '../data/site';
 import { servicePath, services } from '../data/services';
 
 interface Props {
-  lang: Lang;
   path: string;
-  altPath: string;
 }
 
-const { lang, path, altPath } = Astro.props;
-const a = aboutContent[lang];
-const homeHref = lang === 'es' ? '/' : '/en/';
-const homeLabel = lang === 'es' ? 'Inicio' : 'Home';
-const whatsappMessage =
-  lang === 'es'
-    ? 'Hola Windytech, quiero una cotización para mi negocio.'
-    : 'Hello Windytech, I would like a quote for my business.';
+const { path } = Astro.props;
+const a = aboutContent;
+const homeHref = '/';
+const homeLabel = 'Inicio';
+const whatsappMessage = 'Hola Windytech, quiero una cotización para mi negocio.';
 ---
 
 <BaseLayout
-  lang={lang}
   title={a.pageTitle}
   description={a.pageDescription}
   path={path}
-  altPath={altPath}
-  ogImage={lang === 'en' ? '/assets/og-en.png' : '/assets/og.png'}
+  ogImage={'/assets/og.png'}
   ogImageAlt={`${a.pageH1} — ${site.name}`}
   pageType="AboutPage"
   breadcrumb={[
@@ -37,7 +30,7 @@ const whatsappMessage =
 >
   <section class="about-hero">
     <div class="container">
-      <nav class="breadcrumb" aria-label={lang === 'es' ? 'Ruta de navegación' : 'Breadcrumb'}>
+      <nav class="breadcrumb" aria-label={'Ruta de navegación'}>
         <a href={homeHref}>{homeLabel}</a>
         <span aria-hidden="true">/</span>
         <span>{a.pageH1}</span>
@@ -57,7 +50,7 @@ const whatsappMessage =
           <Icon name="whatsapp" size={18} />
         </a>
         <a class="btn btn-light" href={`${homeHref}#servicios`}>
-          {lang === 'es' ? 'Ver servicios' : 'See services'}
+          {'Ver servicios'}
         </a>
       </div>
     </div>
@@ -96,7 +89,7 @@ const whatsappMessage =
             <li>
               <Icon name="check" size={20} />
               {services[index] ? (
-                <a href={servicePath(lang, services[index])}>{serviceText}</a>
+                <a href={servicePath(services[index])}>{serviceText}</a>
               ) : (
                 <span>{serviceText}</span>
               )}

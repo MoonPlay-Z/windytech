@@ -4,7 +4,7 @@ import { getPosts } from '../../lib/db/queries';
 
 export const prerender = false;
 
-const posts = await getPosts('es');
+const posts = await getPosts();
 ---
 
-<BlogPage locale="es" posts={posts} />
+<BlogPage posts={posts} />

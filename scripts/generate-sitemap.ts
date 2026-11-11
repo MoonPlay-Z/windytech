@@ -44,7 +44,7 @@ const staticRoutes: Entry[] = [
 
 /** Servicios (páginas de detalle) definidos en el código. */
 const serviceRoutes: Entry[] = services.map((service) => ({
-  path: service.pathEs,
+  path: service.path,
   changefreq: 'monthly',
   priority: '0.8',
 }));

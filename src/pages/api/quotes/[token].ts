@@ -17,7 +17,6 @@ export const GET: APIRoute = async ({ params }) => {
     {
       number: quote.number,
       customerName: quote.customerName,
-      locale: quote.locale,
       currency: quote.currency,
       rateSnapshot: quote.rateSnapshot,
       rateDate: quote.rateDate,

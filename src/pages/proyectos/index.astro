@@ -4,7 +4,7 @@ import { getProjects } from '../../lib/db/queries';
 
 export const prerender = false;
 
-const projects = await getProjects('es');
+const projects = await getProjects();
 ---
 
-<ProjectsPage locale="es" projects={projects} />
+<ProjectsPage projects={projects} />

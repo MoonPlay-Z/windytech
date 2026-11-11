@@ -1,6 +1,6 @@
 ---
 import Icon from '../Icon.astro';
-import { site, whatsappLink, type Lang } from '../../data/site';
+import { site, whatsappLink } from '../../data/site';
 import {
   availabilityLabels,
   catalogCopy,
@@ -14,14 +14,13 @@ import type { RateResult } from '../../lib/rate';
 
 interface Props {
   product: CatalogProduct;
-  locale: Lang;
   rate: RateResult | null;
 }
 
-const { product, locale, rate } = Astro.props;
-const es = locale === 'es';
-const t = catalogCopy[locale];
-const price = priceFor(product, null, locale);
+const { product, rate } = Astro.props;
+const es = true;
+const t = catalogCopy;
+const price = priceFor(product, null);
 const image = primaryImage(product);
 // Si Cloudinary no está disponible la URL sale vacía: en ese caso mostramos
 // el icono de reserva en lugar de una imagen rota.
@@ -29,8 +28,8 @@ const imageSrc = image ? productImage(image.cloudinaryPublicId, 800) : '';
 const imageSrcSet = image ? productSrcSet(image.cloudinaryPublicId) : '';
 const imageSmall = image ? productImage(image.cloudinaryPublicId, 400) : '';
 const href = `${es ? '/catalogo/' : '/en/catalog/'}${product.slug}/`;
-const availability = availabilityLabels[locale][product.availability];
-const condition = conditionLabels[locale][product.condition];
+const availability = availabilityLabels[product.availability];
+const condition = conditionLabels[product.condition];
 const compareAt = Math.max(price.compareAtCents, price.listCents);
 const vesPrice = rate ? Math.round(price.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(compareAt * rate.rate) : 0;

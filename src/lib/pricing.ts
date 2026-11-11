@@ -1,5 +1,3 @@
-export type PriceLocale = 'es' | 'en';
-
 export type PromotionRule = {
   id: number;
   type: 'PERCENT' | 'FIXED';
@@ -76,7 +74,6 @@ export function resolvePrice(
   variant: PriceableVariant,
   rules: PromotionRule[],
   now: Date = new Date(),
-  locale: PriceLocale = 'es',
 ): ResolvedPrice {
   const listCents = variant?.priceCents ?? product.priceCents;
   const compareAtCents = variant?.compareAtCents ?? product.compareAtCents ?? 0;
@@ -98,8 +95,7 @@ export function resolvePrice(
 
   const discountCents = best?.discount ?? 0;
   const badge = best
-    ? (locale === 'es' ? best.rule.badgeEs : best.rule.badgeEn) ||
-      (best.rule.type === 'PERCENT' ? `-${best.rule.value}%` : 'Oferta')
+    ? best.rule.badgeEs || (best.rule.type === 'PERCENT' ? `-${best.rule.value}%` : 'Oferta')
     : '';
 
   return {

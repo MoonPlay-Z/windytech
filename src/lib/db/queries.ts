@@ -57,12 +57,12 @@ function textArrayLiteral(values: string[]): string {
 /* Catálogo público                                                    */
 /* ------------------------------------------------------------------ */
 
-export async function getCategories(locale: string): Promise<Category[]> {
+export async function getCategories(): Promise<Category[]> {
   const rows = await safeRows(
     sql`SELECT c.id, t.slug, t.name, t.description, c.image_public_id AS "imagePublicId",
                (SELECT COUNT(*)::int FROM products p WHERE p.category_id = c.id AND p.is_active = true) AS "productCount"
         FROM categories c
-        JOIN category_translations t ON t.category_id = c.id AND t.locale = ${locale}
+        JOIN category_translations t ON t.category_id = c.id AND t.locale = 'es'
         ORDER BY c.sort_order ASC, t.name ASC`,
   );
   return rows as unknown as Category[];
@@ -106,7 +106,6 @@ export async function getPromotionRules(now: Date = new Date()): Promise<Promoti
 }
 
 export type CatalogFilters = {
-  locale: string;
   category?: string;
   condition?: string;
   brand?: string;
@@ -117,7 +116,6 @@ export type CatalogFilters = {
 };
 
 export async function getCatalog(filters: CatalogFilters): Promise<CatalogProduct[]> {
-  const { locale } = filters;
   const conditions: SQL[] = [sql`p.is_active = true`];
 
   if (filters.category) {
@@ -151,7 +149,7 @@ export async function getCatalog(filters: CatalogFilters): Promise<CatalogProduc
                p.sku, p.availability, p.is_featured AS "isFeatured", p.specs,
                t.slug, t.name, t.short_description AS "shortDescription"
         FROM products p
-        JOIN product_translations t ON t.product_id = p.id AND t.locale = ${locale}
+        JOIN product_translations t ON t.product_id = p.id AND t.locale = 'es'
         WHERE ${where}
         ORDER BY p.is_featured DESC, p.created_at DESC
         LIMIT ${limit}`,
@@ -190,7 +188,7 @@ export async function getCatalog(filters: CatalogFilters): Promise<CatalogProduc
   });
 }
 
-export async function getProduct(locale: string, slug: string): Promise<CatalogProduct | null> {
+export async function getProduct(slug: string): Promise<CatalogProduct | null> {
   const row = await one(
     sql`SELECT p.id, p.category_id AS "categoryId", p.brand, p.model, p.condition,
                p.price_cents AS "priceCents", p.compare_at_cents AS "compareAtCents",
@@ -199,7 +197,7 @@ export async function getProduct(locale: string, slug: string): Promise<CatalogP
                t.description_md AS "descriptionMd", t.seo_title AS "seoTitle",
                t.seo_description AS "seoDescription"
         FROM products p
-        JOIN product_translations t ON t.product_id = p.id AND t.locale = ${locale}
+        JOIN product_translations t ON t.product_id = p.id AND t.locale = 'es'
         WHERE p.is_active = true AND t.slug = ${slug}
         LIMIT 1`,
   );
@@ -232,7 +230,7 @@ export async function getProduct(locale: string, slug: string): Promise<CatalogP
 }
 
 /** Productos por id con traducción del idioma pedido (para recalcular cotizaciones). */
-export async function getProductsByIds(locale: string, ids: number[]): Promise<CatalogProduct[]> {
+export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]> {
   if (ids.length === 0) return [];
   const rows = await safeRows(
     sql`SELECT p.id, p.category_id AS "categoryId", p.brand, p.model, p.condition,
@@ -241,7 +239,7 @@ export async function getProductsByIds(locale: string, ids: number[]): Promise<C
                COALESCE(t.slug, '') AS slug, COALESCE(t.name, p.model) AS name,
                COALESCE(t.short_description, '') AS "shortDescription"
         FROM products p
-        LEFT JOIN product_translations t ON t.product_id = p.id AND t.locale = ${locale}
+        LEFT JOIN product_translations t ON t.product_id = p.id AND t.locale = 'es'
         WHERE p.is_active = true AND p.id IN (${inList(ids)})`,
   );
   if (rows.length === 0) return [];
@@ -264,9 +262,9 @@ export async function getProductsByIds(locale: string, ids: number[]): Promise<C
   })) as unknown as CatalogProduct[];
 }
 
-export async function getProductSlug(productId: number, locale: string): Promise<string | null> {
+export async function getProductSlug(productId: number): Promise<string | null> {
   const row = await one(
-    sql`SELECT slug FROM product_translations WHERE product_id = ${productId} AND locale = ${locale} LIMIT 1`,
+    sql`SELECT slug FROM product_translations WHERE product_id = ${productId} AND locale = 'es' LIMIT 1`,
   );
   return row ? String(row.slug) : null;
 }
@@ -282,26 +280,26 @@ export async function getBrands(): Promise<string[]> {
 /* Proyectos y blog                                                    */
 /* ------------------------------------------------------------------ */
 
-export async function getProjects(locale: string): Promise<ProjectSummary[]> {
+export async function getProjects(): Promise<ProjectSummary[]> {
   const rows = await safeRows(
     sql`SELECT p.id, p.year, p.client_name AS "clientName", p.services,
                p.cover_public_id AS "coverPublicId",
                t.slug, t.title, t.summary
         FROM projects p
-        JOIN project_translations t ON t.project_id = p.id AND t.locale = ${locale}
+        JOIN project_translations t ON t.project_id = p.id AND t.locale = 'es'
         WHERE p.is_published = true AND p.client_approved = true
         ORDER BY p.sort_order ASC, p.year DESC NULLS LAST, p.id DESC`,
   );
   return rows as unknown as ProjectSummary[];
 }
 
-export async function getProject(locale: string, slug: string): Promise<ProjectSummary | null> {
+export async function getProject(slug: string): Promise<ProjectSummary | null> {
   const row = await one(
     sql`SELECT p.id, p.year, p.client_name AS "clientName", p.services,
                p.cover_public_id AS "coverPublicId",
                t.slug, t.title, t.summary, t.description_md AS "descriptionMd"
         FROM projects p
-        JOIN project_translations t ON t.project_id = p.id AND t.locale = ${locale}
+        JOIN project_translations t ON t.project_id = p.id AND t.locale = 'es'
         WHERE p.is_published = true AND p.client_approved = true AND t.slug = ${slug}
         LIMIT 1`,
   );
@@ -314,26 +312,26 @@ export async function getProject(locale: string, slug: string): Promise<ProjectS
   return { ...(row as unknown as ProjectSummary), id, images } as ProjectSummary;
 }
 
-export async function getPosts(locale: string): Promise<PostSummary[]> {
+export async function getPosts(): Promise<PostSummary[]> {
   const rows = await safeRows(
     sql`SELECT p.id, p.cover_public_id AS "coverPublicId", p.author, p.tags,
                p.published_at AS "publishedAt",
                t.slug, t.title, t.excerpt
         FROM posts p
-        JOIN post_translations t ON t.post_id = p.id AND t.locale = ${locale}
+        JOIN post_translations t ON t.post_id = p.id AND t.locale = 'es'
         WHERE p.is_published = true AND (p.published_at IS NULL OR p.published_at <= now())
         ORDER BY p.published_at DESC NULLS LAST, p.id DESC`,
   );
   return rows as unknown as PostSummary[];
 }
 
-export async function getPost(locale: string, slug: string): Promise<PostSummary | null> {
+export async function getPost(slug: string): Promise<PostSummary | null> {
   const row = await one(
     sql`SELECT p.id, p.cover_public_id AS "coverPublicId", p.author, p.tags,
                p.published_at AS "publishedAt",
                t.slug, t.title, t.excerpt, t.body_md AS "bodyMd"
         FROM posts p
-        JOIN post_translations t ON t.post_id = p.id AND t.locale = ${locale}
+        JOIN post_translations t ON t.post_id = p.id AND t.locale = 'es'
         WHERE p.is_published = true AND (p.published_at IS NULL OR p.published_at <= now())
           AND t.slug = ${slug}
         LIMIT 1`,
@@ -710,7 +708,7 @@ export async function productSlugInUse(
   const row = await one<{ exists: boolean }>(
     sql`SELECT EXISTS (
             SELECT 1 FROM product_translations
-            WHERE locale = ${locale} AND slug = ${slug}
+            WHERE locale = 'es' AND slug = ${slug}
               AND (${excludeProductId}::int IS NULL OR product_id <> ${excludeProductId})
           ) AS exists`,
   );
@@ -726,7 +724,7 @@ export async function postSlugInUse(
   const row = await one<{ exists: boolean }>(
     sql`SELECT EXISTS (
             SELECT 1 FROM post_translations
-            WHERE locale = ${locale} AND slug = ${slug}
+            WHERE locale = 'es' AND slug = ${slug}
               AND (${excludePostId}::int IS NULL OR post_id <> ${excludePostId})
           ) AS exists`,
   );
@@ -1182,7 +1180,7 @@ export async function deletePost(id: number) {
 /* ------------------------------------------------------------------ */
 
 /** Paquetes activos con su traducción en el idioma pedido (público). */
-export async function listServicePlans(locale: string, serviceKey?: string) {
+export async function listServicePlans(serviceKey?: string) {
   const rows = await safeRows<{
     id: number;
     serviceKey: string;
@@ -1204,7 +1202,7 @@ export async function listServicePlans(locale: string, serviceKey?: string) {
                p.is_featured AS "isFeatured", p.sort_order AS "sortOrder",
                t.slug, t.name, t.tagline, t.includes
         FROM service_plans p
-        JOIN service_plan_translations t ON t.plan_id = p.id AND t.locale = ${locale}
+        JOIN service_plan_translations t ON t.plan_id = p.id AND t.locale = 'es'
         WHERE p.is_active = true
           AND (${serviceKey ?? null}::text IS NULL OR p.service_key = ${serviceKey ?? null})
         ORDER BY p.sort_order ASC, p.id ASC`,
@@ -1286,7 +1284,7 @@ export async function servicePlanSlugInUse(
   const row = await one<{ exists: boolean }>(
     sql`SELECT EXISTS (
             SELECT 1 FROM service_plan_translations
-            WHERE locale = ${locale} AND slug = ${slug}
+            WHERE locale = 'es' AND slug = ${slug}
               AND (${excludePlanId}::int IS NULL OR plan_id <> ${excludePlanId})
           ) AS exists`,
   );

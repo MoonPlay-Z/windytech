@@ -14,17 +14,15 @@ import { site, whatsappLink } from '../../data/site';
 
 export const prerender = false;
 
-const locale: Locale = 'es';
-const t = catalogCopy[locale];
+const t = catalogCopy;
 const params = Astro.url.searchParams;
 
 const [rate, categories, brands, products] = await Promise.all([
   currentRate(),
-  getCategories(locale),
+  getCategories(),
   getBrands(),
   getCatalog({
-    locale,
-    category: params.get('category') ?? undefined,
+        category: params.get('category') ?? undefined,
     condition: params.get('condition') ?? undefined,
     brand: params.get('brand') ?? undefined,
     search: params.get('q') ?? undefined,
@@ -50,11 +48,9 @@ const itemListSchema = {
 ---
 
 <BaseLayout
-  lang="es"
   title="Catálogo de equipos informáticos | Windytech"
   description="Laptops, equipos de escritorio, monitores y accesorios con precios en dólares, disponibilidad actualizada y cotización por WhatsApp. Precios sin IVA."
   path="/catalogo/"
-  altPath="/en/catalog/"
   ogImage="/assets/og.png"
   ogImageAlt="Catálogo de equipos informáticos de Windytech"
   currencyDefault={currencyDefault}
@@ -71,7 +67,7 @@ const itemListSchema = {
       <p class="catalog-intro">{t.intro}</p>
       <div class="catalog-hero-meta">
         <span>{t.noTaxNote}</span>
-        <CurrencySwitch locale={locale} rate={rate} />
+        <CurrencySwitch rate={rate} />
       </div>
     </div>
   </section>
@@ -79,7 +75,6 @@ const itemListSchema = {
   <section class="section section--white catalog-section">
     <div class="container">
       <CatalogFilters
-        locale={locale}
         categories={categories}
         brands={brands}
         action="/catalogo/"
@@ -101,8 +96,7 @@ const itemListSchema = {
         path="/catalogo/"
         title={`${t.title} | ${site.name}`}
         text={t.intro}
-        lang={locale}
-        label={locale === 'es' ? 'Comparte el catálogo con tus clientes' : 'Share the catalog with your customers'}
+        label={'Comparte el catálogo con tus clientes'}
         campaign="catalog"
         variant="card"
       />
@@ -123,7 +117,7 @@ const itemListSchema = {
       ) : (
         <div class="product-grid">
           {products.map((product) => (
-            <ProductCard product={product} locale="es" rate={rate} />
+            <ProductCard product={product} rate={rate} />
           ))}
         </div>
       )}

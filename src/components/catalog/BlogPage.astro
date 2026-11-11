@@ -2,18 +2,17 @@
 import '../../styles/catalog.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
-import { site, type Lang } from '../../data/site';
+import { site } from '../../data/site';
 import { blogPath, type PostSummary } from '../../lib/catalog';
 import { imageUrl } from '../../lib/cloudinary';
 
 interface Props {
-  locale: Lang;
   posts: PostSummary[];
 }
 
-const { locale, posts } = Astro.props;
-const es = locale === 'es';
-const href = blogPath(locale);
+const { posts } = Astro.props;
+const es = true;
+const href = blogPath();
 
 const copy = es
   ? {
@@ -46,11 +45,9 @@ const itemList = {
 ---
 
 <BaseLayout
-  lang={locale}
   title={`${copy.title} | ${site.name}`}
   description={copy.intro}
   path={href}
-  altPath={es ? '/en/blog/' : '/blog/'}
   ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
   extraSchema={[itemList]}
   breadcrumb={[

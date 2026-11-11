@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { site, type Lang } from '../data/site';
+import { site } from '../data/site';
 import { shareCopy, shareLinks, trackedUrl } from '../lib/social';
 
 interface Props {
@@ -10,7 +10,6 @@ interface Props {
   title: string;
   /** Texto breve que acompaña al enlace. */
   text?: string;
-  lang: Lang;
   /** Etiqueta del bloque. */
   label?: string;
   /** Campaña UTM para medir el canal. */
@@ -23,15 +22,14 @@ const {
   path,
   title,
   text,
-  lang,
   label,
   campaign = 'share',
   variant = 'inline',
 } = Astro.props;
 
-const copy = shareCopy[lang];
+const copy = shareCopy;
 const url = new URL(path, site.url).toString();
-const links = shareLinks({ url, title, text, lang, campaign });
+const links = shareLinks({ url, title, text, campaign });
 const copyUrl = trackedUrl(url, 'copy', campaign);
 ---
 

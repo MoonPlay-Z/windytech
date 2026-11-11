@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareBar from '../ShareBar.astro';
-import { site, whatsappLink, type Lang } from '../../data/site';
+import { site, whatsappLink } from '../../data/site';
 import { projectsPath, type ProjectSummary } from '../../lib/catalog';
 import { projectImage } from '../../lib/cloudinary';
 import { renderMarkdown } from '../../lib/markdown';
@@ -9,13 +9,12 @@ import '../../styles/catalog.css';
 import '../../styles/detail.css';
 
 interface Props {
-  locale: Lang;
   project: ProjectSummary;
 }
 
-const { locale, project } = Astro.props;
-const es = locale === 'es';
-const listHref = projectsPath(locale);
+const { project } = Astro.props;
+const es = true;
+const listHref = projectsPath();
 const href = `${listHref}${project.slug}/`;
 const cover = project.coverPublicId ? projectImage(project.coverPublicId, 1600) : null;
 
@@ -33,18 +32,16 @@ const schema = {
 ---
 
 <BaseLayout
-  lang={locale}
   title={`${project.title} | ${site.name}`}
   description={project.summary}
   path={href}
-  altPath={`${es ? '/en/projects/' : '/proyectos/'}${project.slug}/`}
-  ogImage={cover ?? (es ? '/assets/og.png' : '/assets/og-en.png')}
+  ogImage={cover ?? '/assets/og.png'}
   ogImageAlt={project.title}
   ogType="article"
   extraSchema={[schema]}
   breadcrumb={[
-    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
-    { name: es ? 'Proyectos' : 'Projects', path: listHref },
+    { name: 'Inicio', path: '/' },
+    { name: 'Proyectos', path: listHref },
     { name: project.title, path: href },
   ]}
 >
@@ -110,7 +107,6 @@ const schema = {
         path={href}
         title={project.title}
         text={project.summary}
-        lang={locale}
         label={es ? 'Comparte este proyecto y consigue clientes' : 'Share this project and win customers'}
         campaign="project"
         variant="card"
