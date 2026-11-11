@@ -1,0 +1,71 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listServicePlansAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const plans = await listServicePlansAdmin();
+
+const periodLabels: Record<string, string> = {
+  one_time: 'Pago único',
+  monthly: 'Mensual',
+  yearly: 'Anual',
+};
+---
+
+<AdminLayout title="Paquetes de servicios" admin={admin} active="services">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="nuevo/">Nuevo paquete</a>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Paquete</th>
+          <th>Precio</th>
+          <th>Tiempo de aplicación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {plans.map((plan) => (
+          <tr>
+            <td>{plan.id}</td>
+            <td>
+              <a href={`/admin/servicios/${plan.id}/`}>{plan.name || `Paquete ${plan.id}`}</a>
+              {plan.badge && <span class="admin-tag">{plan.badge}</span>}
+            </td>
+            <td>
+              ${(plan.priceCents / 100).toFixed(2)} {plan.currency}
+              <small>{periodLabels[plan.billingPeriod] ?? plan.billingPeriod}</small>
+            </td>
+            <td>{plan.deliveryTime || '—'}</td>
+            <td>
+              {plan.isActive ? 'Activo' : 'Oculto'}
+              {plan.isFeatured ? ' · Destacado' : ''}
+            </td>
+            <td>
+              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/servicios/${plan.id}/`}>Editar</a>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete={`/api/admin/service-plans?id=${plan.id}`}
+                data-confirm="¿Eliminar este paquete de servicio?"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        ))}
+        {plans.length === 0 && (
+          <tr><td colspan="6">Sin paquetes. Crea el primero para mostrarlo en la página de servicios.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

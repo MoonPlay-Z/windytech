@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
+import ServicePlans from './ServicePlans.astro';
 import { site, whatsappLink, type Lang } from '../data/site';
 import { serviceHub, services } from '../data/services';
+import { listServicePlans } from '../lib/db/queries';
 
 interface Props {
   lang: Lang;
@@ -14,6 +16,8 @@ const es = lang === 'es';
 const homeHref = es ? '/' : '/en/';
 const homeLabel = es ? 'Inicio' : 'Home';
 const viewLabel = es ? 'Ver servicio' : 'View service';
+
+const plans = await listServicePlans(lang);
 
 const itemList = {
   '@type': 'ItemList',
@@ -96,6 +100,8 @@ const itemList = {
       </div>
     </div>
   </section>
+
+  <ServicePlans lang={lang} plans={plans} />
 
   <section class="cta-band">
     <div class="container cta-inner">

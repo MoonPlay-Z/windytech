@@ -32,6 +32,12 @@ function fieldValue(
       .map((item) => item.trim())
       .filter(Boolean);
   }
+  if (type === 'lines') {
+    return element.value
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
   if (type === 'json') {
     const raw = element.value.trim();
     if (!raw) return {};

@@ -287,6 +287,49 @@ export const postTranslations = pgTable(
   ],
 );
 
+/* Paquetes de servicios (planes que el cliente puede contratar) */
+export const servicePlans = pgTable(
+  'service_plans',
+  {
+    id: serial('id').primaryKey(),
+    /** Clave del servicio estático relacionado (software, whatsapp, web...). */
+    serviceKey: text('service_key').notNull().default(''),
+    priceCents: integer('price_cents').notNull().default(0),
+    currency: text('currency').notNull().default('USD'),
+    /** one_time | monthly | yearly */
+    billingPeriod: text('billing_period').notNull().default('one_time'),
+    /** Tiempo de aplicación: "2 a 4 semanas". */
+    deliveryTime: text('delivery_time').notNull().default(''),
+    badge: text('badge').notNull().default(''),
+    isActive: boolean('is_active').notNull().default(true),
+    isFeatured: boolean('is_featured').notNull().default(false),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('service_plans_active_idx').on(table.isActive)],
+);
+
+export const servicePlanTranslations = pgTable(
+  'service_plan_translations',
+  {
+    id: serial('id').primaryKey(),
+    planId: integer('plan_id')
+      .notNull()
+      .references(() => servicePlans.id, { onDelete: 'cascade' }),
+    locale: localeEnum('locale').notNull(),
+    slug: text('slug').notNull(),
+    name: text('name').notNull(),
+    tagline: text('tagline').notNull().default(''),
+    /** Contenido del paquete, una línea por punto. */
+    includes: text('includes').array().notNull().default([]),
+  },
+  (table) => [
+    uniqueIndex('service_plan_translations_locale_slug_idx').on(table.locale, table.slug),
+    index('service_plan_translations_plan_idx').on(table.planId),
+  ],
+);
+
 export const media = pgTable('media', {
   id: serial('id').primaryKey(),
   publicId: text('public_id').notNull().unique(),

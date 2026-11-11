@@ -643,7 +643,7 @@
 }
 
 .admin-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -694,6 +694,11 @@
 .admin-stat--posts .admin-stat-icon {
   background: #eaf3fb;
   color: #3974a2;
+}
+
+.admin-stat--services .admin-stat-icon {
+  background: #e7f7f3;
+  color: #0b7a7a;
 }
 
 .admin-stat-label {

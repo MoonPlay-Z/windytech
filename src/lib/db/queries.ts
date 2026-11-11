@@ -7,6 +7,7 @@ import type {
   ProjectSummary,
   PublicQuote,
   QuoteStatus,
+  ServicePlan,
 } from '../catalog';
 import type { PromotionRule } from '../pricing';
 
@@ -1173,6 +1174,190 @@ export async function deletePost(id: number) {
   const client = db();
   if (!client) return false;
   await client.execute(sql`DELETE FROM posts WHERE id = ${id}`);
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Paquetes de servicios                                              */
+/* ------------------------------------------------------------------ */
+
+/** Paquetes activos con su traducción en el idioma pedido (público). */
+export async function listServicePlans(locale: string) {
+  const rows = await safeRows<{
+    id: number;
+    serviceKey: string;
+    priceCents: number;
+    currency: string;
+    billingPeriod: string;
+    deliveryTime: string;
+    badge: string;
+    isFeatured: boolean;
+    sortOrder: number;
+    slug: string;
+    name: string;
+    tagline: string;
+    includes: string[];
+  }>(
+    sql`SELECT p.id, p.service_key AS "serviceKey", p.price_cents AS "priceCents",
+               p.currency, p.billing_period AS "billingPeriod",
+               p.delivery_time AS "deliveryTime", p.badge,
+               p.is_featured AS "isFeatured", p.sort_order AS "sortOrder",
+               t.slug, t.name, t.tagline, t.includes
+        FROM service_plans p
+        JOIN service_plan_translations t ON t.plan_id = p.id AND t.locale = ${locale}
+        WHERE p.is_active = true
+        ORDER BY p.sort_order ASC, p.id ASC`,
+  );
+  return rows as unknown as ServicePlan[];
+}
+
+/** Paquetes con su traducción en español (panel). */
+export async function listServicePlansAdmin() {
+  return safeRows<{
+    id: number;
+    serviceKey: string;
+    priceCents: number;
+    currency: string;
+    billingPeriod: string;
+    deliveryTime: string;
+    badge: string;
+    isActive: boolean;
+    isFeatured: boolean;
+    sortOrder: number;
+    slug: string;
+    name: string;
+    tagline: string;
+    includes: string[];
+  }>(
+    sql`SELECT p.id, p.service_key AS "serviceKey", p.price_cents AS "priceCents",
+               p.currency, p.billing_period AS "billingPeriod",
+               p.delivery_time AS "deliveryTime", p.badge,
+               p.is_active AS "isActive", p.is_featured AS "isFeatured",
+               p.sort_order AS "sortOrder",
+               COALESCE(t.slug, '') AS slug, COALESCE(t.name, '') AS name,
+               COALESCE(t.tagline, '') AS tagline, COALESCE(t.includes, '{}') AS includes
+        FROM service_plans p
+        LEFT JOIN service_plan_translations t ON t.plan_id = p.id AND t.locale = 'es'
+        ORDER BY p.sort_order ASC, p.id ASC`,
+  );
+}
+
+export type ServicePlanAdmin = {
+  id: number;
+  serviceKey: string;
+  priceCents: number;
+  currency: string;
+  billingPeriod: string;
+  deliveryTime: string;
+  badge: string;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  translations: {
+    locale: string;
+    slug: string;
+    name: string;
+    tagline: string;
+    includes: string[];
+  }[];
+};
+
+export async function getServicePlanAdmin(id: number): Promise<ServicePlanAdmin | null> {
+  const plan = await one<Row>(
+    sql`SELECT id, service_key AS "serviceKey", price_cents AS "priceCents", currency,
+               billing_period AS "billingPeriod", delivery_time AS "deliveryTime", badge,
+               is_active AS "isActive", is_featured AS "isFeatured", sort_order AS "sortOrder"
+        FROM service_plans WHERE id = ${id} LIMIT 1`,
+  );
+  if (!plan) return null;
+  const translations = await safeRows(
+    sql`SELECT locale, slug, name, tagline, includes FROM service_plan_translations WHERE plan_id = ${id}`,
+  );
+  return { ...plan, translations } as unknown as ServicePlanAdmin;
+}
+
+/** Indica si un slug ya pertenece a otro paquete. */
+export async function servicePlanSlugInUse(
+  locale: string,
+  slug: string,
+  excludePlanId: number | null = null,
+): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (
+            SELECT 1 FROM service_plan_translations
+            WHERE locale = ${locale} AND slug = ${slug}
+              AND (${excludePlanId}::int IS NULL OR plan_id <> ${excludePlanId})
+          ) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
+export async function saveServicePlan(input: {
+  id?: number;
+  serviceKey: string;
+  priceCents: number;
+  currency: string;
+  billingPeriod: string;
+  deliveryTime: string;
+  badge: string;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  translations: {
+    locale: string;
+    slug: string;
+    name: string;
+    tagline: string;
+    includes: string[];
+  }[];
+}): Promise<number | null> {
+  const client = db();
+  if (!client) return null;
+
+  return client.transaction(async (tx) => {
+    let id = input.id ?? 0;
+
+    if (id) {
+      await tx.execute(
+        sql`UPDATE service_plans SET service_key = ${input.serviceKey},
+                price_cents = ${input.priceCents}, currency = ${input.currency},
+                billing_period = ${input.billingPeriod}, delivery_time = ${input.deliveryTime},
+                badge = ${input.badge}, is_active = ${input.isActive},
+                is_featured = ${input.isFeatured}, sort_order = ${input.sortOrder},
+                updated_at = now()
+            WHERE id = ${id}`,
+      );
+    } else {
+      const result = await tx.execute(
+        sql`INSERT INTO service_plans (service_key, price_cents, currency, billing_period,
+                delivery_time, badge, is_active, is_featured, sort_order)
+            VALUES (${input.serviceKey}, ${input.priceCents}, ${input.currency},
+                ${input.billingPeriod}, ${input.deliveryTime}, ${input.badge},
+                ${input.isActive}, ${input.isFeatured}, ${input.sortOrder})
+            RETURNING id`,
+      );
+      id = Number((result.rows[0] as { id: number }).id);
+    }
+
+    for (const tr of input.translations) {
+      await tx.execute(
+        sql`DELETE FROM service_plan_translations WHERE plan_id = ${id} AND locale = ${tr.locale}`,
+      );
+      await tx.execute(
+        sql`INSERT INTO service_plan_translations (plan_id, locale, slug, name, tagline, includes)
+            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.name}, ${tr.tagline},
+                ${textArrayLiteral(tr.includes)}::text[])`,
+      );
+    }
+
+    return id;
+  });
+}
+
+export async function deleteServicePlan(id: number) {
+  const client = db();
+  if (!client) return false;
+  await client.execute(sql`DELETE FROM service_plans WHERE id = ${id}`);
   return true;
 }
 

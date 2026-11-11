@@ -204,6 +204,30 @@ export const postSchema = z.object({
   ).min(1),
 });
 
+export const servicePlanSchema = z.object({
+  id: z.coerce.number().int().positive().optional(),
+  serviceKey: z.string().trim().max(60).default(''),
+  price: z.coerce.number().min(0).max(1_000_000),
+  currency: z.enum(['USD', 'VES']).default('USD'),
+  billingPeriod: z.enum(['one_time', 'monthly', 'yearly']).default('one_time'),
+  deliveryTime: z.string().trim().max(120).default(''),
+  badge: z.string().trim().max(80).default(''),
+  isActive: z.coerce.boolean().default(true),
+  isFeatured: z.coerce.boolean().default(false),
+  sortOrder: z.coerce.number().int().min(0).default(0),
+  translations: z
+    .array(
+      z.object({
+        locale: z.enum(['es', 'en']),
+        slug,
+        name: z.string().trim().min(2).max(120),
+        tagline: z.string().trim().max(300).default(''),
+        includes: z.array(z.string().trim().min(2).max(300)).max(30).default([]),
+      }),
+    )
+    .min(1),
+});
+
 export const loginSchema = z.object({
   email: z.string().trim().email().max(200),
   password: z.string().min(8).max(200),

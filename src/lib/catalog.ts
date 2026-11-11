@@ -87,8 +87,24 @@ export type PostSummary = {
   bodyMd?: string;
 };
 
-export type PublicQuote = {
+/** Paquete de servicio: contenido, costo y tiempo de aplicación. */
+export type ServicePlan = {
   id: number;
+  serviceKey: string;
+  priceCents: number;
+  currency: string;
+  billingPeriod: 'one_time' | 'monthly' | 'yearly';
+  deliveryTime: string;
+  badge: string;
+  isFeatured: boolean;
+  sortOrder: number;
+  slug: string;
+  name: string;
+  tagline: string;
+  includes: string[];
+};
+
+export type PublicQuote = {  id: number;
   number: string;
   publicToken: string;
   customerName: string;

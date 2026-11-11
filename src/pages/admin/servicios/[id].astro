@@ -1,0 +1,187 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getServicePlanAdmin } from '../../../lib/db/queries';
+import { services } from '../../../data/services';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const planId = Number(Astro.params.id);
+if (!Number.isInteger(planId) || planId <= 0) return Astro.redirect('/admin/servicios/', 302);
+
+const plan = await getServicePlanAdmin(planId);
+if (!plan) return Astro.redirect('/admin/servicios/', 302);
+
+const translations: any[] = plan.translations ?? [];
+const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
+const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
+const price = (plan.priceCents / 100).toFixed(2);
+---
+
+<AdminLayout title="Editar paquete" admin={admin} active="services">
+  <section class="admin-card">
+    <h2>Editar paquete de servicio</h2>
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/service-plans"
+      data-success="Paquete guardado."
+      data-redirect="/admin/servicios/"
+    >
+      <input type="hidden" data-field="id" data-type="number" value={String(planId)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Servicio relacionado</span>
+          <select name="serviceKey" data-field="serviceKey">
+            <option value="">Sin vincular</option>
+            {services.map((service) => (
+              <option value={service.id} selected={service.id === plan.serviceKey}>{service.es.title}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Precio</span>
+          <input
+            type="number"
+            name="price"
+            data-field="price"
+            data-type="number"
+            min="0"
+            step="0.01"
+            value={price}
+            required
+          />
+        </label>
+        <label>
+          <span>Moneda</span>
+          <select name="currency" data-field="currency">
+            <option value="USD" selected={plan.currency === 'USD'}>USD</option>
+            <option value="VES" selected={plan.currency === 'VES'}>Bs</option>
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Periodicidad</span>
+          <select name="billingPeriod" data-field="billingPeriod">
+            <option value="one_time" selected={plan.billingPeriod === 'one_time'}>Pago único</option>
+            <option value="monthly" selected={plan.billingPeriod === 'monthly'}>Mensual</option>
+            <option value="yearly" selected={plan.billingPeriod === 'yearly'}>Anual</option>
+          </select>
+        </label>
+        <label>
+          <span>Tiempo de aplicación</span>
+          <input
+            type="text"
+            name="deliveryTime"
+            data-field="deliveryTime"
+            maxlength="120"
+            value={plan.deliveryTime ?? ''}
+          />
+        </label>
+        <label>
+          <span>Etiqueta</span>
+          <input type="text" name="badge" data-field="badge" maxlength="80" value={plan.badge ?? ''} />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Orden</span>
+          <input
+            type="number"
+            name="sortOrder"
+            data-field="sortOrder"
+            data-type="number"
+            min="0"
+            value={String(plan.sortOrder ?? 0)}
+          />
+        </label>
+        <label class="admin-check">
+          <input
+            type="checkbox"
+            name="isActive"
+            data-field="isActive"
+            data-type="checkbox"
+            checked={plan.isActive ? true : undefined}
+          />
+          Visible en la web
+        </label>
+        <label class="admin-check">
+          <input
+            type="checkbox"
+            name="isFeatured"
+            data-field="isFeatured"
+            data-type="checkbox"
+            checked={plan.isFeatured ? true : undefined}
+          />
+          Destacado
+        </label>
+      </div>
+
+      <fieldset class="admin-fieldset">
+        <legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug ES</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} />
+          </label>
+          <label>
+            <span>Slug EN</span>
+            <input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Nombre ES</span>
+            <input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} />
+          </label>
+          <label>
+            <span>Nombre EN</span>
+            <input name="tr.en.name" data-field="tr.en.name" type="text" value={enTranslation.name ?? ''} />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Descripción corta ES</span>
+            <input
+              name="tr.es.tagline"
+              data-field="tr.es.tagline"
+              type="text"
+              maxlength="300"
+              value={esTranslation.tagline ?? ''}
+            />
+          </label>
+          <label>
+            <span>Descripción corta EN</span>
+            <input
+              name="tr.en.tagline"
+              data-field="tr.en.tagline"
+              type="text"
+              maxlength="300"
+              value={enTranslation.tagline ?? ''}
+            />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Contenido del paquete ES (un punto por línea)</span>
+            <textarea name="tr.es.includes" data-field="tr.es.includes" data-type="lines" rows="6">{(esTranslation.includes ?? []).join('\n')}</textarea>
+          </label>
+          <label>
+            <span>Contenido del paquete EN (un punto por línea)</span>
+            <textarea name="tr.en.includes" data-field="tr.en.includes" data-type="lines" rows="6">{(enTranslation.includes ?? []).join('\n')}</textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/servicios/">Volver</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

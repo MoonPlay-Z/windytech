@@ -1,7 +1,13 @@
 ---
 import AdminLayout from '../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../lib/auth';
-import { countQuotesByStatus, listPostsAdmin, listProductsAdmin, listProjectsAdmin } from '../../lib/db/queries';
+import {
+  countQuotesByStatus,
+  listPostsAdmin,
+  listProductsAdmin,
+  listProjectsAdmin,
+  listServicePlansAdmin,
+} from '../../lib/db/queries';
 
 export const prerender = false;
 
@@ -11,11 +17,12 @@ if (!admin) {
   return Astro.redirect('/admin/login/', 302);
 }
 
-const [products, projects, posts, quotes] = await Promise.all([
+const [products, projects, posts, quotes, plans] = await Promise.all([
   listProductsAdmin(),
   listProjectsAdmin(),
   listPostsAdmin(),
   countQuotesByStatus(),
+  listServicePlansAdmin(),
 ]);
 ---
 
@@ -57,6 +64,13 @@ const [products, projects, posts, quotes] = await Promise.all([
       <strong>{posts.length}</strong>
       <span class="admin-stat-caption">Publicaciones</span>
       <span class="admin-stat-link">Gestionar contenido <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="admin-stat admin-stat--services" href="/admin/servicios/">
+      <span class="admin-stat-icon" aria-hidden="true">◈</span>
+      <span class="admin-stat-label">PAQUETES</span>
+      <strong>{plans.length}</strong>
+      <span class="admin-stat-caption">Paquetes de servicio</span>
+      <span class="admin-stat-link">Ver paquetes <span aria-hidden="true">→</span></span>
     </a>
   </div>
 

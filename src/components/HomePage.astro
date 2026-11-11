@@ -241,6 +241,12 @@ const shareText = `${title} — ${shareUrl}`;
           </article>
         ))}
       </div>
+      <div class="section-foot">
+        <a class="btn btn-dark" href={`${lang === 'es' ? '/servicios/' : '/en/services/'}#paquetes`}>
+          {lang === 'es' ? 'Ver paquetes, costos y tiempos' : 'See packages, prices and timelines'}
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </div>
     </div>
   </section>
 

@@ -1,0 +1,134 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { services } from '../../../data/services';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+---
+
+<AdminLayout title="Nuevo paquete" admin={admin} active="services">
+  <section class="admin-card">
+    <h2>Nuevo paquete de servicio</h2>
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/service-plans"
+      data-success="Paquete creado."
+      data-redirect="/admin/servicios/"
+    >
+      <div class="admin-form-row">
+        <label>
+          <span>Servicio relacionado</span>
+          <select name="serviceKey" data-field="serviceKey">
+            <option value="">Sin vincular</option>
+            {services.map((service) => (
+              <option value={service.id}>{service.es.title}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Precio</span>
+          <input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" required />
+        </label>
+        <label>
+          <span>Moneda</span>
+          <select name="currency" data-field="currency">
+            <option value="USD">USD</option>
+            <option value="VES">Bs</option>
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Periodicidad</span>
+          <select name="billingPeriod" data-field="billingPeriod">
+            <option value="one_time">Pago único</option>
+            <option value="monthly">Mensual</option>
+            <option value="yearly">Anual</option>
+          </select>
+        </label>
+        <label>
+          <span>Tiempo de aplicación</span>
+          <input
+            type="text"
+            name="deliveryTime"
+            data-field="deliveryTime"
+            maxlength="120"
+            placeholder="2 a 4 semanas"
+          />
+        </label>
+        <label>
+          <span>Etiqueta</span>
+          <input type="text" name="badge" data-field="badge" maxlength="80" placeholder="Más solicitado" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Orden</span>
+          <input type="number" name="sortOrder" data-field="sortOrder" data-type="number" min="0" value="0" />
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isActive" data-field="isActive" data-type="checkbox" checked />
+          Visible en la web
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isFeatured" data-field="isFeatured" data-type="checkbox" />
+          Destacado
+        </label>
+      </div>
+
+      <fieldset class="admin-fieldset">
+        <legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug ES</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
+          </label>
+          <label>
+            <span>Slug EN</span>
+            <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Nombre ES</span>
+            <input name="tr.es.name" data-field="tr.es.name" type="text" required />
+          </label>
+          <label>
+            <span>Nombre EN</span>
+            <input name="tr.en.name" data-field="tr.en.name" type="text" required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Descripción corta ES</span>
+            <input name="tr.es.tagline" data-field="tr.es.tagline" type="text" maxlength="300" />
+          </label>
+          <label>
+            <span>Descripción corta EN</span>
+            <input name="tr.en.tagline" data-field="tr.en.tagline" type="text" maxlength="300" />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Contenido del paquete ES (un punto por línea)</span>
+            <textarea name="tr.es.includes" data-field="tr.es.includes" data-type="lines" rows="6"></textarea>
+          </label>
+          <label>
+            <span>Contenido del paquete EN (un punto por línea)</span>
+            <textarea name="tr.en.includes" data-field="tr.en.includes" data-type="lines" rows="6"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear paquete</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/servicios/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>
