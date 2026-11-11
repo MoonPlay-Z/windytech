@@ -40,6 +40,18 @@ function inList(ids: number[]): SQL {
   );
 }
 
+/**
+ * Serializa un arreglo de strings como literal de PostgreSQL (`{a,b}`).
+ * Necesario porque Drizzle interpreta un array embebido en `sql` como una
+ * lista de placeholders y no como el valor de una columna `text[]`.
+ */
+function textArrayLiteral(values: string[]): string {
+  const escaped = values.map(
+    (value) => `"${String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`,
+  );
+  return `{${escaped.join(',')}}`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Catálogo público                                                    */
 /* ------------------------------------------------------------------ */
@@ -248,7 +260,7 @@ export async function getProductsByIds(locale: string, ids: number[]): Promise<C
     images: [],
     variants: variantRows.filter((variant) => Number(variant.productId) === Number(row.id)),
     rules,
-  })) as CatalogProduct[];
+  })) as unknown as CatalogProduct[];
 }
 
 export async function getProductSlug(productId: number, locale: string): Promise<string | null> {
@@ -598,7 +610,25 @@ export async function listProductsAdmin() {
   );
 }
 
-export async function getProductAdmin(id: number) {
+export type ProductAdmin = {
+  id: number;
+  categoryId: number | null;
+  brand: string;
+  model: string;
+  condition: string;
+  priceCents: number;
+  compareAtCents: number | null;
+  sku: string;
+  availability: string;
+  isActive: boolean;
+  isFeatured: boolean;
+  specs: Record<string, string>;
+  translations: Row[];
+  variants: Row[];
+  images: Row[];
+};
+
+export async function getProductAdmin(id: number): Promise<ProductAdmin | null> {
   const product = await one<Row>(
     sql`SELECT id, category_id AS "categoryId", brand, model, condition,
                price_cents AS "priceCents", compare_at_cents AS "compareAtCents", sku,
@@ -620,7 +650,7 @@ export async function getProductAdmin(id: number) {
                         alt, position, is_primary AS "isPrimary"
                  FROM product_images WHERE product_id = ${id} ORDER BY is_primary DESC, position ASC`),
   ]);
-  return { ...product, translations, variants, images };
+  return { ...product, translations, variants, images } as unknown as ProductAdmin;
 }
 
 export type ProductInput = {
@@ -962,14 +992,14 @@ export async function saveProject(input: {
     if (id) {
       await tx.execute(
         sql`UPDATE projects SET year = ${input.year}, client_name = ${input.clientName},
-                client_approved = ${input.clientApproved}, services = ${input.services},
+                client_approved = ${input.clientApproved}, services = ${textArrayLiteral(input.services)}::text[],
                 cover_public_id = ${input.coverPublicId}, is_published = ${input.isPublished},
                 sort_order = ${input.sortOrder}, updated_at = now() WHERE id = ${id}`,
       );
     } else {
       const result = await tx.execute(
         sql`INSERT INTO projects (year, client_name, client_approved, services, cover_public_id, is_published, sort_order)
-            VALUES (${input.year}, ${input.clientName}, ${input.clientApproved}, ${input.services},
+            VALUES (${input.year}, ${input.clientName}, ${input.clientApproved}, ${textArrayLiteral(input.services)}::text[],
                 ${input.coverPublicId}, ${input.isPublished}, ${input.sortOrder}) RETURNING id`,
       );
       id = Number((result.rows[0] as { id: number }).id);
@@ -1051,13 +1081,13 @@ export async function savePost(input: {
     if (id) {
       await tx.execute(
         sql`UPDATE posts SET cover_public_id = ${input.coverPublicId}, author = ${input.author},
-                tags = ${input.tags}, published_at = ${input.publishedAt},
+                tags = ${textArrayLiteral(input.tags)}::text[], published_at = ${input.publishedAt},
                 is_published = ${input.isPublished}, updated_at = now() WHERE id = ${id}`,
       );
     } else {
       const result = await tx.execute(
         sql`INSERT INTO posts (cover_public_id, author, tags, published_at, is_published)
-            VALUES (${input.coverPublicId}, ${input.author}, ${input.tags}, ${input.publishedAt},
+            VALUES (${input.coverPublicId}, ${input.author}, ${textArrayLiteral(input.tags)}::text[], ${input.publishedAt},
                 ${input.isPublished}) RETURNING id`,
       );
       id = Number((result.rows[0] as { id: number }).id);

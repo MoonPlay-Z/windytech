@@ -16,6 +16,12 @@ type AboutContent = {
   intro: string;
   definitionTitle: string;
   definition: string[];
+  missionTitle: string;
+  missionText: string;
+  visionTitle: string;
+  visionText: string;
+  objectivesTitle: string;
+  objectives: string[];
   servicesTitle: string;
   services: string[];
   processTitle: string;
@@ -67,6 +73,19 @@ export const aboutContent: Record<Lang, AboutContent> = {
     definition: [
       'Windytech es una empresa de servicios digitales con base en Venezuela que trabaja con clientes de cualquier país de forma remota. Su equipo desarrolla aplicaciones y herramientas a la medida, automatiza la atención por WhatsApp Business, crea sitios web y landing pages, y complementa el trabajo con SEO, publicidad y equipamiento informático.',
       'Trabaja con emprendimientos, pequeñas empresas, negocios en crecimiento y compañías con varias sedes. Cada proyecto se cotiza con alcance cerrado, precio claro y fechas definidas, y se atiende directamente con las personas que ejecutan el trabajo.',
+    ],
+    missionTitle: 'Nuestra misión',
+    missionText:
+      'Ayudar a negocios de cualquier tamaño a crecer con tecnología útil: software a la medida, automatización y presencia digital que ahorran tiempo, reducen errores y generan ventas.',
+    visionTitle: 'Nuestra visión',
+    visionText:
+      'Ser el estudio de referencia en Latinoamérica para negocios que quieren digitalizarse sin complicaciones, con soluciones claras, medibles y sostenibles en el tiempo.',
+    objectivesTitle: 'Nuestros objetivos',
+    objectives: [
+      'Entregar cada proyecto con alcance, precio y fechas claras, sin sorpresas.',
+      'Automatizar los procesos repetitivos para que los equipos se enfoquen en vender y atender.',
+      'Construir sitios y aplicaciones rápidas, accesibles y medibles.',
+      'Acompañar a cada cliente con soporte y mejora continua después de la entrega.',
     ],
     servicesTitle: 'Qué hace Windytech',
     services: [
@@ -166,6 +185,19 @@ export const aboutContent: Record<Lang, AboutContent> = {
     definition: [
       'Windytech is a digital services company based in Venezuela that works remotely with clients in any country. Its team builds custom applications and internal tools, automates WhatsApp Business support, creates websites and landing pages, and supports the work with SEO, advertising and IT equipment.',
       'It works with startups, small businesses, growing companies and organizations with multiple locations. Every project is quoted with a fixed scope, clear pricing and defined dates, and clients speak directly with the people doing the work.',
+    ],
+    missionTitle: 'Our mission',
+    missionText:
+      'To help businesses of every size grow with useful technology: custom software, automation and a digital presence that saves time, reduces errors and drives sales.',
+    visionTitle: 'Our vision',
+    visionText:
+      'To be the reference studio in Latin America for businesses that want to go digital without friction, with clear, measurable and sustainable solutions.',
+    objectivesTitle: 'Our objectives',
+    objectives: [
+      'Deliver every project with a clear scope, price and timeline — no surprises.',
+      'Automate repetitive work so teams can focus on selling and serving customers.',
+      'Build fast, accessible and measurable websites and applications.',
+      'Support every client with maintenance and continuous improvement after launch.',
     ],
     servicesTitle: 'What Windytech does',
     services: [

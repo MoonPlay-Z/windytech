@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { createAdmin, listAdmins, updateAdmin, updateAdminPassword, writeAudit } from '../../../lib/db/queries';
 import { hashPassword } from '../../../lib/auth';
 import { json, readJson, requireAdmin, requireOwner } from '../../../lib/api';
+import { sameOrigin } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -13,6 +14,7 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
   if (!requireOwner(admin)) return json({ error: 'Solo el propietario puede gestionar usuarios.' }, 403);

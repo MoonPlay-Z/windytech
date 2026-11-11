@@ -1,0 +1,105 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+---
+
+<AdminLayout title="Nuevo proyecto" admin={admin} active="projects">
+  <section class="admin-card">
+    <h2>Nuevo proyecto</h2>
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/projects"
+      data-success="Proyecto creado."
+      data-redirect="/admin/proyectos/"
+    >
+      <div class="admin-form-row">
+        <label>
+          <span>Año</span>
+          <input type="number" name="year" data-field="year" data-type="number" min="2000" max="2100" />
+        </label>
+        <label>
+          <span>Cliente</span>
+          <input name="clientName" data-field="clientName" type="text" maxlength="160" />
+        </label>
+        <label>
+          <span>Orden</span>
+          <input type="number" name="sortOrder" data-field="sortOrder" data-type="number" min="0" value="0" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label class="admin-check">
+          <input type="checkbox" name="clientApproved" data-field="clientApproved" data-type="checkbox" />
+          Cliente aprobó publicar
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isPublished" data-field="isPublished" data-type="checkbox" />
+          Publicado
+        </label>
+      </div>
+      <label>
+        <span>Servicios (separados por coma)</span>
+        <input name="services" data-field="services" data-type="array" type="text" placeholder="Web, Automatización" />
+      </label>
+
+      <fieldset class="admin-fieldset">
+        <legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug ES</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
+          </label>
+          <label>
+            <span>Slug EN</span>
+            <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Título ES</span>
+            <input name="tr.es.title" data-field="tr.es.title" type="text" required />
+          </label>
+          <label>
+            <span>Título EN</span>
+            <input name="tr.en.title" data-field="tr.en.title" type="text" required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Resumen ES</span>
+            <input name="tr.es.summary" data-field="tr.es.summary" type="text" maxlength="600" />
+          </label>
+          <label>
+            <span>Resumen EN</span>
+            <input name="tr.en.summary" data-field="tr.en.summary" type="text" maxlength="600" />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Descripción ES (Markdown)</span>
+            <textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="4"></textarea>
+          </label>
+          <label>
+            <span>Descripción EN (Markdown)</span>
+            <textarea name="tr.en.descriptionMd" data-field="tr.en.descriptionMd" rows="4"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <ImageUploader mode="single" folder="windytech/proyectos/nuevo" field="coverPublicId" label="Imagen de portada" />
+      <ImageUploader mode="multi" folder="windytech/proyectos/nuevo" field="images" label="Galería del proyecto" />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear proyecto</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/proyectos/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

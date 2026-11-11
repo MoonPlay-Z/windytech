@@ -1,12 +1,14 @@
 import type { APIRoute } from 'astro';
 import { cloudinaryConfigured, signUpload } from '../../../../lib/cloudinary';
 import { json, readJson, requireAdmin } from '../../../../lib/api';
+import { sameOrigin } from '../../../../lib/security';
 
 export const prerender = false;
 
 const ALLOWED = /^windytech\/(productos|proyectos|publicaciones|media)\//;
 
 export const POST: APIRoute = async ({ request }) => {
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
   if (!cloudinaryConfigured()) {

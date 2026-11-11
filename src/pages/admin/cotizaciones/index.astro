@@ -32,12 +32,12 @@ const quotes = await listQuotes();
             <td>{quote.phone}</td>
             <td>${(quote.totalCents / 100).toFixed(2)} {quote.currency}</td>
             <td>
-              <select data-quote-status={quote.id} value={quote.status}>
-                <option value="NEW">Nueva</option>
-                <option value="CONTACTED">Contactada</option>
-                <option value="QUOTED">Cotizada</option>
-                <option value="CLOSED">Cerrada</option>
-                <option value="LOST">Perdida</option>
+              <select data-quote-status={quote.id}>
+                <option value="NEW" selected={quote.status === 'NEW'}>Nueva</option>
+                <option value="CONTACTED" selected={quote.status === 'CONTACTED'}>Contactada</option>
+                <option value="QUOTED" selected={quote.status === 'QUOTED'}>Cotizada</option>
+                <option value="CLOSED" selected={quote.status === 'CLOSED'}>Cerrada</option>
+                <option value="LOST" selected={quote.status === 'LOST'}>Perdida</option>
               </select>
             </td>
             <td>{new Date(quote.createdAt).toLocaleDateString('es-VE')}</td>

@@ -14,26 +14,35 @@ webs, marketing, redes y equipos. El catálogo de equipos queda para una fase po
 ```bash
 npm install
 npm run dev       # servidor local en http://localhost:4321
-npm run build     # genera dist/ y dist/sitemap.xml
-npm run preview   # previsualiza dist/
-npm run sitemap   # regenera dist/sitemap.xml sobre un build existente
+npm run build     # compila el servidor SSR en dist/
+npm run preview   # previsualiza el build
+npm run check     # revisión de tipos y plantillas Astro
+npm test          # pruebas unitarias (node:test + tsx)
+npm run sitemap   # genera dist/sitemap.xml sobre un build estático
 npm run seo:check # valida canonical, hreflang, títulos, JSON-LD y enlaces
 npm run indexnow  # avisa a Bing/Brave/Yandex de las URLs del sitemap
-npm run check     # revisión de tipos y plantillas Astro
+npm run db:push   # sincroniza el esquema Drizzle con la base de datos
+npm run db:studio # abre Drizzle Studio
 ```
 
-`npm run seo:check` revisa `dist/`. Para comprobar el sitio publicado:
-`node scripts/check-seo.mjs --site=https://www.windytech.studio`.
+`npm run seo:check` necesita HTML estático en `dist/` o el sitio publicado:
+`node scripts/check-seo.mjs --site=https://www.windytech.studio`. Como el sitio se
+sirve con SSR (`@astrojs/node`), el build de producción no genera HTML estático y el
+chequeo automático se hace contra el sitio desplegado, no en el CI.
 
 ## Estructura
 
 ```
 src/
-  components/     Header, Footer, Icon, ContactForm, HomePage, AboutPage, ServicePage, ServicesHub, LegalPage
+  components/     Header, Footer, Icon, ContactForm, HomePage, AboutPage, ServicePage, admin/*
   data/           site.ts (contenido bilingüe), services.ts, about.ts, legal.ts
   layouts/        BaseLayout.astro (SEO, iconos, Open Graph, schema)
-  pages/          /, /en/, /servicios/*, /en/services/*, /nosotros/, /en/about/, /legal/*, /en/legal/*
-  styles/         global.css
+  lib/            API, auth, base de datos Drizzle, catálogo, precios, seguridad
+  pages/          marketing (/, /servicios/*, /nosotros/…), /cuenta/*, /admin/*, /api/*
+  scripts/        JS de cliente (panel, cuenta, carrito)
+  styles/         global.css, account.css, admin.css
+  middleware.ts   cabeceras de seguridad y caché
+drizzle/          SQL histórico de referencia (el esquema se sincroniza con db:push)
 public/
   assets/         logos WebP/PNG, fuentes WOFF2, favicons 48–512, imagen Open Graph
   robots.txt
@@ -42,11 +51,12 @@ public/
   site.webmanifest
   <clave>.txt     verificación de IndexNow
 scripts/
+  bootstrap-admin.ts    crea el administrador inicial
   generate-sitemap.mjs  genera dist/sitemap.xml desde el HTML construido
   check-seo.mjs         comprobaciones SEO sobre dist o el sitio live
   indexnow.mjs          aviso de cambios a Bing, Brave, Yandex y otros
-vercel.json       cabeceras de seguridad y caché (Vercel)
-.github/workflows/seo.yml  CI de check, build y seo:check
+render.yaml       despliegue del servicio web Node en Render
+.github/workflows/seo.yml  CI de check y build
 SEO-GEO.md        guía de SEO, GEO y presencia en buscadores
 ```
 
@@ -76,17 +86,41 @@ Web3Forms, Resend o un endpoint propio.
 - `/legal/privacidad/` y `/legal/terminos/`
 - `/en/legal/privacy/` y `/en/legal/terms/`
 
-## Deploy (Vercel)
+## Base de datos
+
+El esquema vive en `src/lib/db/schema.ts` y se sincroniza con:
+
+```bash
+npm run db:push
+```
+
+Los archivos de `drizzle/` son SQL histórico de referencia: se aplicaron antes de que
+existiera un journal de migraciones. Por eso **no** se debe ejecutar
+`drizzle-kit migrate` sobre la base actual (intentaría recrear tablas existentes).
+Para un entorno nuevo, aplica el esquema con `db:push`; para generar SQL a partir de
+cambios futuros, usa `npm run db:generate` después de crear un baseline.
+
+El administrador inicial se crea una sola vez con:
+
+```bash
+npx tsx scripts/bootstrap-admin.ts
+```
+
+## Deploy (Render)
 
 1. Sube el proyecto a GitHub.
-2. Importa el repositorio en Vercel.
-3. Build command: `npm run build`
-4. Output directory: `dist`
-5. Configura `www.windytech.studio` como dominio canónico (el apex redirige con 308).
-6. Añade el dominio a Google Search Console y Bing Webmaster Tools y envía `/sitemap.xml`.
+2. Crea un **Web Service** en Render apuntando al repositorio (o importa `render.yaml`).
+3. Build command: `npm ci && npm run build`
+4. Start command: `node dist/server/entry.mjs`
+5. Configura las variables de `.env.example` en el panel de Render. `DATABASE_URL`
+   debe apuntar a la base PostgreSQL de Neon.
+6. Añade `www.windytech.studio` como dominio canónico y verifica `/api/health`.
+7. Ejecuta `npm run db:push` una vez contra la base y envía `/sitemap.xml` en Google
+   Search Console y Bing Webmaster Tools.
 
-`vercel.json` aplica cabeceras de seguridad y caché; `public/_headers` solo sirve en
-Netlify/Cloudflare y Vercel lo ignora. El sitemap se genera en cada build.
+Las cabeceras de seguridad y caché se aplican desde `src/middleware.ts`, así que no
+dependen del proveedor de hosting. El sitemap estático se genera con `npm run sitemap`
+sobre un build estático o se sirve desde el sitio publicado.
 
 El sitio incluye metadatos estructurados bilingües, páginas de servicio, una página
 `/nosotros/`, preguntas frecuentes visibles, iconos para resultados de búsqueda, Open Graph

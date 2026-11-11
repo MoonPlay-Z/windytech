@@ -7,8 +7,8 @@ import { hash } from 'bcryptjs';
 import { sql } from 'drizzle-orm';
 import { getDb, schema } from '../src/lib/db';
 
-const EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL;
-const PASSWORD = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+const EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL ?? '';
+const PASSWORD = process.env.ADMIN_BOOTSTRAP_PASSWORD ?? '';
 
 if (!EMAIL || !PASSWORD) {
   console.error('Faltan ADMIN_BOOTSTRAP_EMAIL o ADMIN_BOOTSTRAP_PASSWORD en .env');

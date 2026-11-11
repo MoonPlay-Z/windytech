@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { categorySchema } from '../../../lib/validation';
 import { deleteCategory, listCategoriesAdmin, saveCategory, writeAudit } from '../../../lib/db/queries';
 import { json, readJson, requireAdmin } from '../../../lib/api';
+import { sameOrigin } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -12,6 +13,7 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
 
@@ -20,13 +22,17 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Datos inválidos.', fields: parsed.error.flatten().fieldErrors }, 422);
   }
 
-  const id = await saveCategory(parsed.data);
+  const id = await saveCategory({
+    ...parsed.data,
+    imagePublicId: parsed.data.imagePublicId ?? null,
+  });
   if (!id) return json({ error: 'No se pudo guardar la categoría.' }, 503);
   await writeAudit(admin.id, parsed.data.id ? 'UPDATE' : 'CREATE', 'categories', String(id), null);
   return json({ ok: true, id });
 };
 
 export const DELETE: APIRoute = async ({ request, url }) => {
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
   const id = Number(url.searchParams.get('id'));

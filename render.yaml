@@ -1,20 +1,22 @@
 services:
-  - type: backend
-    name: windytech-backend
-    env: node
+  - type: web
+    name: windytech-web
+    runtime: node
     plan: starter
     region: ohio
-    buildCommand: npm ci
-    startCommand: node backend/src/index.js
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/server/entry.mjs
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: SESSION_SECRET
-        generateValue: true
       - key: PUBLIC_SITE_URL
         value: https://www.windytech.studio
-      - key: PUBLIC_API_URL
-        value: https://windytech-backend.onrender.com
+      - key: SESSION_SECRET
+        generateValue: true
+      # Neon PostgreSQL: pega la cadena de conexión en el panel de Render.
+      - key: DATABASE_URL
+        sync: false
       - key: PUBLIC_CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
@@ -29,14 +31,3 @@ services:
         sync: false
       - key: ADMIN_NOTIFICACION_EMAIL
         sync: false
-      - key: DATABASE_URL
-        fromEnvironment: NEON_DATABASE_URL
-
-  # Neon database definition is added via dashboard or environment variables
-databases: {}
-
-# Neon PostgreSQL configuration
-envVars:
-  - name: NEON_DATABASE_URL
-    fromSecret: neon_database_url
-    sync: false

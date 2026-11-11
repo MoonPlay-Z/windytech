@@ -69,6 +69,27 @@ const whatsappMessage =
         <h2>{a.definitionTitle}</h2>
         {a.definition.map((paragraph) => <p>{paragraph}</p>)}
 
+        <div class="about-pillars">
+          <article class="about-pillar">
+            <h2>{a.missionTitle}</h2>
+            <p>{a.missionText}</p>
+          </article>
+          <article class="about-pillar">
+            <h2>{a.visionTitle}</h2>
+            <p>{a.visionText}</p>
+          </article>
+        </div>
+
+        <h2>{a.objectivesTitle}</h2>
+        <ul class="about-service-list">
+          {a.objectives.map((objective) => (
+            <li>
+              <Icon name="check" size={20} />
+              <span>{objective}</span>
+            </li>
+          ))}
+        </ul>
+
         <h2>{a.servicesTitle}</h2>
         <ul class="about-service-list">
           {a.services.map((serviceText, index) => (

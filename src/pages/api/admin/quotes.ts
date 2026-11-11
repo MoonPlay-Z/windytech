@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { listQuotes, updateQuoteStatus, writeAudit } from '../../../lib/db/queries';
 import { json, readJson, requireAdmin } from '../../../lib/api';
+import { sameOrigin } from '../../../lib/security';
 import type { QuoteStatus } from '../../../lib/catalog';
 
 export const prerender = false;
@@ -14,6 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const PATCH: APIRoute = async ({ request }) => {
+  if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
 

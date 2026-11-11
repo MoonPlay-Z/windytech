@@ -19,11 +19,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm test
       - run: npm run build
-      - run: npm run seo:check
+      # El sitio usa SSR (@astrojs/node) y no genera HTML estático en dist/,
+      # así que seo:check se ejecuta contra el sitio desplegado, no en CI.
 
   indexnow:
-    # Solo manual: avisa a Bing/Brave/Yandex después de que Vercel haya desplegado.
+    # Solo manual: avisa a Bing/Brave/Yandex después de que Render haya desplegado.
     if: github.event_name == 'workflow_dispatch'
     needs: build-and-check
     runs-on: ubuntu-latest

@@ -130,6 +130,18 @@ const isLoggedIn = Boolean(customer);
         <Icon name="shopping-cart" size={20} />
         <span class="cart-count" data-cart-count hidden>0</span>
       </a>
+      <button
+        type="button"
+        class="menu-toggle"
+        data-menu-toggle
+        data-open-label={lang === 'es' ? 'Abrir menú' : 'Open menu'}
+        data-close-label={lang === 'es' ? 'Cerrar menú' : 'Close menu'}
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        aria-label={lang === 'es' ? 'Abrir menú' : 'Open menu'}
+      >
+        <span class="menu-box" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
     </div>
   </div>
 </header>
@@ -201,11 +213,11 @@ const isLoggedIn = Boolean(customer);
     });
   }
 
-  /* --- Cerrar sesión desde el menú de perfil --- */
-  const logoutButton = document.querySelector<HTMLButtonElement>('[data-logout-button]');
-  if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
-      logoutButton.disabled = true;
+  /* --- Cerrar sesión (menú de perfil y botón de la página de cuenta) --- */
+  const logoutButtons = document.querySelectorAll<HTMLButtonElement>('[data-logout-button]');
+  logoutButtons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      logoutButtons.forEach((item) => (item.disabled = true));
       try {
         const response = await fetch('/api/auth/logout', {
           method: 'POST',
@@ -215,9 +227,9 @@ const isLoggedIn = Boolean(customer);
         if (!response.ok) throw new Error(data.error || 'No se pudo cerrar la sesión.');
         window.location.assign('/cuenta/login/');
       } catch (error) {
-        logoutButton.disabled = false;
+        logoutButtons.forEach((item) => (item.disabled = false));
         alert(error instanceof Error ? error.message : 'No se pudo cerrar la sesión.');
       }
     });
-  }
+  });
 </script>

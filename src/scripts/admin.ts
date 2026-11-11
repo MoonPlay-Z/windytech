@@ -103,11 +103,10 @@ function setupLogout() {
         if (!response.ok || !data.ok) {
           throw new Error(data.error ?? 'No se pudo cerrar la sesión.');
         }
+        window.location.href = '/admin/login/';
       } catch (error) {
-        alert(error instanceof Error ? error.message : 'Error al cerrar sesión.');
-      } finally {
         button.disabled = false;
-        window.location.href = '/admin/';
+        alert(error instanceof Error ? error.message : 'Error al cerrar sesión.');
       }
     });
   });
@@ -194,7 +193,7 @@ function setupUploaders() {
         row.innerHTML = `
           <img src="https://res.cloudinary.com/${root.dataset.cloud ?? ''}/image/upload/f_auto,q_auto,w_160/${item.cloudinaryPublicId}" alt="" />
           <div class="upload-item-fields">
-            <input type="text" value="${item.alt.replace(/"/g, '&quot;')}" data-alt placeholder="Texto alternativo" />
+            <input type="text" value="${(item.alt ?? '').replace(/"/g, '&quot;')}" data-alt placeholder="Texto alternativo" />
             ${
               mode === 'multi'
                 ? `<label class="upload-primary"><input type="radio" name="primary-${folder}" ${item.isPrimary ? 'checked' : ''} data-primary /> Principal</label>`

@@ -33,14 +33,14 @@ const products = await listProductsAdmin();
           <tr>
             <td>{product.id}</td>
             <td>
-              <a href={`/${product.id}/`}>{product.name}</a>
+              <a href={`/admin/productos/${product.id}/`}>{product.name}</a>
             </td>
             <td>{product.sku}</td>
             <td>${(product.priceCents / 100).toFixed(2)}</td>
             <td>{product.availability}</td>
             <td>{product.isActive ? 'Sí' : 'No'}</td>
             <td>
-              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/${product.id}/`}>Editar</a>
+              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/productos/${product.id}/`}>Editar</a>
               <button
                 class="admin-btn admin-btn--danger admin-btn--sm"
                 data-delete="/api/admin/products?id={product.id}"

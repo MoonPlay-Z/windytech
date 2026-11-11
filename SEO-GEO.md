@@ -58,18 +58,19 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
 
 ### Indexación
 
-- `dist/sitemap.xml` se genera en cada `npm run build` con `scripts/generate-sitemap.mjs`:
-  recorre el HTML construido, lee canonical y `hreflang` y excluye las páginas `noindex`.
-  Hoy incluye 22 URLs y crece solo al añadir páginas.
+- `dist/sitemap.xml` se genera con `npm run sitemap` (`scripts/generate-sitemap.mjs`)
+  sobre un build estático: recorre el HTML, lee canonical y `hreflang` y excluye las
+  páginas `noindex`. Con SSR el sitemap se sirve desde el sitio desplegado.
 - `robots.txt` con el sitemap declarado y permisos para Google, Bing, Brave, DuckDuckGo,
   Apple, Yandex, Naver, Seznam, Qwant y rastreadores de IA.
 - `canonical` y `hreflang` en todas las páginas.
-- Cabeceras de seguridad y caché en `vercel.json` (`_headers` no aplica en Vercel).
+- Cabeceras de seguridad y caché en `src/middleware.ts` (independientes del hosting).
 - `llms.txt` (resumen) y `llms-full.txt` (perfil completo) enlazados con
   `rel="alternate" type="text/plain"`.
 - Verificación de Bing activa (`msvalidate.01`). Google y Yandex se activan al pegar su
   código en `site.verification`.
-- Comprobación automática: `npm run seo:check` y workflow `.github/workflows/seo.yml`.
+- Comprobación: `npm run seo:check` (sitio desplegado) y workflow
+  `.github/workflows/seo.yml` (tipos, tests y build) en cada push.
 
 ---
 

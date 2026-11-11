@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePrice, computeTotals, promotionMatches } from './pricing';
+import { resolvePrice, computeTotals, promotionMatches, type PromotionRule } from './pricing';
 
 const now = new Date('2026-11-09T10:00:00-04:00');
 
@@ -20,7 +20,7 @@ describe('resolvePrice', () => {
   });
 
   it('aplica descuento porcentual', () => {
-    const rules = [{ id: 1, type: 'PERCENT', value: 20, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [10] }];
+    const rules: PromotionRule[] = [{ id: 1, type: 'PERCENT', value: 20, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [10] }];
     const price = resolvePrice(product, null, rules, now);
     assert.strictEqual(price.unitCents, 80000);
     assert.strictEqual(price.discountCents, 20000);
@@ -28,7 +28,7 @@ describe('resolvePrice', () => {
   });
 
   it('aplica descuento fijo con tope al precio base', () => {
-    const rules = [{ id: 1, type: 'FIXED', value: 200000, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] }];
+    const rules: PromotionRule[] = [{ id: 1, type: 'FIXED', value: 200000, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] }];
     const price = resolvePrice(product, null, rules, now);
     assert.strictEqual(price.unitCents, 0);
   });
@@ -40,7 +40,7 @@ describe('resolvePrice', () => {
   });
 
   it('elige la promoción con mayor descuento', () => {
-    const rules = [
+    const rules: PromotionRule[] = [
       { id: 1, type: 'PERCENT', value: 10, priority: 5, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] },
       { id: 2, type: 'PERCENT', value: 30, priority: 1, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] },
     ];
@@ -51,7 +51,7 @@ describe('resolvePrice', () => {
 
   it('ignora promociones vencidas', () => {
     const past = new Date('2026-01-01');
-    const rules = [{ id: 1, type: 'PERCENT', value: 50, priority: 0, startsAt: past, endsAt: past, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] }];
+    const rules: PromotionRule[] = [{ id: 1, type: 'PERCENT', value: 50, priority: 0, startsAt: past, endsAt: past, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] }];
     const price = resolvePrice(product, null, rules, now);
     assert.strictEqual(price.unitCents, 100000);
   });
@@ -72,12 +72,12 @@ describe('computeTotals', () => {
 
 describe('promotionMatches', () => {
   it('coincide por categoría', () => {
-    const rule = { id: 1, type: 'PERCENT', value: 10, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [10] };
+    const rule: PromotionRule = { id: 1, type: 'PERCENT', value: 10, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [10] };
     assert.strictEqual(promotionMatches(rule, product, now), true);
   });
 
   it('no coincide sin targets (aplica a todo)', () => {
-    const rule = { id: 1, type: 'PERCENT', value: 10, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] };
+    const rule: PromotionRule = { id: 1, type: 'PERCENT', value: 10, priority: 0, startsAt: now, endsAt: null, isActive: true, badgeEs: '', badgeEn: '', productIds: [], categoryIds: [] };
     assert.strictEqual(promotionMatches(rule, product, now), true);
   });
 });

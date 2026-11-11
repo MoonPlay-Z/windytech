@@ -40,9 +40,11 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
       <div class="admin-form-row">
         <label><span>Marca</span><input name="brand" data-field="brand" type="text" value={product.brand} /></label>
         <label><span>Modelo</span><input name="model" data-field="model" type="text" value={product.model} /></label>
+        <label><span>Categoría ID</span><input type="number" name="categoryId" data-field="categoryId" data-type="number" min="0" value={product.categoryId ?? ''} /></label>
       </div>
       <div class="admin-form-row">
         <label><span>Precio USD</span><input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" value={priceUsd} /></label>
+        <label><span>Precio tachado</span><input type="number" name="compareAt" data-field="compareAt" data-type="number" min="0" step="0.01" value={compareAtUsd} /></label>
         <label><span>SKU</span><input name="sku" data-field="sku" type="text" value={product.sku} /></label>
       </div>
       <div class="admin-form-row">
