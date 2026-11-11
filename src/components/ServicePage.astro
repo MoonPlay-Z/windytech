@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
+import PlanCard from './PlanCard.astro';
+import ShareBar from './ShareBar.astro';
 import { site, whatsappLink, type Lang } from '../data/site';
 import { servicePath, services, type Service } from '../data/services';
+import { listServicePlans } from '../lib/db/queries';
 
 interface Props {
   lang: Lang;
@@ -24,18 +27,28 @@ const labels = es
       related: 'Otros servicios',
       cta: 'Pedir cotización',
       back: 'Ver todos los servicios',
+      plansTitle: 'Paquetes de este servicio',
+      plansIntro:
+        'Elige el paquete que se ajusta a tu momento: verás qué incluye, cuánto cuesta y en cuánto tiempo se aplica.',
+      shareLabel: 'Comparte este servicio y consigue clientes',
     }
   : {
       breadcrumb: 'Breadcrumb',
       related: 'Other services',
       cta: 'Request a quote',
       back: 'See all services',
+      plansTitle: 'Packages for this service',
+      plansIntro:
+        'Pick the package that fits your moment: what it includes, what it costs and how long it takes to apply.',
+      shareLabel: 'Share this service and win customers',
     };
 
 const canonical = new URL(path, site.url).toString();
 const related = s.related
   .map((slug) => services.find((item) => item[lang].slug === slug))
   .filter((item): item is Service => Boolean(item));
+
+const plans = await listServicePlans(lang, service.id);
 
 const serviceSchema = {
   '@type': 'Service',
@@ -66,6 +79,39 @@ const serviceSchema = {
       },
     })),
   },
+  ...(plans.length > 0
+    ? {
+        makesOffer: plans.map((plan) => ({
+          '@type': 'Offer',
+          name: plan.name,
+          description: plan.tagline,
+          url: canonical,
+          priceCurrency: plan.currency,
+          price: (plan.priceCents / 100).toFixed(2),
+          ...(plan.billingPeriod === 'monthly'
+            ? { priceSpecification: { '@type': 'UnitPriceSpecification', price: (plan.priceCents / 100).toFixed(2), priceCurrency: plan.currency, unitText: 'MONTH' } }
+            : {}),
+          itemOffered: {
+            '@type': 'Service',
+            name: plan.name,
+            description: plan.tagline,
+            ...(plan.deliveryTime
+              ? {
+                  deliveryTime: plan.deliveryTime,
+                  ...(plan.includes.length > 0
+                    ? {
+                        hasPart: plan.includes.map((item) => ({
+                          '@type': 'Service',
+                          name: item,
+                        })),
+                      }
+                    : {}),
+                }
+              : {}),
+          },
+        })),
+      }
+    : {}),
 };
 ---
 
@@ -209,8 +255,30 @@ const serviceSchema = {
     </div>
   </section>
 
-  <section class="section section--soft" id="preguntas">
-    <div class="container">
+  {
+    plans.length > 0 && (
+      <section class="section section--white" id="paquetes">
+        <div class="container">
+          <div class="plans-head">
+            <span class="eyebrow">{es ? 'PAQUETES' : 'PACKAGES'}</span>
+            <h2>{labels.plansTitle}</h2>
+            <p>{labels.plansIntro}</p>
+          </div>
+          <div class="plan-grid">
+            {plans.map((plan) => (
+              <PlanCard
+                plan={plan}
+                lang={lang}
+                shareUrl={new URL(`${path}#plan-${plan.slug}`, site.url).toString()}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section section--soft" id="preguntas">    <div class="container">
       <div class="section-head">
         <span class="eyebrow">{s.eyebrow}</span>
         <h2>{s.faqTitle}</h2>
@@ -245,4 +313,14 @@ const serviceSchema = {
       </a>
     </div>
   </section>
+
+  <ShareBar
+    path={path}
+    title={s.title}
+    text={s.metaDescription}
+    lang={lang}
+    label={labels.shareLabel}
+    campaign="service"
+    variant="card"
+  />
 </BaseLayout>

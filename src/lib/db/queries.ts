@@ -1182,7 +1182,7 @@ export async function deletePost(id: number) {
 /* ------------------------------------------------------------------ */
 
 /** Paquetes activos con su traducción en el idioma pedido (público). */
-export async function listServicePlans(locale: string) {
+export async function listServicePlans(locale: string, serviceKey?: string) {
   const rows = await safeRows<{
     id: number;
     serviceKey: string;
@@ -1206,6 +1206,7 @@ export async function listServicePlans(locale: string) {
         FROM service_plans p
         JOIN service_plan_translations t ON t.plan_id = p.id AND t.locale = ${locale}
         WHERE p.is_active = true
+          AND (${serviceKey ?? null}::text IS NULL OR p.service_key = ${serviceKey ?? null})
         ORDER BY p.sort_order ASC, p.id ASC`,
   );
   return rows as unknown as ServicePlan[];

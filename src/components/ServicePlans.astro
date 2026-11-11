@@ -1,8 +1,9 @@
 ---
 import Icon from './Icon.astro';
-import { whatsappLink, type Lang } from '../data/site';
+import PlanCard from './PlanCard.astro';
+import { site, type Lang } from '../data/site';
 import { services } from '../data/services';
-import { formatUsd, formatVes } from '../lib/money';
+import { shareCopy, shareLinks } from '../lib/social';
 import type { ServicePlan } from '../lib/catalog';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 const { lang, plans } = Astro.props;
 const es = lang === 'es';
+const servicesHref = es ? '/servicios/' : '/en/services/';
 
 const copy = {
   es: {
@@ -19,36 +21,29 @@ const copy = {
     title: 'Elige el paquete que se aplica a tu negocio',
     intro:
       'Cada paquete indica qué incluye, cuánto cuesta y en cuánto tiempo se aplica. Si ninguno encaja, cotizamos a medida.',
-    cta: 'Contratar por WhatsApp',
-    includes: 'Incluye',
-    delivery: 'Tiempo de aplicación',
-    period: { one_time: 'pago único', monthly: 'por mes', yearly: 'por año' },
-    viewService: 'Ver servicio',
-    priceFrom: 'desde',
+    shareLabel: 'Comparte el catálogo con tus clientes',
+    shareText: 'Estos son los paquetes de servicios de Windytech, con precio y tiempo de aplicación:',
   },
   en: {
     eyebrow: 'PACKAGES AND PLANS',
     title: 'Choose the package that fits your business',
     intro:
       'Every package shows what it includes, what it costs and how long it takes to apply. If none fits, we quote it to measure.',
-    cta: 'Start on WhatsApp',
-    includes: 'Includes',
-    delivery: 'Delivery time',
-    period: { one_time: 'one-time', monthly: 'per month', yearly: 'per year' },
-    viewService: 'View service',
-    priceFrom: 'from',
+    shareLabel: 'Share the catalog with your customers',
+    shareText: 'These are the Windytech service packages, with price and delivery time:',
   },
 } as const;
 
 const t = copy[lang];
-
-const money = (plan: ServicePlan) =>
-  plan.currency === 'VES' ? formatVes(plan.priceCents) : formatUsd(plan.priceCents);
-
-const periodLabel = (plan: ServicePlan) =>
-  t.period[plan.billingPeriod as keyof typeof t.period] ?? t.period.one_time;
-
-const serviceFor = (key: string) => services.find((service) => service.id === key);
+const shareCopyText = shareCopy[lang];
+const catalogUrl = new URL(servicesHref, site.url).toString();
+const catalogShare = shareLinks({
+  url: catalogUrl,
+  title: es ? 'Paquetes de servicios Windytech' : 'Windytech service packages',
+  text: t.shareText,
+  lang,
+  campaign: 'plans',
+});
 ---
 
 {
@@ -63,70 +58,54 @@ const serviceFor = (key: string) => services.find((service) => service.id === ke
 
         <div class="plan-grid">
           {plans.map((plan) => {
-            const service = serviceFor(plan.serviceKey);
+            const service = services.find((item) => item.id === plan.serviceKey);
             const serviceHref = service ? (es ? service.pathEs : service.pathEn) : '';
             return (
-              <article class:list={['plan-card', { 'plan-card--featured': plan.isFeatured }]}>
-                {plan.badge && <span class="plan-badge">{plan.badge}</span>}
-                <h3 class="plan-name">{plan.name}</h3>
-                {plan.tagline && <p class="plan-tagline">{plan.tagline}</p>}
-
-                <p class="plan-price">
-                  <span class="plan-price-value">{money(plan)}</span>
-                  <span class="plan-price-period">{periodLabel(plan)}</span>
-                </p>
-
-                {plan.deliveryTime && (
-                  <p class="plan-delivery">
-                    <Icon name="clock" size={16} />
-                    <span>
-                      <strong>{`${t.delivery}: `}</strong>
-                      {plan.deliveryTime}
-                    </span>
-                  </p>
-                )}
-
-                {plan.includes.length > 0 && (
-                  <>
-                    <span class="plan-includes-title">{t.includes}</span>
-                    <ul class="plan-features">
-                      {plan.includes.map((item) => (
-                        <li>
-                          <Icon name="check" size={16} />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-
-                <div class="plan-actions">
-                  <a
-                    class:list={['btn', plan.isFeatured ? 'btn-light' : 'btn-primary']}
-                    href={whatsappLink(
-                      es
-                        ? `Hola Windytech, quiero el paquete ${plan.name}.`
-                        : `Hello Windytech, I would like the ${plan.name} package.`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-track="whatsapp"
-                  >
-                    {t.cta}
-                    <Icon name="whatsapp" size={18} />
-                  </a>
-                  {serviceHref && (
-                    <a class="plan-link" href={serviceHref}>
-                      {t.viewService}
-                      <Icon name="arrow-right" size={16} />
-                    </a>
-                  )}
-                </div>
-              </article>
+              <PlanCard
+                plan={plan}
+                lang={lang}
+                serviceHref={serviceHref}
+                shareUrl={new URL(`${servicesHref}#plan-${plan.slug}`, site.url).toString()}
+              />
             );
           })}
+        </div>
+
+        <div class="share-box share-box--inline plans-share" data-share-group>
+          <p class="share-box-label">{t.shareLabel}</p>
+          <nav class="share-actions" aria-label={shareCopyText.navLabel}>
+            {catalogShare.map((link) => (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={link.label}
+                data-share-channel={link.id}
+                data-track={`share-${link.id}`}
+              >
+                <Icon name={link.icon} size={18} />
+                <span>{link.label}</span>
+              </a>
+            ))}
+            <button
+              type="button"
+              data-copy-share
+              data-copy-url={catalogUrl}
+              data-copy-label={shareCopyText.copy}
+              data-copied-label={shareCopyText.copied}
+              data-error-label={shareCopyText.copyError}
+            >
+              <Icon name="copy" size={18} />
+              <span>{shareCopyText.copy}</span>
+            </button>
+          </nav>
+          <span class="share-status" data-share-status aria-live="polite"></span>
         </div>
       </div>
     </section>
   )
 }
+
+<script>
+  import '../scripts/share';
+</script>

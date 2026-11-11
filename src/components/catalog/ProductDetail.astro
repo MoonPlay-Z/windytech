@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
+import ShareBar from '../ShareBar.astro';
 import { site, whatsappLink, type Lang } from '../../data/site';
 import {
   attributeLabels,
@@ -47,6 +48,24 @@ const availabilitySchema =
     : product.availability === 'PREORDER'
       ? 'https://schema.org/PreOrder'
       : 'https://schema.org/OutOfStock';
+
+/** Meta de producto para que Facebook y WhatsApp muestren precio y stock. */
+const productMeta = [
+  { property: 'product:price:amount', content: (basePrice.unitCents / 100).toFixed(2) },
+  { property: 'product:price:currency', content: 'USD' },
+  {
+    property: 'product:availability',
+    content:
+      product.availability === 'IN_STOCK'
+        ? 'instock'
+        : product.availability === 'PREORDER'
+          ? 'preorder'
+          : 'outofstock',
+  },
+  { property: 'product:retailer_item_id', content: product.sku || `WT-${product.id}` },
+  { property: 'product:brand', content: product.brand || site.name },
+  { property: 'product:condition', content: condition.toLowerCase() },
+];
 
 const conditionSchema =
   product.condition === 'NEW'
@@ -128,6 +147,7 @@ const productSchema: Record<string, unknown> = {
   ogType="website"
   currencyDefault={currencyDefault}
   extraSchema={[productSchema]}
+  extraMeta={productMeta}
   breadcrumb={[
     { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
     { name: t.navLabel, path: catalogHref },
@@ -321,6 +341,16 @@ const productSchema: Record<string, unknown> = {
           </div>
 
           <p class="product-note">{t.noTax} {t.quoteNotPurchase}</p>
+
+          <ShareBar
+            path={href}
+            title={product.name}
+            text={product.shortDescription || description}
+            lang={locale}
+            label={es ? 'Comparte este equipo y consigue clientes' : 'Share this item and win customers'}
+            campaign="product"
+            variant="card"
+          />
         </div>
       </div>
     </div>

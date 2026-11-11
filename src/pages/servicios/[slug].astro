@@ -2,14 +2,12 @@
 import ServicePage from '../../components/ServicePage.astro';
 import { services } from '../../data/services';
 
-export function getStaticPaths() {
-  return services.map((service) => ({
-    params: { slug: service.es.slug },
-    props: { service },
-  }));
-}
+// El sitio se renderiza bajo demanda (output: 'server'), así que la página
+// busca el servicio por su slug en lugar de recibirlo en Astro.props.
+export const prerender = false;
 
-const { service } = Astro.props;
+const slug = Astro.params.slug ?? '';
+const service = services.find((item) => item.es.slug === slug);
 if (!service) return Astro.redirect('/404/', 302);
 ---
 

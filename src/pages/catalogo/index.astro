@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.astro';
 import ProductCard from '../../components/catalog/ProductCard.astro';
 import CatalogFilters from '../../components/catalog/CatalogFilters.astro';
 import CurrencySwitch from '../../components/catalog/CurrencySwitch.astro';
+import ShareBar from '../../components/ShareBar.astro';
 import { catalogCopy, type Locale } from '../../lib/catalog';
 import { getBrands, getCatalog, getCategories } from '../../lib/db/queries';
 import { currentRate } from '../../lib/rate';
@@ -95,6 +96,16 @@ const itemListSchema = {
       <div class="catalog-count">
         <strong>{products.length}</strong> {t.results}
       </div>
+
+      <ShareBar
+        path="/catalogo/"
+        title={`${t.title} | ${site.name}`}
+        text={t.intro}
+        lang={locale}
+        label={locale === 'es' ? 'Comparte el catálogo con tus clientes' : 'Share the catalog with your customers'}
+        campaign="catalog"
+        variant="card"
+      />
 
       {products.length === 0 ? (
         <div class="catalog-empty">

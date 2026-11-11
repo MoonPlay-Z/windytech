@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShareBar from '../ShareBar.astro';
 import { site, whatsappLink, type Lang } from '../../data/site';
 import { projectsPath, type ProjectSummary } from '../../lib/catalog';
 import { projectImage } from '../../lib/cloudinary';
@@ -102,6 +103,16 @@ const schema = {
         </a>
         <a class="btn btn-light" href={listHref}>{es ? 'Ver todos los proyectos' : 'See all projects'}</a>
       </div>
+
+      <ShareBar
+        path={href}
+        title={project.title}
+        text={project.summary}
+        lang={locale}
+        label={es ? 'Comparte este proyecto y consigue clientes' : 'Share this project and win customers'}
+        campaign="project"
+        variant="card"
+      />
     </div>
   </section>
 </BaseLayout>

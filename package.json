@@ -5,10 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && tsx scripts/generate-sitemap.ts",
     "preview": "astro preview",
     "check": "astro check",
-    "sitemap": "node scripts/generate-sitemap.mjs",
+    "sitemap": "tsx scripts/generate-sitemap.ts",
     "seo:check": "node scripts/check-seo.mjs",
     "indexnow": "node scripts/indexnow.mjs",
     "db:generate": "npx drizzle-kit generate",

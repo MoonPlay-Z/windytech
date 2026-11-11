@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShareBar from '../ShareBar.astro';
 import { site, type Lang } from '../../data/site';
 import { blogPath, type PostSummary } from '../../lib/catalog';
 import { imageUrl } from '../../lib/cloudinary';
@@ -31,7 +32,21 @@ const schema = {
   ...(published ? { datePublished: published.toISOString(), dateModified: published.toISOString() } : {}),
   ...(cover ? { image: { '@type': 'ImageObject', url: cover } } : {}),
   ...(post.tags.length > 0 ? { keywords: post.tags.join(', ') } : {}),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': new URL(href, site.url).toString() },
+  ...(post.tags.length > 0
+    ? {
+        about: post.tags.map((tag) => ({ '@type': 'Thing', name: tag })),
+      }
+    : {}),
 };
+
+/** Meta de artículo para que las redes muestren autor y fecha. */
+const articleMeta = [
+  ...(published ? [{ property: 'article:published_time', content: published.toISOString() }] : []),
+  { property: 'article:author', content: post.author || site.name },
+  { property: 'article:section', content: 'Blog' },
+  ...(cover ? [{ property: 'article:image', content: cover }] : []),
+];
 ---
 
 <BaseLayout
@@ -44,6 +59,7 @@ const schema = {
   ogImageAlt={post.title}
   ogType="article"
   extraSchema={[schema]}
+  extraMeta={articleMeta}
   dateModified={published ? published.toISOString().slice(0, 10) : site.contentUpdated}
   breadcrumb={[
     { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
@@ -77,6 +93,16 @@ const schema = {
         </div>
       )}
       <a class="btn btn-light" href={listHref}>{es ? 'Volver al blog' : 'Back to blog'}</a>
+
+      <ShareBar
+        path={href}
+        title={post.title}
+        text={post.excerpt}
+        lang={locale}
+        label={es ? 'Comparte este artículo y consigue clientes' : 'Share this article and win customers'}
+        campaign="post"
+        variant="card"
+      />
     </div>
   </article>
 </BaseLayout>

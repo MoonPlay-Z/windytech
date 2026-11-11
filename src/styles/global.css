@@ -3007,3 +3007,55 @@ html[data-astro-transition='back'] {
   justify-content: center;
   margin-top: 30px;
 }
+
+/* ---------------------------------------------------------------------------
+   Difusión social (compartir productos, servicios, paquetes y artículos)
+   --------------------------------------------------------------------------- */
+
+.share-box {
+  display: grid;
+  gap: 12px;
+}
+
+.share-box--card {
+  margin-top: 26px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.share-box-label {
+  margin: 0;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.share-box .share-actions {
+  justify-content: flex-start;
+}
+
+.plans-share {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  justify-items: center;
+}
+
+.plans-share .share-actions {
+  justify-content: center;
+}
+
+.plans-share .share-box-label {
+  color: var(--muted);
+  text-align: center;
+}
+
+.plan-link--share {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}

@@ -46,6 +46,18 @@ async function exists(file) {
   );
 }
 
+/** Busca el sitemap generado por el build (carpeta de estáticos o raíz). */
+async function findSitemap() {
+  const candidates = [
+    join(dist, 'client', 'sitemap.xml'),
+    join(dist, 'sitemap.xml'),
+  ];
+  for (const candidate of candidates) {
+    if (await exists(candidate)) return candidate;
+  }
+  return null;
+}
+
 async function loadHtml() {
   if (site) {
     const res = await fetch(`${site}/sitemap.xml`);
@@ -68,7 +80,25 @@ async function loadHtml() {
     (file) => file.endsWith('.html') && !VERIFICATION_FILE.test(file),
   );
   if (files.length === 0) {
-    errors.push('No hay dist/*.html. Ejecuta `npm run build` antes de `npm run seo:check`.');
+    // El sitio se renderiza bajo demanda: no hay HTML prerenderizado que
+    // revisar. En ese caso se valida el sitemap generado en el build.
+    const sitemap = await findSitemap();
+    if (!sitemap) {
+      errors.push(
+        'No hay dist/*.html ni sitemap.xml. El sitio se renderiza bajo demanda: usa `npm run seo:check -- --site=https://tu-dominio` para revisarlo en vivo.',
+      );
+      return [];
+    }
+    const xml = await readFile(sitemap, 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    if (locs.length === 0) errors.push('sitemap.xml sin URLs');
+    const withoutAlternates = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].filter(
+      ([, block]) => !block.includes('hreflang="en"'),
+    ).length;
+    if (withoutAlternates > 0) {
+      errors.push(`${withoutAlternates} URLs del sitemap sin alternates hreflang es/en`);
+    }
+    console.log(`[seo] sitemap: ${locs.length} URLs (revisión completa con --site=...)`);
     return [];
   }
   const pages = [];
@@ -158,19 +188,13 @@ for (const page of pages) {
 }
 
 if (!site) {
-  const sitemap = join(dist, 'sitemap.xml');
-  if (!(await exists(sitemap))) {
-    errors.push('No existe dist/sitemap.xml: ejecuta `npm run sitemap` o `npm run build`.');
+  const sitemap = await findSitemap();
+  if (!sitemap) {
+    errors.push('No existe el sitemap: ejecuta `npm run sitemap` o `npm run build`.');
   } else {
     const xml = await readFile(sitemap, 'utf8');
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     if (locs.length === 0) errors.push('sitemap.xml sin URLs');
-    for (const loc of locs) {
-      const path = new URL(loc).pathname;
-      const candidates = [join(dist, path, 'index.html'), join(dist, path)];
-      const found = await Promise.all(candidates.map(exists));
-      if (!found.some(Boolean)) errors.push(`sitemap.xml incluye una URL sin página: ${loc}`);
-    }
     console.log(`[seo] sitemap: ${locs.length} URLs`);
   }
 }

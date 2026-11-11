@@ -1,0 +1,101 @@
+---
+import Icon from './Icon.astro';
+import { whatsappLink, type Lang } from '../data/site';
+import { formatUsd, formatVes } from '../lib/money';
+import { shareCopy } from '../lib/social';
+import type { ServicePlan } from '../lib/catalog';
+
+interface Props {
+  plan: ServicePlan;
+  lang: Lang;
+  /** Enlace al servicio relacionado (página de detalle). */
+  serviceHref?: string;
+  /** URL absoluta que se copia al compartir este paquete. */
+  shareUrl?: string;
+  /** Etiqueta del botón de WhatsApp. */
+  ctaLabel?: string;
+  /** Etiqueta del enlace al servicio. */
+  viewServiceLabel?: string;
+}
+
+const { plan, lang, serviceHref = '', shareUrl = '', ctaLabel, viewServiceLabel } = Astro.props;
+const es = lang === 'es';
+const copy = shareCopy[lang];
+
+const money = (value: ServicePlan) =>
+  value.currency === 'VES' ? formatVes(value.priceCents) : formatUsd(value.priceCents);
+
+const periodLabel = es
+  ? { one_time: 'pago único', monthly: 'por mes', yearly: 'por año' }
+  : { one_time: 'one-time', monthly: 'per month', yearly: 'per year' };
+
+const message = es
+  ? `Hola Windytech, quiero el paquete ${plan.name}.`
+  : `Hello Windytech, I would like the ${plan.name} package.`;
+---
+
+<article class:list={['plan-card', { 'plan-card--featured': plan.isFeatured }]} id={`plan-${plan.slug}`}>
+  {plan.badge && <span class="plan-badge">{plan.badge}</span>}
+  <h3 class="plan-name">{plan.name}</h3>
+  {plan.tagline && <p class="plan-tagline">{plan.tagline}</p>}
+
+  <p class="plan-price">
+    <span class="plan-price-value">{money(plan)}</span>
+    <span class="plan-price-period">{periodLabel[plan.billingPeriod] ?? periodLabel.one_time}</span>
+  </p>
+
+  {plan.deliveryTime && (
+    <p class="plan-delivery">
+      <Icon name="clock" size={16} />
+      <span>
+        <strong>{`${es ? 'Tiempo de aplicación' : 'Delivery time'}: `}</strong>
+        {plan.deliveryTime}
+      </span>
+    </p>
+  )}
+
+  {plan.includes.length > 0 && (
+    <>
+      <span class="plan-includes-title">{es ? 'Incluye' : 'Includes'}</span>
+      <ul class="plan-features">
+        {plan.includes.map((item) => (
+          <li>
+            <Icon name="check" size={16} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  <div class="plan-actions">
+    <a
+      class:list={['btn', plan.isFeatured ? 'btn-light' : 'btn-primary']}
+      href={whatsappLink(message)}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-track="whatsapp"
+    >
+      {ctaLabel ?? (es ? 'Contratar por WhatsApp' : 'Start on WhatsApp')}
+      <Icon name="whatsapp" size={18} />
+    </a>
+    {serviceHref && (
+      <a class="plan-link" href={serviceHref}>
+        {viewServiceLabel ?? (es ? 'Ver servicio' : 'View service')}
+        <Icon name="arrow-right" size={16} />
+      </a>
+    )}
+    <button
+      type="button"
+      class="plan-link plan-link--share"
+      data-copy-share
+      data-copy-url={shareUrl}
+      data-copy-label={copy.copy}
+      data-copied-label={copy.copied}
+      data-error-label={copy.copyError}
+    >
+      <Icon name="copy" size={15} />
+      <span>{copy.copy}</span>
+    </button>
+  </div>
+</article>

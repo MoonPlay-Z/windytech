@@ -39,6 +39,8 @@ interface Props {
   faq?: FaqItem[];
   /** Nodos JSON-LD adicionales (Service, BlogPosting...) para esta página. */
   extraSchema?: Record<string, unknown>[];
+  /** Etiquetas meta extra para redes (product:price, article:published_time...). */
+  extraMeta?: Record<string, string>[];
   /** Moneda sugerida para visitantes de Venezuela. */
   currencyDefault?: 'USD' | 'VES';
   /** Oculta el botón flotante de WhatsApp cuando estorba (carrito/panel). */
@@ -60,6 +62,7 @@ const {
   dateModified = site.contentUpdated,
   faq = [],
   extraSchema = [],
+  extraMeta = [],
   currencyDefault = 'USD',
   hideWhatsappFloat = false,
 } = Astro.props;
@@ -324,6 +327,10 @@ const schemaGraph = {
     <meta name="twitter:image" content={ogImageUrl} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
     <meta name="twitter:url" content={canonical} />
+
+    {extraMeta.map((meta) => (
+      <meta {...meta} />
+    ))}
 
     {site.verification.google && (
       <meta name="google-site-verification" content={site.verification.google} />

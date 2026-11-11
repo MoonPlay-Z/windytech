@@ -1,0 +1,73 @@
+---
+import Icon from './Icon.astro';
+import { site, type Lang } from '../data/site';
+import { shareCopy, shareLinks, trackedUrl } from '../lib/social';
+
+interface Props {
+  /** Ruta o URL absoluta de la página que se comparte. */
+  path: string;
+  /** Título del recurso (producto, servicio, paquete o artículo). */
+  title: string;
+  /** Texto breve que acompaña al enlace. */
+  text?: string;
+  lang: Lang;
+  /** Etiqueta del bloque. */
+  label?: string;
+  /** Campaña UTM para medir el canal. */
+  campaign?: string;
+  /** Variante visual: en línea (detalle) o dentro de una tarjeta. */
+  variant?: 'inline' | 'card';
+}
+
+const {
+  path,
+  title,
+  text,
+  lang,
+  label,
+  campaign = 'share',
+  variant = 'inline',
+} = Astro.props;
+
+const copy = shareCopy[lang];
+const url = new URL(path, site.url).toString();
+const links = shareLinks({ url, title, text, lang, campaign });
+const copyUrl = trackedUrl(url, 'copy', campaign);
+---
+
+<div class:list={['share-box', `share-box--${variant}`]} data-share-group>
+  {label && <p class="share-box-label">{label}</p>}
+  <nav class="share-actions" aria-label={copy.navLabel}>
+    {
+      links.map((link) => (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={link.label}
+          data-share-channel={link.id}
+          data-track={`share-${link.id}`}
+        >
+          <Icon name={link.icon} size={18} />
+          <span>{link.label}</span>
+        </a>
+      ))
+    }
+    <button
+      type="button"
+      data-copy-share
+      data-copy-url={copyUrl}
+      data-copy-label={copy.copy}
+      data-copied-label={copy.copied}
+      data-error-label={copy.copyError}
+    >
+      <Icon name="copy" size={18} />
+      <span>{copy.copy}</span>
+    </button>
+  </nav>
+  <span class="share-status" data-share-status aria-live="polite"></span>
+</div>
+
+<script>
+  import '../scripts/share';
+</script>
