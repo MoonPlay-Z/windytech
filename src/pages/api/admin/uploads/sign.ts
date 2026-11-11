@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json(
       {
         error:
-          'Cloudinary no está configurado en este entorno. Revisa PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.',
+          'Cloudinary no está configurado en este entorno. Añade CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en el panel de Render (Environment) y vuelve a desplegar.',
       },
       503,
     );
