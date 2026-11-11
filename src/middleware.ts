@@ -47,25 +47,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     });
   }
 
-  // Apex → www (308) para conservar el canonical del sitio.
-  // Astro construye `url` con localhost detrás del proxy del adaptador Node,
-  // así que leemos el host público real de las cabeceras reenviadas.
-  const publicHost = (request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '')
-    .split(',')[0]
-    .trim()
-    .toLowerCase()
-    .replace(/:\d+$/, '')
-    .replace(/\.$/, '');
-
-  if (publicHost === 'windytech.studio') {
-    const target = new URL(request.url);
-    target.hostname = 'www.windytech.studio';
-    target.protocol = 'https:';
-    return new Response(null, {
-      status: 308,
-      headers: { Location: target.toString() },
-    });
-  }
+  // Render ya redirige los dominios secundarios (www → apex) a su dominio
+  // primario. No redirigimos aquí para no crear un bucle entre ambos.
 
   const response = await next();
   harden(response.headers, url.pathname);
