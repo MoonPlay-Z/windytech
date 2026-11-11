@@ -52,6 +52,22 @@ const isLoggedIn = Boolean(customer);
       {t.nav.items.map((item) => (
         <a href={item.href.startsWith('/') ? item.href : `${homeHref}${item.href}`}>{item.label}</a>
       ))}
+      <div class="nav-account">
+        {isLoggedIn && customer ? (
+          <>
+            <a href="/cuenta/perfil/">Mi perfil</a>
+            <a href="/cuenta/editar-perfil/">Modificar perfil</a>
+            <button type="button" class="nav-account-logout" data-logout-button>
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <a href="/cuenta/login/">Iniciar sesión</a>
+            <a href="/cuenta/registro/">Registrarse</a>
+          </>
+        )}
+      </div>
       <a
         class="btn btn-primary nav-cta"
         href={whatsappLink(t.whatsapp.general)}
@@ -107,14 +123,14 @@ const isLoggedIn = Boolean(customer);
       ) : (
         <>
           <a
-            class="btn btn-sm btn-outline"
+            class="btn btn-sm btn-outline header-account"
             href="/cuenta/login/"
             aria-label="Iniciar sesión"
           >
             Iniciar sesión
           </a>
           <a
-            class="btn btn-sm btn-outline ml-2"
+            class="btn btn-sm btn-outline ml-2 header-account"
             href="/cuenta/registro/"
             aria-label="Registrarse"
           >

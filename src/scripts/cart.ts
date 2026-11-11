@@ -142,7 +142,11 @@ function renderCart() {
       row.className = 'cart-line';
       row.innerHTML = `
         <div class="cart-line-media">
-          ${item.image ? `<img src="${item.image}" alt="" width="96" height="72" loading="lazy" />` : ''}
+          ${
+            item.image
+              ? `<img src="${item.image}" alt="" width="96" height="72" loading="lazy" />`
+              : `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.5" y="3.5" width="14" height="12" rx="2"/><path d="M16.5 9.5h3a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/><path d="M9 20h7"/></svg>`
+          }
         </div>
         <div class="cart-line-body">
           <a class="cart-line-name" href="${locale === 'en' ? '/en/catalog/' : '/catalogo/'}${item.slug}/">${item.name}</a>

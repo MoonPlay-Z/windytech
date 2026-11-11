@@ -17,8 +17,11 @@ services:
       # Neon PostgreSQL: pega la cadena de conexión en el panel de Render.
       - key: DATABASE_URL
         sync: false
+      # Cloudinary (imágenes de productos, proyectos y publicaciones).
+      # El nombre del cloud es público; la clave y el secret se pegan en el
+      # panel de Render (Environment) para no guardarlos en el repositorio.
       - key: PUBLIC_CLOUDINARY_CLOUD_NAME
-        sync: false
+        value: cxy5wtgr
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET

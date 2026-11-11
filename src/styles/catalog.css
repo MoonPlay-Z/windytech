@@ -80,7 +80,7 @@
 
 .catalog-filters {
   display: grid;
-  grid-template-columns: minmax(190px, 1.45fr) repeat(3, minmax(125px, 1fr)) minmax(180px, 1.15fr) auto;
+  grid-template-columns: minmax(210px, 1.6fr) repeat(2, minmax(140px, 1fr)) minmax(210px, 1.25fr) auto;
   align-items: end;
   gap: 12px;
   margin: -38px 0 28px;
@@ -456,12 +456,13 @@
 }
 
 @media (max-width: 1100px) {
+  /* Los filtros bajan a dos filas: ningún campo se queda apretado. */
   .catalog-filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .catalog-field--search {
-    grid-column: span 2;
+    grid-column: span 3;
   }
 
   .catalog-filter-actions {
@@ -505,6 +506,10 @@
     margin-top: -34px;
     padding: 14px;
     border-radius: 17px;
+  }
+
+  .catalog-field--search {
+    grid-column: span 2;
   }
 
   .catalog-field--search {

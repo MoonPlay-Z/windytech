@@ -133,6 +133,13 @@ article[id] {
   scroll-margin-top: 96px;
 }
 
+/* El atributo `hidden` gana siempre: sin esto, cualquier clase con `display`
+   (por ejemplo .cart-layout) deja visible un bloque que el JS marcó como
+   oculto y aparecen dos estados a la vez. */
+[hidden] {
+  display: none !important;
+}
+
 :focus-visible {
   outline: 3px solid var(--mint);
   outline-offset: 3px;
@@ -148,6 +155,14 @@ article[id] {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Las secciones con ancla (#contacto, #servicios...) no deben quedar tapadas
+   por la cabecera fija al saltar desde el menú. */
+:target,
+section[id],
+[id] {
+  scroll-margin-top: 104px;
 }
 
 .skip-link {
@@ -563,6 +578,11 @@ article[id] {
 }
 
 .nav-cta {
+  display: none;
+}
+
+/* Los accesos de cuenta del panel desplegable solo se muestran en móvil. */
+.nav-account {
   display: none;
 }
 
@@ -1864,6 +1884,32 @@ a.contact-card:hover {
   box-shadow: 0 16px 36px rgba(37, 211, 102, 0.5);
 }
 
+/* Al bajar la página el botón se aparta para no tapar el contenido. */
+.wa-float.is-hidden {
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  pointer-events: none;
+}
+
+/* Reserva de espacio para que el botón flotante no tape el pie ni los
+   últimos botones de acción. */
+.site-footer {
+  padding-bottom: 96px;
+}
+
+@media (max-width: 720px) {
+  .wa-float {
+    right: 14px;
+    bottom: 14px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .site-footer {
+    padding-bottom: 78px;
+  }
+}
+
 /* Legal pages */
 .legal-page {
   background: #fff;
@@ -2224,7 +2270,7 @@ a.contact-card:hover {
   display: grid;
   gap: 20px;
   position: sticky;
-  top: 96px;
+  top: 104px;
 }
 
 .about-facts-card,
@@ -2345,10 +2391,46 @@ a.contact-card:hover {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
     padding: 8px 24px 24px;
     border-bottom: 1px solid var(--line);
     background: #fff;
     box-shadow: 0 18px 30px rgba(14, 34, 52, 0.08);
+  }
+
+  /* Cuenta del cliente dentro del panel de navegación */
+  .nav-account {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .nav-account a,
+  .nav-account button {
+    display: block;
+    width: 100%;
+    padding: 13px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--navy);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .nav-account a:last-child,
+  .nav-account button:last-child {
+    border-bottom: 0;
+  }
+
+  .nav-account-logout {
+    color: #9c2929 !important;
   }
 
   .nav[data-open="true"] {
@@ -2379,6 +2461,39 @@ a.contact-card:hover {
   .container {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  /* La barra de campaña se compacta: una sola línea con la etiqueta y el
+     enlace, sin el texto largo que ocupaba tres renglones. */
+  .campaign-bar {
+    font-size: 13px;
+  }
+
+  .campaign-inner {
+    flex-wrap: nowrap;
+    gap: 4px 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .campaign-inner > span:not(.campaign-label) {
+    display: none;
+  }
+
+  .campaign-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  /* En móvil los botones de cuenta viven en el menú desplegable: así la
+     cabecera no desborda la pantalla. */
+  .header-account,
+  .header-actions .profile-menu {
+    display: none;
+  }
+
+  .nav-account {
+    display: block;
   }
 
   .about-facts {
