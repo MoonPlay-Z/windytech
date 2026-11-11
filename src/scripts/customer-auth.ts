@@ -29,10 +29,10 @@ function initCustomerAuth() {
         credentials: 'same-origin',
         body: JSON.stringify(payload),
       });
-      const data = (await response.json()) as AuthResponse;
+      const data = (await response.json().catch(() => null)) as AuthResponse | null;
 
-      if (!response.ok || !data.user) {
-        throw new Error(data.error || 'No se pudo completar la solicitud.');
+      if (!response.ok || !data?.user) {
+        throw new Error(data?.error || `No se pudo completar la solicitud (${response.status}).`);
       }
 
       window.location.assign('/cuenta/perfil/');

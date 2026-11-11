@@ -68,7 +68,7 @@ async function submitJson(url: string, method: string, body?: unknown) {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = (await response.json().catch(() => ({}))) as { error?: string; ok?: boolean; id?: number };
-  if (!response.ok) throw new Error(data.error ?? 'Error');
+  if (!response.ok) throw new Error(data.error ?? `Error (${response.status}).`);
   return data;
 }
 

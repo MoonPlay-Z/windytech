@@ -234,8 +234,10 @@ const isLoggedIn = Boolean(customer);
             method: 'POST',
             credentials: 'same-origin',
           });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'No se pudo cerrar la sesión.');
+          const data = (await response.json().catch(() => null)) as { error?: string } | null;
+          if (!response.ok) {
+            throw new Error(data?.error || `No se pudo cerrar la sesión (${response.status}).`);
+          }
           window.location.assign('/cuenta/login/');
         } catch (error) {
           logoutButtons.forEach((item) => (item.disabled = false));

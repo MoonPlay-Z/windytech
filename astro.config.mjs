@@ -10,6 +10,11 @@ export default defineConfig({
   integrations: [icon()],
   adapter: node({ mode: 'standalone' }),
   output: 'server',
+  // Detrás de Render/Cloudflare el origen puede llegar como http/https o
+  // apex/www. Nuestro middleware y `sameOrigin()` comparan el host real.
+  security: {
+    checkOrigin: false,
+  },
   // Precarga los enlaces al pasar el ratón para que la navegación cliente sea
   // casi instantánea, incluso en páginas renderizadas bajo demanda.
   prefetch: {

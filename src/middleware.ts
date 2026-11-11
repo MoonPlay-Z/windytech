@@ -1,5 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
+import { sameOrigin } from './lib/security';
 
+const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const ADMIN = /^\/admin(\/|$)/;
 const PRIVATE = /^\/(api|admin)(\/|$)|^\/(cotizacion|en\/quote)\/[^/]+/;
 
@@ -34,8 +36,28 @@ function harden(headers: Headers, pathname: string) {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { url, request } = context;
 
+  // Protección CSRF propia: compara hosts (no esquema) y tolera proxies.
+  // Astro trae `checkOrigin`, pero rechaza antes de poder normalizar
+  // apex/www o el protocolo terminado en el proxy.
+  if (UNSAFE_METHODS.has(request.method) && !sameOrigin(request)) {
+    const headers = { 'Content-Type': 'application/json; charset=utf-8' };
+    return new Response(JSON.stringify({ error: 'Origen no permitido.' }), {
+      status: 403,
+      headers: url.pathname.startsWith('/api/') ? headers : { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+
   // Apex → www (308) para conservar el canonical del sitio.
-  if (url.hostname === 'windytech.studio') {
+  // Astro construye `url` con localhost detrás del proxy del adaptador Node,
+  // así que leemos el host público real de las cabeceras reenviadas.
+  const publicHost = (request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase()
+    .replace(/:\d+$/, '')
+    .replace(/\.$/, '');
+
+  if (publicHost === 'windytech.studio') {
     const target = new URL(request.url);
     target.hostname = 'www.windytech.studio';
     target.protocol = 'https:';
