@@ -131,6 +131,34 @@ garantizan posiciones ni un panel de conocimiento automático. La guía completa
 La portada también incluye enlaces de compartir en WhatsApp, Facebook y LinkedIn, más una
 acción para copiar el enlace; son enlaces directos y no cargan widgets externos de seguimiento.
 
+## Imágenes (Cloudinary)
+
+Las fotos de productos, proyectos y publicaciones se guardan en Cloudinary. El panel
+firma la subida en el servidor y el navegador envía el archivo directamente a Cloudinary
+(sin pasar por el servidor), con `f_auto,q_auto` en la entrega.
+
+Variables de entorno:
+
+| Variable | Dónde | Valor |
+|---|---|---|
+| `PUBLIC_CLOUDINARY_CLOUD_NAME` | `.env` y Render | `cxy5wtgr` (público) |
+| `CLOUDINARY_API_KEY` | `.env` y Render | clave de la API (privada) |
+| `CLOUDINARY_API_SECRET` | `.env` y Render | secret de la API (privado) |
+
+**En Render** (obligatorio para que las imágenes funcionen en producción):
+
+1. Abre el servicio → **Environment**.
+2. Añade `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` con los valores de Cloudinary
+   (Settings → API Keys). `PUBLIC_CLOUDINARY_CLOUD_NAME` ya viaja en `render.yaml`.
+3. Guarda los cambios: Render vuelve a desplegar y el panel empieza a aceptar fotos.
+
+Mientras falten esas variables, el panel responde
+`Cloudinary no está configurado en este entorno` y el resto del sitio sigue funcionando.
+
+Las carpetas permitidas son `windytech/productos`, `windytech/proyectos`,
+`windytech/publicaciones` y `windytech/media`; el servidor valida la ruta antes de firmar.
+Al borrar un producto o una publicación, sus imágenes se eliminan de Cloudinary.
+
 ## Pendientes antes de publicar
 
 - [ ] Revisar el número de WhatsApp y el correo en `src/data/site.ts`.

@@ -12,7 +12,13 @@ export const POST: APIRoute = async ({ request }) => {
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'No autorizado.' }, 401);
   if (!cloudinaryConfigured()) {
-    return json({ error: 'Cloudinary no está configurado en este entorno.' }, 503);
+    return json(
+      {
+        error:
+          'Cloudinary no está configurado en este entorno. Revisa PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.',
+      },
+      503,
+    );
   }
 
   const body = await readJson<{ folder?: string }>(request);
