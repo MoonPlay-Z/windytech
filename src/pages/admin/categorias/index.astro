@@ -30,7 +30,7 @@ const categories = await listCategoriesAdmin();
             <td>
               <button
                 class="admin-btn admin-btn--danger admin-btn--sm"
-                data-delete="/api/admin/categories?id={category.id}"
+                data-delete={`/api/admin/categories?id=${category.id}`}
                 data-confirm="¿Eliminar esta categoría?"
               >
                 Eliminar

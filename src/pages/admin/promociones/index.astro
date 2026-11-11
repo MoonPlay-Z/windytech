@@ -40,7 +40,7 @@ const promotions = await listPromotionsAdmin();
             <td>
               <button
                 class="admin-btn admin-btn--danger admin-btn--sm"
-                data-delete="/api/admin/promotions?id={promotion.id}"
+                data-delete={`/api/admin/promotions?id=${promotion.id}`}
                 data-confirm="¿Eliminar esta promoción?"
               >
                 Eliminar

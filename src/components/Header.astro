@@ -73,7 +73,7 @@ const isLoggedIn = Boolean(customer);
               class="btn btn-sm btn-outline profile-trigger"
               aria-haspopup="menu"
               aria-expanded="false"
-              aria-label="Menú de cuenta de {customer.name}"
+              aria-label={`Menú de cuenta de ${customer.name}`}
               data-profile-toggle
             >
               <span class="profile-name">{customer.name}</span>

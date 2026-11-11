@@ -13,7 +13,16 @@ function setPath(target: Json, path: string, value: unknown) {
   node[parts[parts.length - 1]] = value;
 }
 
-function fieldValue(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): unknown {
+function fieldLabel(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string {
+  const wrapper = element.closest('label');
+  const span = wrapper?.querySelector('span');
+  return span?.textContent?.trim() || element.name || 'campo';
+}
+
+function fieldValue(
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  errors: string[],
+): unknown {
   const type = element.dataset.type;
   if (element instanceof HTMLInputElement && element.type === 'checkbox') return element.checked;
   if (type === 'number') return element.value === '' ? null : Number(element.value);
@@ -24,19 +33,23 @@ function fieldValue(element: HTMLInputElement | HTMLSelectElement | HTMLTextArea
       .filter(Boolean);
   }
   if (type === 'json') {
+    const raw = element.value.trim();
+    if (!raw) return {};
     try {
-      return JSON.parse(element.value || '[]');
+      return JSON.parse(raw);
     } catch {
-      return [];
+      errors.push(`«${fieldLabel(element)}» no contiene un JSON válido.`);
+      return {};
     }
   }
   return element.value;
 }
 
-function collect(form: HTMLFormElement): Json {
+function collect(form: HTMLFormElement): { payload: Json; errors: string[] } {
   const payload: Json = {};
+  const errors: string[] = [];
   form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-field]').forEach((element) => {
-    setPath(payload, element.dataset.field ?? '', fieldValue(element));
+    setPath(payload, element.dataset.field ?? '', fieldValue(element, errors));
   });
 
   // tr.es.name / tr.en.name → translations: [{ locale, ... }]
@@ -49,7 +62,7 @@ function collect(form: HTMLFormElement): Json {
     delete payload.tr;
   }
 
-  return payload;
+  return { payload, errors };
 }
 
 function message(form: HTMLFormElement, text: string, kind: 'ok' | 'error' = 'error') {
@@ -67,8 +80,21 @@ async function submitJson(url: string, method: string, body?: unknown) {
     credentials: 'same-origin',
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const data = (await response.json().catch(() => ({}))) as { error?: string; ok?: boolean; id?: number };
-  if (!response.ok) throw new Error(data.error ?? `Error (${response.status}).`);
+  const data = (await response.json().catch(() => ({}))) as {
+    error?: string;
+    ok?: boolean;
+    id?: number;
+    fields?: Record<string, string[]>;
+  };
+  if (!response.ok) {
+    const details = data.fields
+      ? Object.entries(data.fields)
+          .map(([field, list]) => `${field}: ${(list ?? []).join(' ')}`)
+          .join(' · ')
+      : '';
+    const base = data.error ?? `Error (${response.status}).`;
+    throw new Error(details ? `${base} (${details})` : base);
+  }
   return data;
 }
 
@@ -128,7 +154,12 @@ function setupForms() {
       const button = form.querySelector<HTMLButtonElement>('[type="submit"]');
       if (button) button.disabled = true;
       try {
-        await submitJson(endpoint, 'POST', collect(form));
+        const { payload, errors } = collect(form);
+        if (errors.length > 0) {
+          message(form, errors[0]);
+          return;
+        }
+        await submitJson(endpoint, 'POST', payload);
         message(form, form.dataset.success ?? 'Guardado.', 'ok');
         if (redirect) window.location.href = redirect;
         else window.location.reload();

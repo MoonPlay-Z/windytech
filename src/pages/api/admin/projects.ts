@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { projectSchema } from '../../../lib/validation';
+import { projectSchema, fieldErrors } from '../../../lib/validation';
 import { deleteProject, listProjectsAdmin, saveProject, writeAudit } from '../../../lib/db/queries';
 import { destroyAsset } from '../../../lib/cloudinary';
 import { json, readJson, requireAdmin } from '../../../lib/api';
@@ -20,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const parsed = projectSchema.safeParse(await readJson(request));
   if (!parsed.success) {
-    return json({ error: 'Datos inválidos.', fields: parsed.error.flatten().fieldErrors }, 422);
+    return json({ error: 'Datos inválidos.', fields: fieldErrors(parsed.error) }, 422);
   }
 
   const data = parsed.data;

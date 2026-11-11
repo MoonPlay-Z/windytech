@@ -1,5 +1,46 @@
 import { z } from 'zod';
 
+/**
+ * Convierte los errores de Zod en mensajes legibles en español, agrupados
+ * por campo, para mostrarlos en el panel sin jerga técnica.
+ */
+export function fieldErrors(error: z.ZodError): Record<string, string[]> {
+  const fields: Record<string, string[]> = {};
+
+  for (const issue of error.issues) {
+    const key = issue.path.length > 0 ? issue.path.join('.') : 'formulario';
+    const list = (fields[key] ??= []);
+    const message = translateIssue(issue);
+    if (!list.includes(message)) list.push(message);
+  }
+
+  return fields;
+}
+
+function translateIssue(issue: z.core.$ZodIssue): string {
+  switch (issue.code) {
+    case 'invalid_type':
+      if (issue.input === undefined || issue.input === null) {
+        return 'Este campo es obligatorio.';
+      }
+      return 'Tipo de valor no válido.';
+    case 'invalid_format':
+      if (issue.format === 'email') return 'Escribe un correo válido.';
+      return issue.message;
+    case 'invalid_value':
+      return 'Valor no válido.';
+    case 'invalid_union':
+      return 'Valor no válido.';
+    case 'too_small':
+      if (issue.minimum === 1) return 'Este campo es obligatorio.';
+      return `El valor mínimo es ${issue.minimum}.`;
+    case 'too_big':
+      return `El valor máximo es ${issue.maximum}.`;
+    default:
+      return issue.message || 'Valor no válido.';
+  }
+}
+
 const slug = z
   .string()
   .trim()

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { quoteSchema } from '../../lib/validation';
+import { quoteSchema, fieldErrors } from '../../lib/validation';
 import { buildQuote } from '../../lib/quote-service';
 import { clientIp, rateLimit, sameOrigin } from '../../lib/security';
 import { serverEnv } from '../../lib/env';
@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json(
       {
         error: 'Revisa los datos del formulario.',
-        fields: parsed.error.flatten().fieldErrors,
+        fields: fieldErrors(parsed.error),
       },
       422,
     );

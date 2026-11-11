@@ -2,7 +2,7 @@
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import ImageUploader from '../../../components/admin/ImageUploader.astro';
 import { sessionFromRequest } from '../../../lib/auth';
-import { getProductAdmin } from '../../../lib/db/queries';
+import { getProductAdmin, listCategoriesAdmin } from '../../../lib/db/queries';
 
 export const prerender = false;
 
@@ -14,6 +14,8 @@ if (!Number.isInteger(productId) || productId <= 0) return Astro.redirect('/admi
 
 const product = await getProductAdmin(productId);
 if (!product) return Astro.redirect('/admin/productos/', 302);
+
+const categories = await listCategoriesAdmin();
 
 const translations: any[] = product.translations ?? [];
 const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
@@ -35,12 +37,22 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
 <AdminLayout title="Editar producto" admin={admin} active="products">
   <section class="admin-card">
     <h2>Editar producto</h2>
-    <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto guardado.">
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto guardado." data-redirect="/admin/productos/">
       <input type="hidden" data-field="id" data-type="number" value={String(productId)} />
       <div class="admin-form-row">
         <label><span>Marca</span><input name="brand" data-field="brand" type="text" value={product.brand} /></label>
         <label><span>Modelo</span><input name="model" data-field="model" type="text" value={product.model} /></label>
-        <label><span>Categoría ID</span><input type="number" name="categoryId" data-field="categoryId" data-type="number" min="0" value={product.categoryId ?? ''} /></label>
+        <label>
+          <span>Categoría</span>
+          <select name="categoryId" data-field="categoryId" data-type="number">
+            <option value="">Sin categoría</option>
+            {categories.map((category) => (
+              <option value={String(category.id)} selected={category.id === product.categoryId}>
+                {category.name || `Categoría ${category.id}`}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div class="admin-form-row">
         <label><span>Precio USD</span><input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" value={priceUsd} /></label>
@@ -62,6 +74,22 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
         <div class="admin-form-row">
           <label><span>Nombre ES</span><input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} /></label>
           <label><span>Nombre EN</span><input name="tr.en.name" data-field="tr.en.name" type="text" value={enTranslation.name ?? ''} /></label>
+        </div>
+        <div class="admin-form-row">
+          <label><span>Descripción corta ES</span><input name="tr.es.shortDescription" data-field="tr.es.shortDescription" type="text" maxlength="400" value={esTranslation.shortDescription ?? ''} /></label>
+          <label><span>Descripción corta EN</span><input name="tr.en.shortDescription" data-field="tr.en.shortDescription" type="text" maxlength="400" value={enTranslation.shortDescription ?? ''} /></label>
+        </div>
+        <div class="admin-form-row">
+          <label><span>Descripción (Markdown) ES</span><textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="6">{esTranslation.descriptionMd ?? ''}</textarea></label>
+          <label><span>Descripción (Markdown) EN</span><textarea name="tr.en.descriptionMd" data-field="tr.en.descriptionMd" rows="6">{enTranslation.descriptionMd ?? ''}</textarea></label>
+        </div>
+        <div class="admin-form-row">
+          <label><span>Título SEO ES</span><input name="tr.es.seoTitle" data-field="tr.es.seoTitle" type="text" maxlength="200" value={esTranslation.seoTitle ?? ''} /></label>
+          <label><span>Título SEO EN</span><input name="tr.en.seoTitle" data-field="tr.en.seoTitle" type="text" maxlength="200" value={enTranslation.seoTitle ?? ''} /></label>
+        </div>
+        <div class="admin-form-row">
+          <label><span>Meta descripción SEO ES</span><input name="tr.es.seoDescription" data-field="tr.es.seoDescription" type="text" maxlength="320" value={esTranslation.seoDescription ?? ''} /></label>
+          <label><span>Meta descripción SEO EN</span><input name="tr.en.seoDescription" data-field="tr.en.seoDescription" type="text" maxlength="320" value={enTranslation.seoDescription ?? ''} /></label>
         </div>
       </fieldset>
       <ImageUploader mode="multi" folder={`windytech/productos/${productId}`} field="images" label="Imágenes del producto" images={images} />

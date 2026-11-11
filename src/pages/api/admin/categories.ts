@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { categorySchema } from '../../../lib/validation';
+import { categorySchema, fieldErrors } from '../../../lib/validation';
 import { deleteCategory, listCategoriesAdmin, saveCategory, writeAudit } from '../../../lib/db/queries';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
@@ -19,7 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const parsed = categorySchema.safeParse(await readJson(request));
   if (!parsed.success) {
-    return json({ error: 'Datos inválidos.', fields: parsed.error.flatten().fieldErrors }, 422);
+    return json({ error: 'Datos inválidos.', fields: fieldErrors(parsed.error) }, 422);
   }
 
   const id = await saveCategory({

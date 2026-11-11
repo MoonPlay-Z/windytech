@@ -18,18 +18,30 @@ const posts = await listPostsAdmin();
     </header>
     <table class="admin-table">
       <thead>
-        <tr><th style="width:40px">#</th><th>Título (ES)</th><th>Autor</th><th>Publicada</th></tr>
+        <tr><th style="width:40px">#</th><th>Título (ES)</th><th>Autor</th><th>Publicada</th><th>Acciones</th></tr>
       </thead>
       <tbody>
         {posts.map((post) => (
           <tr>
             <td>{post.id}</td>
-            <td>{post.title}</td>
+            <td>
+              <a href={`/admin/publicaciones/${post.id}/`}>{post.title}</a>
+            </td>
             <td>{post.author}</td>
             <td>{post.isPublished ? 'Sí' : 'No'}</td>
+            <td>
+              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/publicaciones/${post.id}/`}>Editar</a>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete={`/api/admin/posts?id=${post.id}`}
+                data-confirm="¿Eliminar esta publicación?"
+              >
+                Eliminar
+              </button>
+            </td>
           </tr>
         ))}
-        {posts.length === 0 && <tr><td colspan="4">Sin publicaciones.</td></tr>}
+        {posts.length === 0 && <tr><td colspan="5">Sin publicaciones.</td></tr>}
       </tbody>
     </table>
   </section>

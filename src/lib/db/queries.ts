@@ -689,6 +689,49 @@ export type ProductInput = {
   }[];
 };
 
+/** Comprueba que la categoría exista (evita errores de clave foránea). */
+export async function categoryExists(id: number): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (SELECT 1 FROM categories WHERE id = ${id}) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
+/**
+ * Indica si un slug ya pertenece a otro producto (en ese idioma).
+ * `excludeProductId` permite reutilizar el slug del propio producto al editar.
+ */
+export async function productSlugInUse(
+  locale: string,
+  slug: string,
+  excludeProductId: number | null = null,
+): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (
+            SELECT 1 FROM product_translations
+            WHERE locale = ${locale} AND slug = ${slug}
+              AND (${excludeProductId}::int IS NULL OR product_id <> ${excludeProductId})
+          ) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
+/** Igual que `productSlugInUse`, pero para publicaciones. */
+export async function postSlugInUse(
+  locale: string,
+  slug: string,
+  excludePostId: number | null = null,
+): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (
+            SELECT 1 FROM post_translations
+            WHERE locale = ${locale} AND slug = ${slug}
+              AND (${excludePostId}::int IS NULL OR post_id <> ${excludePostId})
+          ) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
 export async function saveProduct(input: ProductInput): Promise<number | null> {
   const client = db();
   if (!client) return null;
@@ -720,14 +763,17 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
     }
 
     for (const tr of input.translations) {
+      // Se replaces la traducción de este producto en ese idioma: el slug pudo
+      // cambiar. No se usa ON CONFLICT (locale, slug) porque robaría el slug
+      // de otro producto (la API ya avisa si el slug está en uso).
+      await tx.execute(
+        sql`DELETE FROM product_translations WHERE product_id = ${id} AND locale = ${tr.locale}`,
+      );
       await tx.execute(
         sql`INSERT INTO product_translations (product_id, locale, slug, name, short_description,
                 description_md, seo_title, seo_description)
             VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.name}, ${tr.shortDescription},
-                ${tr.descriptionMd}, ${tr.seoTitle}, ${tr.seoDescription})
-            ON CONFLICT (locale, slug) DO UPDATE SET product_id = ${id}, name = ${tr.name},
-                short_description = ${tr.shortDescription}, description_md = ${tr.descriptionMd},
-                seo_title = ${tr.seoTitle}, seo_description = ${tr.seoDescription}`,
+                ${tr.descriptionMd}, ${tr.seoTitle}, ${tr.seoDescription})`,
       );
     }
 
@@ -1053,7 +1099,23 @@ export async function listPostsAdmin() {
   );
 }
 
-export async function getPostAdmin(id: number) {
+export type PostAdmin = {
+  id: number;
+  coverPublicId: string | null;
+  author: string;
+  tags: string[];
+  publishedAt: Date | null;
+  isPublished: boolean;
+  translations: {
+    locale: string;
+    slug: string;
+    title: string;
+    excerpt: string;
+    bodyMd: string;
+  }[];
+};
+
+export async function getPostAdmin(id: number): Promise<PostAdmin | null> {
   const post = await one<Row>(
     sql`SELECT id, cover_public_id AS "coverPublicId", author, tags, published_at AS "publishedAt",
                is_published AS "isPublished" FROM posts WHERE id = ${id} LIMIT 1`,
@@ -1062,7 +1124,7 @@ export async function getPostAdmin(id: number) {
   const translations = await safeRows(
     sql`SELECT locale, slug, title, excerpt, body_md AS "bodyMd" FROM post_translations WHERE post_id = ${id}`,
   );
-  return { ...post, translations };
+  return { ...post, translations } as unknown as PostAdmin;
 }
 
 export async function savePost(input: {
@@ -1093,11 +1155,14 @@ export async function savePost(input: {
       id = Number((result.rows[0] as { id: number }).id);
     }
     for (const tr of input.translations) {
+      // Igual que en productos: se reemplaza la traducción de este post en ese
+      // idioma para no dejar slugs antiguos ni robar el slug de otro post.
+      await tx.execute(
+        sql`DELETE FROM post_translations WHERE post_id = ${id} AND locale = ${tr.locale}`,
+      );
       await tx.execute(
         sql`INSERT INTO post_translations (post_id, locale, slug, title, excerpt, body_md)
-            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.title}, ${tr.excerpt}, ${tr.bodyMd})
-            ON CONFLICT (locale, slug) DO UPDATE SET post_id = ${id}, title = ${tr.title},
-                excerpt = ${tr.excerpt}, body_md = ${tr.bodyMd}`,
+            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.title}, ${tr.excerpt}, ${tr.bodyMd})`,
       );
     }
     return id;

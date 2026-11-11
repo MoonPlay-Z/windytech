@@ -1,6 +1,12 @@
 import type { APIRoute } from 'astro';
-import { postSchema } from '../../../lib/validation';
-import { deletePost, listPostsAdmin, savePost, writeAudit } from '../../../lib/db/queries';
+import { postSchema, fieldErrors } from '../../../lib/validation';
+import {
+  deletePost,
+  listPostsAdmin,
+  postSlugInUse,
+  savePost,
+  writeAudit,
+} from '../../../lib/db/queries';
 import { destroyAsset } from '../../../lib/cloudinary';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
@@ -20,21 +26,43 @@ export const POST: APIRoute = async ({ request }) => {
 
   const parsed = postSchema.safeParse(await readJson(request));
   if (!parsed.success) {
-    return json({ error: 'Datos inválidos.', fields: parsed.error.flatten().fieldErrors }, 422);
+    return json({ error: 'Datos inválidos.', fields: fieldErrors(parsed.error) }, 422);
   }
 
   const data = parsed.data;
   const publishedAt = data.publishedAt ? new Date(data.publishedAt) : null;
 
-  const id = await savePost({
-    id: data.id,
-    coverPublicId: data.coverPublicId ?? null,
-    author: data.author,
-    tags: data.tags,
-    publishedAt: publishedAt && Number.isFinite(publishedAt.getTime()) ? publishedAt : null,
-    isPublished: data.isPublished,
-    translations: data.translations,
-  });
+  // El slug es único por idioma: avisa antes de tocar la base de datos.
+  for (const translation of data.translations) {
+    if (await postSlugInUse(translation.locale, translation.slug, data.id ?? null)) {
+      return json(
+        {
+          error: `El slug "${translation.slug}" ya lo usa otra publicación.`,
+          fields: { [`translations.${translation.locale}.slug`]: ['Slug duplicado.'] },
+        },
+        422,
+      );
+    }
+  }
+
+  let id: number | null;
+  try {
+    id = await savePost({
+      id: data.id,
+      coverPublicId: data.coverPublicId ?? null,
+      author: data.author,
+      tags: data.tags,
+      publishedAt: publishedAt && Number.isFinite(publishedAt.getTime()) ? publishedAt : null,
+      isPublished: data.isPublished,
+      translations: data.translations,
+    });
+  } catch (error) {
+    console.error('[admin] no se pudo guardar la publicación:', error);
+    return json(
+      { error: 'No se pudo guardar la publicación. Revisa los datos e inténtalo de nuevo.' },
+      500,
+    );
+  }
 
   if (!id) return json({ error: 'No se pudo guardar la publicación.' }, 503);
   await writeAudit(admin.id, data.id ? 'UPDATE' : 'CREATE', 'posts', String(id), { title: data.translations[0]?.title });

@@ -1,0 +1,147 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getPostAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const postId = Number(Astro.params.id);
+if (!Number.isInteger(postId) || postId <= 0) return Astro.redirect('/admin/publicaciones/', 302);
+
+const post = await getPostAdmin(postId);
+if (!post) return Astro.redirect('/admin/publicaciones/', 302);
+
+const translations: any[] = post.translations ?? [];
+const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
+const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
+
+/** El campo datetime-local necesita "YYYY-MM-DDTHH:mm" en hora local. */
+function toLocalInput(value: unknown): string {
+  if (!value) return '';
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+const tags = Array.isArray(post.tags) ? (post.tags as string[]).join(', ') : String(post.tags ?? '');
+const publishedAtValue = toLocalInput(post.publishedAt);
+---
+
+<AdminLayout title="Editar publicación" admin={admin} active="posts">
+  <section class="admin-card">
+    <h2>Editar publicación</h2>
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/posts"
+      data-success="Publicación guardada."
+      data-redirect="/admin/publicaciones/"
+    >
+      <input type="hidden" data-field="id" data-type="number" value={String(postId)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Autor</span>
+          <input name="author" data-field="author" type="text" maxlength="120" value={post.author ?? ''} />
+        </label>
+        <label>
+          <span>Fecha de publicación</span>
+          <input
+            type="datetime-local"
+            name="publishedAt"
+            data-field="publishedAt"
+            value={publishedAtValue}
+          />
+        </label>
+        <label class="admin-check">
+          <input
+            type="checkbox"
+            name="isPublished"
+            data-field="isPublished"
+            data-type="checkbox"
+            checked={post.isPublished ? true : undefined}
+          />
+          Publicada
+        </label>
+      </div>
+      <label>
+        <span>Etiquetas (separadas por coma)</span>
+        <input name="tags" data-field="tags" data-type="array" type="text" value={tags} />
+      </label>
+
+      <fieldset class="admin-fieldset">
+        <legend>Traducciones ES / EN</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug ES</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} />
+          </label>
+          <label>
+            <span>Slug EN</span>
+            <input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Título ES</span>
+            <input name="tr.es.title" data-field="tr.es.title" type="text" value={esTranslation.title ?? ''} />
+          </label>
+          <label>
+            <span>Título EN</span>
+            <input name="tr.en.title" data-field="tr.en.title" type="text" value={enTranslation.title ?? ''} />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Extracto ES</span>
+            <input
+              name="tr.es.excerpt"
+              data-field="tr.es.excerpt"
+              type="text"
+              maxlength="600"
+              value={esTranslation.excerpt ?? ''}
+            />
+          </label>
+          <label>
+            <span>Extracto EN</span>
+            <input
+              name="tr.en.excerpt"
+              data-field="tr.en.excerpt"
+              type="text"
+              maxlength="600"
+              value={enTranslation.excerpt ?? ''}
+            />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Contenido ES (Markdown)</span>
+            <textarea name="tr.es.bodyMd" data-field="tr.es.bodyMd" rows="8">{esTranslation.bodyMd ?? ''}</textarea>
+          </label>
+          <label>
+            <span>Contenido EN (Markdown)</span>
+            <textarea name="tr.en.bodyMd" data-field="tr.en.bodyMd" rows="8">{enTranslation.bodyMd ?? ''}</textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <ImageUploader
+        mode="single"
+        folder={`windytech/publicaciones/${postId}`}
+        field="coverPublicId"
+        label="Imagen de portada"
+        publicId={post.coverPublicId ?? null}
+      />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/publicaciones/">Volver</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>
