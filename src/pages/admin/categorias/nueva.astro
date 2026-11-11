@@ -21,32 +21,20 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
       </div>
       <div class="admin-form-row">
         <label>
-          <span>Slug ES</span>
+          <span>Slug</span>
           <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
         </label>
-        <label>
-          <span>Slug EN</span>
-          <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
-        </label>
       </div>
       <div class="admin-form-row">
         <label>
-          <span>Nombre ES</span>
+          <span>Nombre</span>
           <input name="tr.es.name" data-field="tr.es.name" type="text" required />
         </label>
-        <label>
-          <span>Nombre EN</span>
-          <input name="tr.en.name" data-field="tr.en.name" type="text" required />
-        </label>
       </div>
       <div class="admin-form-row">
         <label>
-          <span>Descripción ES</span>
+          <span>Descripción</span>
           <input name="tr.es.description" data-field="tr.es.description" type="text" />
-        </label>
-        <label>
-          <span>Descripción EN</span>
-          <input name="tr.en.description" data-field="tr.en.description" type="text" />
         </label>
       </div>
       <ImageUploader mode="single" folder="windytech/categorias" field="imagePublicId" label="Imagen de categoría" />

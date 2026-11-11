@@ -58,13 +58,12 @@ function collect(form: HTMLFormElement): { payload: Json; errors: string[] } {
     setPath(payload, element.dataset.field ?? '', fieldValue(element, errors));
   });
 
-  // tr.es.name / tr.en.name → translations: [{ locale, ... }]
+  // El panel es solo en español: los campos tr.es.* se agrupan en una única
+  // traducción con locale 'es'.
   if (payload.tr && typeof payload.tr === 'object') {
     const groups = payload.tr as Record<string, Json>;
-    payload.translations = Object.entries(groups).map(([locale, fields]) => ({
-      locale,
-      ...fields,
-    }));
+    const es = (groups.es ?? {}) as Json;
+    payload.translations = [{ locale: 'es', ...es }];
     delete payload.tr;
   }
 
@@ -216,7 +215,22 @@ function setupUploaders() {
     const list = root.querySelector<HTMLElement>('[data-upload-list]');
     const fileInput = root.querySelector<HTMLInputElement>('[data-upload-input]');
     const altInput = root.querySelector<HTMLInputElement>('[data-upload-alt]');
+    const filesLabel = root.querySelector<HTMLElement>('[data-upload-files]');
     if (!hidden || !list || !fileInput) return;
+
+    // El input nativo muestra textos en inglés según el navegador: lo
+    // escondemos y mostramos nuestro propio mensaje en español.
+    const showFiles = (count: number) => {
+      if (!filesLabel) return;
+      filesLabel.textContent =
+        count === 0
+          ? 'Ningún archivo seleccionado'
+          : count === 1
+            ? '1 archivo seleccionado'
+            : `${count} archivos seleccionados`;
+    };
+    fileInput.addEventListener('change', () => showFiles(fileInput.files?.length ?? 0));
+    showFiles(fileInput.files?.length ?? 0);
 
     let items: UploadItem[] = [];
     if (mode === 'multi') {

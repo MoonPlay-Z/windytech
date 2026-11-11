@@ -71,7 +71,7 @@ export const quoteSchema = z.object({
     .regex(/^[+\d\s().-]+$/, 'Teléfono inválido.'),
   email: z.union([z.string().trim().email(), z.literal('')]).default(''),
   notes: z.string().trim().max(1500).default(''),
-  locale: z.enum(['es', 'en']).default('es'),
+  locale: z.literal('es').default('es'),
   currency: z.enum(['USD', 'VES']).default('USD'),
   items: z.array(quoteItemSchema).min(1).max(30),
   website: z.string().max(0).optional(), // honeypot
@@ -80,8 +80,9 @@ export const quoteSchema = z.object({
 
 export type QuoteInput = z.infer<typeof quoteSchema>;
 
+/** El sitio es solo en español: toda traducción va en locale 'es'. */
 const translation = z.object({
-  locale: z.enum(['es', 'en']),
+  locale: z.literal('es').default('es'),
   slug,
   name: z.string().trim().min(2).max(180),
 });
@@ -142,7 +143,7 @@ export const categorySchema = z.object({
   imagePublicId: z.string().trim().max(300).nullable().optional(),
   translations: z.array(
     z.object({
-      locale: z.enum(['es', 'en']),
+      locale: z.literal('es').default('es'),
       slug,
       name: z.string().trim().min(2).max(120),
       description: z.string().trim().max(600).default(''),
@@ -176,7 +177,7 @@ export const projectSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).default(0),
   translations: z.array(
     z.object({
-      locale: z.enum(['es', 'en']),
+      locale: z.literal('es').default('es'),
       slug,
       title: z.string().trim().min(2).max(180),
       summary: z.string().trim().max(600).default(''),
@@ -203,7 +204,7 @@ export const postSchema = z.object({
   isPublished: z.coerce.boolean().default(false),
   translations: z.array(
     z.object({
-      locale: z.enum(['es', 'en']),
+      locale: z.literal('es').default('es'),
       slug,
       title: z.string().trim().min(2).max(180),
       excerpt: z.string().trim().max(600).default(''),
@@ -226,7 +227,7 @@ export const servicePlanSchema = z.object({
   translations: z
     .array(
       z.object({
-        locale: z.enum(['es', 'en']),
+        locale: z.literal('es').default('es'),
         slug,
         name: z.string().trim().min(2).max(120),
         tagline: z.string().trim().max(300).default(''),

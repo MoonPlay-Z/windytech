@@ -316,8 +316,54 @@
   font-weight: 600;
 }
 
+/* Input de archivo nativo oculto: lo sustituimos por un botón en español. */
 .uploader input[type='file'] {
-  font-weight: 400;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.uploader-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.uploader-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.uploader-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.uploader-button:hover {
+  border-color: var(--teal);
+  background: var(--bg-soft);
+}
+
+.uploader-files {
+  color: var(--muted);
+  font-size: 12.5px;
 }
 
 .upload-list {

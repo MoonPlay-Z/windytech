@@ -49,45 +49,29 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
       </label>
 
       <fieldset class="admin-fieldset">
-        <legend>Traducciones ES / EN</legend>
+        <legend>Contenido</legend>
         <div class="admin-form-row">
           <label>
-            <span>Slug ES</span>
+            <span>Slug</span>
             <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
           </label>
-          <label>
-            <span>Slug EN</span>
-            <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Título ES</span>
+            <span>Título</span>
             <input name="tr.es.title" data-field="tr.es.title" type="text" required />
           </label>
-          <label>
-            <span>Título EN</span>
-            <input name="tr.en.title" data-field="tr.en.title" type="text" required />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Resumen ES</span>
+            <span>Resumen</span>
             <input name="tr.es.summary" data-field="tr.es.summary" type="text" maxlength="600" />
           </label>
-          <label>
-            <span>Resumen EN</span>
-            <input name="tr.en.summary" data-field="tr.en.summary" type="text" maxlength="600" />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Descripción ES (Markdown)</span>
+            <span>Descripción (Markdown)</span>
             <textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="4"></textarea>
-          </label>
-          <label>
-            <span>Descripción EN (Markdown)</span>
-            <textarea name="tr.en.descriptionMd" data-field="tr.en.descriptionMd" rows="4"></textarea>
           </label>
         </div>
       </fieldset>

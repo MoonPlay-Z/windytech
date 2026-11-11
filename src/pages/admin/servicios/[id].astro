@@ -17,7 +17,6 @@ if (!plan) return Astro.redirect('/admin/servicios/', 302);
 
 const translations: any[] = plan.translations ?? [];
 const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
-const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
 const price = (plan.priceCents / 100).toFixed(2);
 ---
 
@@ -122,30 +121,22 @@ const price = (plan.priceCents / 100).toFixed(2);
       </div>
 
       <fieldset class="admin-fieldset">
-        <legend>Traducciones ES / EN</legend>
+        <legend>Contenido</legend>
         <div class="admin-form-row">
           <label>
-            <span>Slug ES</span>
+            <span>Slug</span>
             <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} />
           </label>
-          <label>
-            <span>Slug EN</span>
-            <input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Nombre ES</span>
+            <span>Nombre</span>
             <input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} />
           </label>
-          <label>
-            <span>Nombre EN</span>
-            <input name="tr.en.name" data-field="tr.en.name" type="text" value={enTranslation.name ?? ''} />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Descripción corta ES</span>
+            <span>Descripción corta</span>
             <input
               name="tr.es.tagline"
               data-field="tr.es.tagline"
@@ -154,25 +145,11 @@ const price = (plan.priceCents / 100).toFixed(2);
               value={esTranslation.tagline ?? ''}
             />
           </label>
-          <label>
-            <span>Descripción corta EN</span>
-            <input
-              name="tr.en.tagline"
-              data-field="tr.en.tagline"
-              type="text"
-              maxlength="300"
-              value={enTranslation.tagline ?? ''}
-            />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Contenido del paquete ES (un punto por línea)</span>
+            <span>Contenido del paquete (un punto por línea)</span>
             <textarea name="tr.es.includes" data-field="tr.es.includes" data-type="lines" rows="6">{(esTranslation.includes ?? []).join('\n')}</textarea>
-          </label>
-          <label>
-            <span>Contenido del paquete EN (un punto por línea)</span>
-            <textarea name="tr.en.includes" data-field="tr.en.includes" data-type="lines" rows="6">{(enTranslation.includes ?? []).join('\n')}</textarea>
           </label>
         </div>
       </fieldset>

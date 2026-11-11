@@ -35,10 +35,14 @@ const serialized =
   data-cloud={cloud}
   data-max={mode === 'multi' ? String(max) : '1'}
 >
-  <label class="uploader-label">
-    <span>{label}</span>
-    <input type="file" accept="image/jpeg,image/png,image/webp" data-upload-input multiple={mode === 'multi'} />
-  </label>
+  <div class="uploader-head">
+    <span class="uploader-title">{label}</span>
+    <label class="uploader-button">
+      <input type="file" accept="image/jpeg,image/png,image/webp" data-upload-input multiple={mode === 'multi'} />
+      <span>{mode === 'multi' ? 'Elegir imágenes' : 'Elegir imagen'}</span>
+    </label>
+    <span class="uploader-files" data-upload-files>Ningún archivo seleccionado</span>
+  </div>
 
   {mode === 'multi' && (
     <label class="uploader-alt">

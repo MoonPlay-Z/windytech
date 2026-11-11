@@ -17,7 +17,6 @@ if (!post) return Astro.redirect('/admin/publicaciones/', 302);
 
 const translations: any[] = post.translations ?? [];
 const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
-const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
 
 /** El campo datetime-local necesita "YYYY-MM-DDTHH:mm" en hora local. */
 function toLocalInput(value: unknown): string {
@@ -74,30 +73,22 @@ const publishedAtValue = toLocalInput(post.publishedAt);
       </label>
 
       <fieldset class="admin-fieldset">
-        <legend>Traducciones ES / EN</legend>
+        <legend>Contenido</legend>
         <div class="admin-form-row">
           <label>
-            <span>Slug ES</span>
+            <span>Slug</span>
             <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} />
           </label>
-          <label>
-            <span>Slug EN</span>
-            <input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Título ES</span>
+            <span>Título</span>
             <input name="tr.es.title" data-field="tr.es.title" type="text" value={esTranslation.title ?? ''} />
           </label>
-          <label>
-            <span>Título EN</span>
-            <input name="tr.en.title" data-field="tr.en.title" type="text" value={enTranslation.title ?? ''} />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Extracto ES</span>
+            <span>Extracto</span>
             <input
               name="tr.es.excerpt"
               data-field="tr.es.excerpt"
@@ -106,25 +97,11 @@ const publishedAtValue = toLocalInput(post.publishedAt);
               value={esTranslation.excerpt ?? ''}
             />
           </label>
-          <label>
-            <span>Extracto EN</span>
-            <input
-              name="tr.en.excerpt"
-              data-field="tr.en.excerpt"
-              type="text"
-              maxlength="600"
-              value={enTranslation.excerpt ?? ''}
-            />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Contenido ES (Markdown)</span>
+            <span>Contenido (Markdown)</span>
             <textarea name="tr.es.bodyMd" data-field="tr.es.bodyMd" rows="8">{esTranslation.bodyMd ?? ''}</textarea>
-          </label>
-          <label>
-            <span>Contenido EN (Markdown)</span>
-            <textarea name="tr.en.bodyMd" data-field="tr.en.bodyMd" rows="8">{enTranslation.bodyMd ?? ''}</textarea>
           </label>
         </div>
       </fieldset>

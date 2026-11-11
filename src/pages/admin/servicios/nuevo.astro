@@ -81,45 +81,29 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
       </div>
 
       <fieldset class="admin-fieldset">
-        <legend>Traducciones ES / EN</legend>
+        <legend>Contenido</legend>
         <div class="admin-form-row">
           <label>
-            <span>Slug ES</span>
+            <span>Slug</span>
             <input name="tr.es.slug" data-field="tr.es.slug" type="text" required />
           </label>
-          <label>
-            <span>Slug EN</span>
-            <input name="tr.en.slug" data-field="tr.en.slug" type="text" required />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Nombre ES</span>
+            <span>Nombre</span>
             <input name="tr.es.name" data-field="tr.es.name" type="text" required />
           </label>
-          <label>
-            <span>Nombre EN</span>
-            <input name="tr.en.name" data-field="tr.en.name" type="text" required />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Descripción corta ES</span>
+            <span>Descripción corta</span>
             <input name="tr.es.tagline" data-field="tr.es.tagline" type="text" maxlength="300" />
           </label>
-          <label>
-            <span>Descripción corta EN</span>
-            <input name="tr.en.tagline" data-field="tr.en.tagline" type="text" maxlength="300" />
-          </label>
         </div>
         <div class="admin-form-row">
           <label>
-            <span>Contenido del paquete ES (un punto por línea)</span>
+            <span>Contenido del paquete (un punto por línea)</span>
             <textarea name="tr.es.includes" data-field="tr.es.includes" data-type="lines" rows="6"></textarea>
-          </label>
-          <label>
-            <span>Contenido del paquete EN (un punto por línea)</span>
-            <textarea name="tr.en.includes" data-field="tr.en.includes" data-type="lines" rows="6"></textarea>
           </label>
         </div>
       </fieldset>

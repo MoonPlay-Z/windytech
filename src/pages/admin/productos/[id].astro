@@ -19,7 +19,6 @@ const categories = await listCategoriesAdmin();
 
 const translations: any[] = product.translations ?? [];
 const esTranslation = translations.find((item: any) => item.locale === 'es') ?? {};
-const enTranslation = translations.find((item: any) => item.locale === 'en') ?? {};
 const images: any[] = (product.images ?? []).map((image: any, index: number) => ({ ...image, position: index }));
 const specsJson = JSON.stringify(product.specs ?? {}, null, 2);
 
@@ -66,30 +65,24 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
         <label class="admin-check"><input type="checkbox" name="isFeatured" data-field="isFeatured" data-type="checkbox" checked={featuredChecked === 'checked'} /> Destacado</label>
       </div>
       <label><span>Especificaciones (JSON)</span><textarea name="specs" data-field="specs" data-type="json" rows="4">{specsJson}</textarea></label>
-      <fieldset class="admin-fieldset"><legend>Traducciones ES / EN</legend>
+      <fieldset class="admin-fieldset"><legend>Contenido</legend>
         <div class="admin-form-row">
-          <label><span>Slug ES</span><input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} /></label>
-          <label><span>Slug EN</span><input name="tr.en.slug" data-field="tr.en.slug" type="text" value={enTranslation.slug ?? ''} /></label>
+          <label><span>Slug</span><input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} /></label>
         </div>
         <div class="admin-form-row">
-          <label><span>Nombre ES</span><input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} /></label>
-          <label><span>Nombre EN</span><input name="tr.en.name" data-field="tr.en.name" type="text" value={enTranslation.name ?? ''} /></label>
+          <label><span>Nombre</span><input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} /></label>
         </div>
         <div class="admin-form-row">
-          <label><span>Descripción corta ES</span><input name="tr.es.shortDescription" data-field="tr.es.shortDescription" type="text" maxlength="400" value={esTranslation.shortDescription ?? ''} /></label>
-          <label><span>Descripción corta EN</span><input name="tr.en.shortDescription" data-field="tr.en.shortDescription" type="text" maxlength="400" value={enTranslation.shortDescription ?? ''} /></label>
+          <label><span>Descripción corta</span><input name="tr.es.shortDescription" data-field="tr.es.shortDescription" type="text" maxlength="400" value={esTranslation.shortDescription ?? ''} /></label>
         </div>
         <div class="admin-form-row">
-          <label><span>Descripción (Markdown) ES</span><textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="6">{esTranslation.descriptionMd ?? ''}</textarea></label>
-          <label><span>Descripción (Markdown) EN</span><textarea name="tr.en.descriptionMd" data-field="tr.en.descriptionMd" rows="6">{enTranslation.descriptionMd ?? ''}</textarea></label>
+          <label><span>Descripción (Markdown)</span><textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="6">{esTranslation.descriptionMd ?? ''}</textarea></label>
         </div>
         <div class="admin-form-row">
-          <label><span>Título SEO ES</span><input name="tr.es.seoTitle" data-field="tr.es.seoTitle" type="text" maxlength="200" value={esTranslation.seoTitle ?? ''} /></label>
-          <label><span>Título SEO EN</span><input name="tr.en.seoTitle" data-field="tr.en.seoTitle" type="text" maxlength="200" value={enTranslation.seoTitle ?? ''} /></label>
+          <label><span>Título SEO</span><input name="tr.es.seoTitle" data-field="tr.es.seoTitle" type="text" maxlength="200" value={esTranslation.seoTitle ?? ''} /></label>
         </div>
         <div class="admin-form-row">
-          <label><span>Meta descripción SEO ES</span><input name="tr.es.seoDescription" data-field="tr.es.seoDescription" type="text" maxlength="320" value={esTranslation.seoDescription ?? ''} /></label>
-          <label><span>Meta descripción SEO EN</span><input name="tr.en.seoDescription" data-field="tr.en.seoDescription" type="text" maxlength="320" value={enTranslation.seoDescription ?? ''} /></label>
+          <label><span>Meta descripción SEO</span><input name="tr.es.seoDescription" data-field="tr.es.seoDescription" type="text" maxlength="320" value={esTranslation.seoDescription ?? ''} /></label>
         </div>
       </fieldset>
       <ImageUploader
