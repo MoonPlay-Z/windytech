@@ -1,0 +1,370 @@
+/* ==========================================================================
+   Móvil — hasta 720 px
+   ========================================================================== */
+
+/* Una sola columna, menú desplegable, botones de cuenta dentro del
+   menú y la barra de campaña compacta. */
+
+@layer responsive {
+  /* --- global.css --- */
+  @media (max-width: 720px) {
+    .wa-float {
+      right: 14px;
+      bottom: 14px;
+      width: 50px;
+      height: 50px;
+    }
+
+    .site-footer {
+      padding-bottom: 78px;
+    }
+  }
+
+  /* --- global.css --- */
+  @media (max-width: 720px) {
+    .container {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    /* La barra de campaña se compacta: una sola línea con la etiqueta y el
+       enlace, sin el texto largo que ocupaba tres renglones. */
+    .campaign-bar {
+      font-size: 13px;
+    }
+
+    .campaign-inner {
+      flex-wrap: nowrap;
+      gap: 4px 12px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .campaign-inner > span:not(.campaign-label) {
+      display: none;
+    }
+
+    .campaign-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    /* En móvil los botones de cuenta viven en el menú desplegable: así la
+       cabecera no desborda la pantalla. */
+    .header-account,
+    .header-actions .profile-menu {
+      display: none;
+    }
+
+    .nav-account {
+      display: block;
+    }
+
+    .about-facts {
+      grid-template-columns: 1fr;
+    }
+
+    .about-hero {
+      padding: 32px 0 40px;
+    }
+
+    .section {
+      padding: 64px 0;
+    }
+
+    .section-head {
+      margin-bottom: 36px;
+    }
+
+    .section-head p {
+      font-size: 16px;
+    }
+
+    .hero-inner {
+      gap: 36px;
+      padding-top: 56px;
+      padding-bottom: 64px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.25rem, 9vw, 2.75rem);
+    }
+
+    .hero-description {
+      font-size: 17px;
+    }
+
+    .hero-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    .hero-panel {
+      padding: 24px;
+    }
+
+    .campaign-inner {
+      text-align: center;
+    }
+
+    .card,
+    .equipment-card,
+    .payments-card {
+      padding: 24px;
+    }
+
+    .segment {
+      padding: 24px;
+    }
+
+    .contact-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-form {
+      padding: 22px;
+    }
+
+    .footer-main {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .wa-float {
+      display: none;
+    }
+  }
+
+  /* --- global.css --- */
+  @media (max-width: 720px) {
+    .plan-card--featured {
+      transform: none;
+    }
+  }
+
+  /* --- catalog.css --- */
+  @media (max-width: 680px) {
+    .catalog-hero {
+      padding: 54px 0 68px;
+    }
+
+    .catalog-hero::after {
+      right: -210px;
+      bottom: -190px;
+    }
+
+    .catalog-hero h1 {
+      font-size: clamp(36px, 10vw, 52px);
+    }
+
+    .catalog-intro {
+      font-size: 15px;
+    }
+
+    .catalog-hero-meta {
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .catalog-filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: -34px;
+      padding: 14px;
+      border-radius: 17px;
+    }
+
+    .catalog-field--search {
+      grid-column: span 2;
+    }
+
+    .catalog-field--search {
+      grid-column: 1 / -1;
+    }
+
+    .catalog-field--price {
+      grid-column: span 2;
+    }
+
+    .catalog-filter-actions {
+      grid-column: 1 / -1;
+      justify-content: space-between;
+    }
+
+    .catalog-section {
+      padding-top: 54px;
+    }
+
+    .product-grid,
+    .project-grid,
+    .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .product-card,
+    .project-card,
+    .blog-card {
+      border-radius: 17px;
+    }
+
+    .product-card-media {
+      aspect-ratio: 5 / 3.8;
+    }
+
+    .project-card-media,
+    .blog-card-media {
+      aspect-ratio: 16 / 9;
+    }
+
+    .product-card-body,
+    .project-card-body,
+    .blog-card-body {
+      padding: 18px;
+    }
+  }
+
+  /* --- detail.css --- */
+  @media (max-width: 720px) {
+    .product-specs dl > div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+
+    .quote-row {
+      grid-template-columns: minmax(0, 1fr) 92px;
+    }
+
+    .quote-row > span:nth-child(2) {
+      display: none;
+    }
+
+    .quote-customer > div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+
+  /* --- cart.css --- */
+  @media (max-width: 720px) {
+    .cart-line {
+      grid-template-columns: 60px minmax(0, 1fr) 30px;
+      grid-template-areas:
+        'media body remove'
+        'qty qty total';
+      row-gap: 10px;
+    }
+
+    .cart-line-media {
+      grid-area: media;
+      width: 60px;
+      height: 52px;
+    }
+
+    .cart-line-body {
+      grid-area: body;
+    }
+
+    .cart-line-qty {
+      grid-area: qty;
+      justify-self: start;
+    }
+
+    .cart-line-total {
+      grid-area: total;
+      min-width: 0;
+      align-self: center;
+    }
+
+    .cart-line-remove {
+      grid-area: remove;
+    }
+  }
+
+  /* --- admin.css --- */
+  @media (max-width: 600px) {
+    .admin-main {
+      padding: 18px 16px 48px;
+    }
+
+    .admin-topbar {
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+    }
+
+    .admin-topbar-actions {
+      gap: 8px;
+    }
+
+    .admin-online {
+      display: none;
+    }
+
+    .admin-topbar .admin-btn {
+      min-height: 36px;
+      padding: 0 11px;
+      font-size: 12px;
+    }
+
+    .admin-welcome {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 17px;
+      padding: 22px;
+    }
+
+    .admin-welcome .admin-btn {
+      width: 100%;
+    }
+
+    .admin-grid {
+      gap: 10px;
+    }
+
+    .admin-stat {
+      padding: 15px;
+      border-radius: 16px;
+    }
+
+    .admin-stat-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 19px;
+    }
+
+    .admin-stat strong {
+      font-size: 29px;
+    }
+
+    .admin-stat-caption {
+      min-height: 30px;
+      font-size: 11px;
+    }
+
+    .admin-stat-link {
+      font-size: 10px;
+    }
+
+    .admin-card {
+      padding: 18px 15px;
+    }
+
+    .admin-quick-links {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-quick-links a {
+      grid-template-columns: 38px minmax(0, 1fr);
+    }
+  }
+
+}

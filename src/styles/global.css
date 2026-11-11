@@ -1,3 +1,6 @@
+@layer base, responsive;
+
+@layer base {
 @font-face {
   font-family: "DM Sans";
   font-style: normal;
@@ -924,13 +927,6 @@ section[id],
   to { transform: translateY(-70px) scale(1.3); opacity: 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-bg *,
-  .hero-bg *::before,
-  .hero-bg *::after {
-    animation: none !important;
-  }
-}
 
 .hero-inner {
   position: relative;
@@ -1897,18 +1893,6 @@ a.contact-card:hover {
   padding-bottom: 96px;
 }
 
-@media (max-width: 720px) {
-  .wa-float {
-    right: 14px;
-    bottom: 14px;
-    width: 50px;
-    height: 50px;
-  }
-
-  .site-footer {
-    padding-bottom: 78px;
-  }
-}
 
 /* Legal pages */
 .legal-page {
@@ -2341,281 +2325,10 @@ a.contact-card:hover {
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .hero-inner {
-    grid-template-columns: 1fr;
-  }
 
-  .hero-panel {
-    max-width: 560px;
-    width: 100%;
-    margin: 0 auto;
-  }
 
-  .clients-inner,
-  .split-grid,
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
 
-  .clients-inner {
-    gap: 40px;
-  }
 
-  .contact-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .about-grid,
-  .about-page-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .about-page-aside {
-    position: static;
-  }
-
-  .about-pillars {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 1180px) {
-  .nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    display: none;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    padding: 8px 24px 24px;
-    border-bottom: 1px solid var(--line);
-    background: #fff;
-    box-shadow: 0 18px 30px rgba(14, 34, 52, 0.08);
-  }
-
-  /* Cuenta del cliente dentro del panel de navegación */
-  .nav-account {
-    display: none;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--line);
-  }
-
-  .nav-account a,
-  .nav-account button {
-    display: block;
-    width: 100%;
-    padding: 13px 0;
-    border: 0;
-    border-bottom: 1px solid var(--line);
-    background: none;
-    color: var(--navy);
-    font: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .nav-account a:last-child,
-  .nav-account button:last-child {
-    border-bottom: 0;
-  }
-
-  .nav-account-logout {
-    color: #9c2929 !important;
-  }
-
-  .nav[data-open="true"] {
-    display: flex;
-  }
-
-  .nav > a:not(.btn) {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .nav-cta {
-    display: inline-flex;
-    margin-top: 16px;
-    align-self: flex-start;
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-  }
-
-  .header-cta {
-    display: none;
-  }
-}
-
-@media (max-width: 720px) {
-  .container {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  /* La barra de campaña se compacta: una sola línea con la etiqueta y el
-     enlace, sin el texto largo que ocupaba tres renglones. */
-  .campaign-bar {
-    font-size: 13px;
-  }
-
-  .campaign-inner {
-    flex-wrap: nowrap;
-    gap: 4px 12px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  .campaign-inner > span:not(.campaign-label) {
-    display: none;
-  }
-
-  .campaign-label {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-  }
-
-  /* En móvil los botones de cuenta viven en el menú desplegable: así la
-     cabecera no desborda la pantalla. */
-  .header-account,
-  .header-actions .profile-menu {
-    display: none;
-  }
-
-  .nav-account {
-    display: block;
-  }
-
-  .about-facts {
-    grid-template-columns: 1fr;
-  }
-
-  .about-hero {
-    padding: 32px 0 40px;
-  }
-
-  .section {
-    padding: 64px 0;
-  }
-
-  .section-head {
-    margin-bottom: 36px;
-  }
-
-  .section-head p {
-    font-size: 16px;
-  }
-
-  .hero-inner {
-    gap: 36px;
-    padding-top: 56px;
-    padding-bottom: 64px;
-  }
-
-  .hero h1 {
-    font-size: clamp(2.25rem, 9vw, 2.75rem);
-  }
-
-  .hero-description {
-    font-size: 17px;
-  }
-
-  .hero-actions .btn {
-    flex: 1 1 auto;
-  }
-
-  .hero-panel {
-    padding: 24px;
-  }
-
-  .campaign-inner {
-    text-align: center;
-  }
-
-  .card,
-  .equipment-card,
-  .payments-card {
-    padding: 24px;
-  }
-
-  .segment {
-    padding: 24px;
-  }
-
-  .contact-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-form {
-    padding: 22px;
-  }
-
-  .footer-main {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .wa-float {
-    display: none;
-  }
-}
-
-@media (max-width: 420px) {
-  .brand-wordmark {
-    display: none;
-  }
-
-  .hero-badge {
-    font-size: 12px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-  }
-
-  .hero-actions .btn {
-    width: 100%;
-  }
-
-  .cta-inner {
-    padding-top: 48px;
-    padding-bottom: 48px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
 
 /* --- Páginas de servicio --- */
 .about-service-list strong {
@@ -2672,6 +2385,7 @@ a.contact-card:hover {
   align-items: center;
   gap: 6px;
   min-height: 38px;
+  max-width: 190px;
   padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -2815,43 +2529,6 @@ html[data-astro-transition='back'] {
   --wt-page-shadow: -40px 0 80px rgba(10, 30, 45, 0.32);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  /* La página saliente se desliza lateralmente mientras gira sobre su borde,
-     como una hoja que se pasa; la entrante espera quieta debajo y queda al
-     descubierto. El marco (cabecera, barra, WhatsApp y pie) no se mueve. */
-  ::view-transition-old(root) {
-    z-index: var(--wt-page-out-z, 2);
-    backface-visibility: hidden;
-    transform-origin: var(--wt-page-out-origin, left center);
-    animation-name: var(--wt-page-out-name, wt-page-turn-out);
-    animation-duration: var(--wt-page-out-duration, 520ms);
-    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
-    animation-fill-mode: both;
-    box-shadow: var(--wt-page-shadow, 40px 0 80px rgba(10, 30, 45, 0.32));
-  }
-
-  ::view-transition-new(root) {
-    z-index: var(--wt-page-in-z, 1);
-    backface-visibility: hidden;
-    animation-name: var(--wt-page-in-name, none);
-    animation-duration: var(--wt-page-in-duration, 520ms);
-    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
-    animation-fill-mode: both;
-  }
-
-  /* El encabezado, la barra de campaña, el botón flotante y el pie no
-     participan en el giro: el marco de la web permanece fijo. */
-  ::view-transition-old(site-header),
-  ::view-transition-new(site-header),
-  ::view-transition-old(site-campaign),
-  ::view-transition-new(site-campaign),
-  ::view-transition-old(site-whatsapp),
-  ::view-transition-new(site-whatsapp),
-  ::view-transition-old(site-footer),
-  ::view-transition-new(site-footer) {
-    animation: none;
-  }
-}
 
 /* Avanzar: la hoja se retira hacia la izquierda con un giro suave. La
    opacidad solo baja cuando ya salió, para que su sombra no quede colgada. */
@@ -3111,11 +2788,6 @@ html[data-astro-transition='back'] {
   color: var(--mint);
 }
 
-@media (max-width: 720px) {
-  .plan-card--featured {
-    transform: none;
-  }
-}
 
 .section-foot {
   display: flex;
@@ -3173,4 +2845,66 @@ html[data-astro-transition='back'] {
   padding: 0;
   cursor: pointer;
   font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg *,
+  .hero-bg *::before,
+  .hero-bg *::after {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* La página saliente se desliza lateralmente mientras gira sobre su borde,
+     como una hoja que se pasa; la entrante espera quieta debajo y queda al
+     descubierto. El marco (cabecera, barra, WhatsApp y pie) no se mueve. */
+  ::view-transition-old(root) {
+    z-index: var(--wt-page-out-z, 2);
+    backface-visibility: hidden;
+    transform-origin: var(--wt-page-out-origin, left center);
+    animation-name: var(--wt-page-out-name, wt-page-turn-out);
+    animation-duration: var(--wt-page-out-duration, 520ms);
+    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-fill-mode: both;
+    box-shadow: var(--wt-page-shadow, 40px 0 80px rgba(10, 30, 45, 0.32));
+  }
+
+  ::view-transition-new(root) {
+    z-index: var(--wt-page-in-z, 1);
+    backface-visibility: hidden;
+    animation-name: var(--wt-page-in-name, none);
+    animation-duration: var(--wt-page-in-duration, 520ms);
+    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-fill-mode: both;
+  }
+
+  /* El encabezado, la barra de campaña, el botón flotante y el pie no
+     participan en el giro: el marco de la web permanece fijo. */
+  ::view-transition-old(site-header),
+  ::view-transition-new(site-header),
+  ::view-transition-old(site-campaign),
+  ::view-transition-new(site-campaign),
+  ::view-transition-old(site-whatsapp),
+  ::view-transition-new(site-whatsapp),
+  ::view-transition-old(site-footer),
+  ::view-transition-new(site-footer) {
+    animation: none;
+  }
+}
 }

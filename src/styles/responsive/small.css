@@ -1,0 +1,51 @@
+/* ==========================================================================
+   Móvil pequeño — hasta 420 px
+   ========================================================================== */
+
+/* Ajustes de seguridad para pantallas estrechas (iPhone SE, Galaxy S8). */
+
+@layer responsive {
+  /* --- global.css --- */
+  @media (max-width: 420px) {
+    .brand-wordmark {
+      display: none;
+    }
+
+    .hero-badge {
+      font-size: 12px;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+    }
+
+    .cta-inner {
+      padding-top: 48px;
+      padding-bottom: 48px;
+    }
+  }
+
+  /* --- account.css --- */
+  @media (max-width: 420px) {
+    .account-card {
+      padding: 24px 20px;
+      border-radius: 18px;
+    }
+  }
+
+  /* --- admin.css --- */
+  @media (max-width: 380px) {
+    .admin-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-stat-caption {
+      min-height: 0;
+    }
+  }
+
+}

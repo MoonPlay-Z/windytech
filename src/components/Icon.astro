@@ -1,5 +1,6 @@
 ---
 import { Icon as AstroIcon } from 'astro-icon/components';
+import { resolveIcon } from '../lib/icons';
 
 interface Props {
   name: string;
@@ -9,49 +10,7 @@ interface Props {
 
 const { name, size = 24, class: className = '' } = Astro.props;
 
-const icons: Record<string, string> = {
-  // Servicios
-  code: 'lucide:code-xml',
-  chat: 'lucide:messages-square',
-  bot: 'lucide:bot',
-  layout: 'lucide:layout-template',
-  chart: 'lucide:trending-up',
-  network: 'lucide:network',
-  monitor: 'lucide:monitor-smartphone',
-  // Interfaz
-  zap: 'lucide:zap',
-  check: 'lucide:circle-check',
-  'check-simple': 'lucide:check',
-  'arrow-right': 'lucide:arrow-right',
-  'arrow-up-right': 'lucide:arrow-up-right',
-  shield: 'lucide:shield-check',
-  clock: 'lucide:clock',
-  sparkles: 'lucide:sparkles',
-  globe: 'lucide:globe',
-  mail: 'lucide:mail',
-  copy: 'lucide:copy',
-  x: 'simple-icons:x',
-  telegram: 'simple-icons:telegram',
-  card: 'lucide:credit-card',
-  menu: 'lucide:menu',
-  close: 'lucide:x',
-  // Marcas (aplicaciones de destino)
-  whatsapp: 'simple-icons:whatsapp',
-  binance: 'simple-icons:binance',
-  paypal: 'simple-icons:paypal',
-  google: 'simple-icons:google',
-  instagram: 'simple-icons:instagram',
-  linkedin: 'simple-icons:linkedin',
-  facebook: 'simple-icons:facebook',
-};
-
-const iconName = icons[name] ?? `lucide:${name}`;
+const iconName = resolveIcon(name);
 ---
 
-<AstroIcon
-  name={iconName as any}
-  size={size}
-  class={className || undefined}
-  aria-hidden="true"
-  focusable="false"
-/>
+<AstroIcon name={iconName} size={size} class={className} />

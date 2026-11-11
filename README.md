@@ -40,7 +40,10 @@ src/
   lib/            API, auth, base de datos Drizzle, catálogo, precios, seguridad
   pages/          marketing (/, /servicios/*, /nosotros/…), /cuenta/*, /admin/*, /api/*
   scripts/        JS de cliente (panel, cuenta, carrito)
-  styles/         global.css, account.css, admin.css
+  styles/         estilos base: global.css, catalog.css, detail.css, cart.css,
+                  account.css, admin.css
+  styles/responsive/  ajustes por dispositivo (desktop, tablet, mobile, small)
+  lib/icons.ts    registro de iconos del sitio (grupos por familia)
   middleware.ts   cabeceras de seguridad y caché
 drizzle/          SQL histórico de referencia (el esquema se sincroniza con db:push)
 public/
@@ -59,6 +62,26 @@ render.yaml       despliegue del servicio web Node en Render
 .github/workflows/seo.yml  CI de check y build
 SEO-GEO.md        guía de SEO, GEO y presencia en buscadores
 ```
+
+## Sistema responsive (modular por dispositivo)
+
+Los estilos base de cada bloque viven en `src/styles/*.css` y **todos los ajustes
+de pantalla están separados por dispositivo** en `src/styles/responsive/`:
+
+| Archivo | Dispositivo | Anchos |
+|---|---|---|
+| `desktop.css` | PC | desde 1181 px |
+| `tablet.css` | Tablet | 721 – 1180 px (y vertical ≤ 980 px) |
+| `mobile.css` | Móvil | hasta 720 px |
+| `small.css` | Móvil pequeño | hasta 420 px |
+
+`src/styles/responsive/index.css` los importa y declara el orden de capas
+(`@layer base, responsive`): así los ajustes de pantalla **siempre ganan** a los
+estilos base, sin importar cómo se empaqueten los archivos.
+
+Los iconos están centralizados en `src/lib/icons.ts`, agrupados por familia
+(servicios, interfaz, comercio, cuenta y marcas). El test `npm test` comprueba
+que ningún `<Icon name="...">` de las plantillas use un nombre sin registrar.
 
 ## Dónde editar
 

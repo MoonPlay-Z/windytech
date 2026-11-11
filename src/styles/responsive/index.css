@@ -1,0 +1,23 @@
+/* ==========================================================================
+   Sistema responsive
+   --------------------------------------------------------------------------
+   Las reglas base viven en los estilos de cada bloque (global, catalog,
+   detail, cart, account, admin) y los ajustes por dispositivo están aquí,
+   separados por archivo:
+
+     desktop.css → PC        (desde 1181 px)
+     tablet.css  → Tablet    (721 px – 1180 px)
+     mobile.css  → Móvil     (hasta 720 px)
+     small.css   → Móvil pequeño (hasta 420 px)
+
+   El orden de las capas (@layer base, responsive) garantiza que los ajustes
+   de pantalla ganen siempre a los estilos base, sin importar en qué orden
+   se empaqueten los archivos.
+   ========================================================================== */
+
+@layer base, responsive;
+
+@import './desktop.css';
+@import './tablet.css';
+@import './mobile.css';
+@import './small.css';

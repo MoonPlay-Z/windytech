@@ -1,3 +1,4 @@
+@layer base {
 /* ---------------------------------------------------------------------------
    Páginas de detalle: producto, artículo, proyecto y cotización.
    Mismo sistema que el resto del sitio (tarjetas, bordes suaves, tokens).
@@ -157,11 +158,6 @@
   align-items: start;
 }
 
-@media (max-width: 900px) {
-  .product-detail {
-    grid-template-columns: 1fr;
-  }
-}
 
 .product-gallery {
   display: grid;
@@ -703,29 +699,4 @@
   font-size: 12.5px;
   line-height: 1.55;
 }
-
-@media (max-width: 980px) {
-  .quote-row {
-    grid-template-columns: minmax(0, 1fr) 54px 92px;
-  }
-}
-
-@media (max-width: 720px) {
-  .product-specs dl > div {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-
-  .quote-row {
-    grid-template-columns: minmax(0, 1fr) 92px;
-  }
-
-  .quote-row > span:nth-child(2) {
-    display: none;
-  }
-
-  .quote-customer > div {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
 }

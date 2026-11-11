@@ -1,0 +1,31 @@
+/* ==========================================================================
+   PC — desde 1181 px
+   ========================================================================== */
+
+/* En pantallas anchas se abre el respiro: más aire entre secciones, rejillas
+   con más separación y la ficha de producto con columnas más separadas.
+   Todo lo demás es estilo base y no necesita ajustes. */
+
+@layer responsive {
+  @media (min-width: 1181px) {
+    .section {
+      padding: 96px 0;
+    }
+
+    .plan-grid {
+      gap: 26px;
+    }
+
+    .service-grid {
+      gap: 28px;
+    }
+
+    .product-detail {
+      gap: 56px;
+    }
+
+    .catalog-filters {
+      margin-top: -42px;
+    }
+  }
+}
