@@ -1,6 +1,7 @@
 ---
 import '../../styles/global.css';
 import '../../styles/admin.css';
+import { ClientRouter } from 'astro:transitions';
 import type { AdminSession } from '../../lib/auth';
 import AdminNav from './AdminNav.astro';
 import { site } from '../../data/site';
@@ -24,6 +25,7 @@ const { title, admin, active } = Astro.props;
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="preload" href="/assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <ClientRouter />
   </head>
   <body class="admin-body">
     <div class="admin-shell">

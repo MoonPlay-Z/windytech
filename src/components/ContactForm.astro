@@ -82,29 +82,35 @@ const f = t.contact.form;
 </form>
 
 <script>
-  const forms = document.querySelectorAll<HTMLFormElement>('[data-contact-form]');
+  function initContactForms() {
+    document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+      if (form.dataset.wtBound === 'true') return;
+      form.dataset.wtBound = 'true';
 
-  forms.forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-      const data = new FormData(form);
-      const name = String(data.get('name') ?? '').trim();
-      const business = String(data.get('business') ?? '').trim();
-      const service = String(data.get('service') ?? '').trim();
-      const message = String(data.get('message') ?? '').trim();
-      const lang = form.dataset.lang ?? 'es';
-      const number = form.dataset.waNumber ?? '584127723148';
+        const data = new FormData(form);
+        const name = String(data.get('name') ?? '').trim();
+        const business = String(data.get('business') ?? '').trim();
+        const service = String(data.get('service') ?? '').trim();
+        const message = String(data.get('message') ?? '').trim();
+        const lang = form.dataset.lang ?? 'es';
+        const number = form.dataset.waNumber ?? '584127723148';
 
-      const intro =
-        lang === 'en'
-          ? `Hello Windytech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
-          : `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
+        const intro =
+          lang === 'en'
+            ? `Hello Windytech, my name is ${name}${business ? ` from ${business}` : ''}. I'm interested in ${service}.`
+            : `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
 
-      const text = `${intro}${message ? `\n\n${message}` : ''}`;
-      const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+        const text = `${intro}${message ? `\n\n${message}` : ''}`;
+        const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 
-      window.open(url, '_blank', 'noopener,noreferrer');
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
     });
-  });
+  }
+
+  initContactForms();
+  document.addEventListener('astro:page-load', initContactForms);
 </script>

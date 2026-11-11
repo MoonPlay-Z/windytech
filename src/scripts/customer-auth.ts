@@ -3,9 +3,11 @@ type AuthResponse = {
   error?: string;
 };
 
-const form = document.querySelector<HTMLFormElement>('[data-auth-form]');
+function initCustomerAuth() {
+  const form = document.querySelector<HTMLFormElement>('[data-auth-form]');
+  if (!form || form.dataset.wtBound === 'true') return;
+  form.dataset.wtBound = 'true';
 
-if (form) {
   const message = document.querySelector<HTMLElement>('[data-auth-message]');
   const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
 
@@ -49,4 +51,15 @@ if (form) {
 // El botón de cerrar sesión lo gestiona el script del Header (presente en todas
 // las páginas), que enlaza todos los elementos [data-logout-button]. Evitamos
 // aquí un segundo listener que provocaría dos peticiones de logout.
+
+function bootCustomerAuth() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCustomerAuth, { once: true });
+  } else {
+    initCustomerAuth();
+  }
+  document.addEventListener('astro:page-load', initCustomerAuth);
+}
+
+bootCustomerAuth();
 

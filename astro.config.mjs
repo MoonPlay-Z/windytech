@@ -10,6 +10,12 @@ export default defineConfig({
   integrations: [icon()],
   adapter: node({ mode: 'standalone' }),
   output: 'server',
+  // Precarga los enlaces al pasar el ratón para que la navegación cliente sea
+  // casi instantánea, incluso en páginas renderizadas bajo demanda.
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   build: {
     format: 'directory',
     inlineStylesheets: 'always',

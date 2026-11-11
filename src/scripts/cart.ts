@@ -222,8 +222,13 @@ async function refreshCart() {
   else renderCart();
 }
 
+const boundButtons = new WeakSet<HTMLButtonElement>();
+
 function setupAddButtons() {
   document.querySelectorAll<HTMLButtonElement>('[data-add-to-cart]').forEach((button) => {
+    if (boundButtons.has(button)) return;
+    boundButtons.add(button);
+
     button.addEventListener('click', () => {
       const dataset = button.dataset;
       const productId = Number(dataset.id);
@@ -255,6 +260,9 @@ function setupAddButtons() {
 
 function setupCurrencySwitch() {
   document.querySelectorAll<HTMLButtonElement>('[data-currency-option]').forEach((button) => {
+    if (boundButtons.has(button)) return;
+    boundButtons.add(button);
+
     button.addEventListener('click', () => {
       const value = button.dataset.currencyOption;
       if (value !== 'USD' && value !== 'VES') return;
@@ -267,7 +275,8 @@ function setupCurrencySwitch() {
 
 function setupQuoteForm() {
   const form = document.querySelector<HTMLFormElement>('[data-quote-form]');
-  if (!form) return;
+  if (!form || form.dataset.wtBound === 'true') return;
+  form.dataset.wtBound = 'true';
   const startedAt = Date.now();
 
   form.addEventListener('submit', async (event) => {
@@ -345,6 +354,8 @@ function setupQuoteForm() {
   });
 }
 
+let globalsBound = false;
+
 function setup() {
   updateCounts();
   applyCurrency();
@@ -355,6 +366,10 @@ function setup() {
     renderCart();
     void refreshCart();
   }
+
+  if (globalsBound) return;
+  globalsBound = true;
+
   window.addEventListener('wt:cart-updated', () => {
     renderCart();
     applyCurrency();
@@ -366,8 +381,13 @@ function setup() {
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', setup);
-} else {
-  setup();
+function initCart() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup, { once: true });
+  } else {
+    setup();
+  }
+  document.addEventListener('astro:page-load', setup);
 }
+
+initCart();

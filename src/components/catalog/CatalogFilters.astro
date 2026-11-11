@@ -75,9 +75,17 @@ const conditions = Object.entries(conditionLabels[locale]) as [string, string][]
 </form>
 
 <script>
-  document.querySelectorAll<HTMLFormElement>('[data-catalog-filters]').forEach((form) => {
-    form.querySelectorAll('select').forEach((select) => {
-      select.addEventListener('change', () => form.requestSubmit());
+  function initCatalogFilters() {
+    document.querySelectorAll<HTMLFormElement>('[data-catalog-filters]').forEach((form) => {
+      if (form.dataset.wtBound === 'true') return;
+      form.dataset.wtBound = 'true';
+
+      form.querySelectorAll('select').forEach((select) => {
+        select.addEventListener('change', () => form.requestSubmit());
+      });
     });
-  });
+  }
+
+  initCatalogFilters();
+  document.addEventListener('astro:page-load', initCatalogFilters);
 </script>

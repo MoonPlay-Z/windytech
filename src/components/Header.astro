@@ -147,89 +147,104 @@ const isLoggedIn = Boolean(customer);
 </header>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
-  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  let cleanupHeader: (() => void) | null = null;
 
-  if (toggle && nav) {
-    const setOpen = (open: boolean) => {
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? toggle.dataset.closeLabel ?? 'Cerrar menú' : toggle.dataset.openLabel ?? 'Abrir menú');
-      nav.dataset.open = String(open);
-      document.body.classList.toggle('nav-open', open);
-    };
+  function initHeader() {
+    cleanupHeader?.();
+    cleanupHeader = null;
+    document.body.classList.remove('nav-open');
 
-    toggle.addEventListener('click', () => {
-      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
-    });
+    const controller = new AbortController();
+    const { signal } = controller;
+    cleanupHeader = () => controller.abort();
 
-    nav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => setOpen(false));
-    });
+    const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+    const nav = document.querySelector<HTMLElement>('[data-nav]');
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') setOpen(false);
+    if (toggle && nav) {
+      const setOpen = (open: boolean) => {
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? toggle.dataset.closeLabel ?? 'Cerrar menú' : toggle.dataset.openLabel ?? 'Abrir menú');
+        nav.dataset.open = String(open);
+        document.body.classList.toggle('nav-open', open);
+      };
+
+      toggle.addEventListener('click', () => {
+        setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+      }, { signal });
+
+      nav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => setOpen(false), { signal });
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') setOpen(false);
+      }, { signal });
+    }
+
+    /* --- Menú de perfil desplegable --- */
+    const profileToggle = document.querySelector<HTMLButtonElement>('[data-profile-toggle]');
+    const profileMenu = document.querySelector<HTMLElement>('[data-profile-menu]');
+    const profileDropdown = document.querySelector<HTMLElement>('[data-profile-dropdown]');
+
+    if (profileToggle && profileMenu && profileDropdown) {
+      const closeDropdown = () => {
+        profileToggle.setAttribute('aria-expanded', 'false');
+        profileDropdown.hidden = true;
+        profileMenu.removeAttribute('data-open');
+      };
+
+      profileToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isOpen = profileToggle.getAttribute('aria-expanded') === 'true';
+        if (isOpen) {
+          closeDropdown();
+        } else {
+          profileToggle.setAttribute('aria-expanded', 'true');
+          profileDropdown.hidden = false;
+          profileMenu.setAttribute('data-open', 'true');
+        }
+      }, { signal });
+
+      // Cerrar al hacer clic en cualquier opción del menú
+      profileDropdown.querySelectorAll('[data-profile-close]').forEach((link) => {
+        link.addEventListener('click', () => closeDropdown(), { signal });
+      });
+
+      // Cerrar al hacer clic fuera
+      document.addEventListener('click', (event) => {
+        if (!profileMenu.contains(event.target as Node)) {
+          closeDropdown();
+        }
+      }, { signal });
+
+      // Cerrar con Escape
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeDropdown();
+      }, { signal });
+    }
+
+    /* --- Cerrar sesión (menú de perfil y botón de la página de cuenta) --- */
+    const logoutButtons = document.querySelectorAll<HTMLButtonElement>('[data-logout-button]');
+    logoutButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        logoutButtons.forEach((item) => (item.disabled = true));
+        try {
+          const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'No se pudo cerrar la sesión.');
+          window.location.assign('/cuenta/login/');
+        } catch (error) {
+          logoutButtons.forEach((item) => (item.disabled = false));
+          alert(error instanceof Error ? error.message : 'No se pudo cerrar la sesión.');
+        }
+      }, { signal });
     });
   }
 
-  /* --- Menú de perfil desplegable --- */
-  const profileToggle = document.querySelector<HTMLButtonElement>('[data-profile-toggle]');
-  const profileMenu = document.querySelector<HTMLElement>('[data-profile-menu]');
-  const profileDropdown = document.querySelector<HTMLElement>('[data-profile-dropdown]');
-
-  if (profileToggle && profileMenu && profileDropdown) {
-    const closeDropdown = () => {
-      profileToggle.setAttribute('aria-expanded', 'false');
-      profileDropdown.hidden = true;
-      profileMenu.removeAttribute('data-open');
-    };
-
-    profileToggle.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const isOpen = profileToggle.getAttribute('aria-expanded') === 'true';
-      if (isOpen) {
-        closeDropdown();
-      } else {
-        profileToggle.setAttribute('aria-expanded', 'true');
-        profileDropdown.hidden = false;
-        profileMenu.setAttribute('data-open', 'true');
-      }
-    });
-
-    // Cerrar al hacer clic en cualquier opción del menú
-    profileDropdown.querySelectorAll('[data-profile-close]').forEach((link) => {
-      link.addEventListener('click', () => closeDropdown());
-    });
-
-    // Cerrar al hacer clic fuera
-    document.addEventListener('click', (event) => {
-      if (!profileMenu.contains(event.target as Node)) {
-        closeDropdown();
-      }
-    });
-
-    // Cerrar con Escape
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeDropdown();
-    });
-  }
-
-  /* --- Cerrar sesión (menú de perfil y botón de la página de cuenta) --- */
-  const logoutButtons = document.querySelectorAll<HTMLButtonElement>('[data-logout-button]');
-  logoutButtons.forEach((button) => {
-    button.addEventListener('click', async () => {
-      logoutButtons.forEach((item) => (item.disabled = true));
-      try {
-        const response = await fetch('/api/auth/logout', {
-          method: 'POST',
-          credentials: 'same-origin',
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'No se pudo cerrar la sesión.');
-        window.location.assign('/cuenta/login/');
-      } catch (error) {
-        logoutButtons.forEach((item) => (item.disabled = false));
-        alert(error instanceof Error ? error.message : 'No se pudo cerrar la sesión.');
-      }
-    });
-  });
+  initHeader();
+  document.addEventListener('astro:page-load', initHeader);
 </script>

@@ -60,37 +60,53 @@ const users = await listAdmins();
 </AdminLayout>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('[data-reset-password]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const userId = button.dataset.userId;
-      const userEmail = button.dataset.userEmail;
-      if (!userId) return;
+  function initResetPasswords() {
+    document.querySelectorAll<HTMLButtonElement>('[data-reset-password]').forEach((button) => {
+      if (button.dataset.wtBound === 'true') return;
+      button.dataset.wtBound = 'true';
 
-      const original = button.textContent;
-      button.disabled = true;
-      button.textContent = 'Restableciendo...';
+      button.addEventListener('click', async () => {
+        const userId = button.dataset.userId;
+        const userEmail = button.dataset.userEmail;
+        if (!userId) return;
 
-      try {
-        const response = await fetch(`/api/admin/users/${userId}/password`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-        });
-        const data = await response.json();
+        const original = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Restableciendo...';
 
-        if (!response.ok || !data.success) {
-          throw new Error(data.error || 'No se pudo restablecer la clave.');
+        try {
+          const response = await fetch(`/api/admin/users/${userId}/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+          });
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'No se pudo restablecer la clave.');
+          }
+
+          alert(
+            `Nueva contraseña temporal para ${userEmail}:\n${data.temporaryPassword}\n\nCompártesela al usuario.`,
+          );
+        } catch (error) {
+          alert(error instanceof Error ? error.message : 'Error inesperado.');
+        } finally {
+          button.disabled = false;
+          button.textContent = original;
         }
-
-        alert(
-          `Nueva contraseña temporal para ${userEmail}:\n${data.temporaryPassword}\n\nCompártesela al usuario.`,
-        );
-      } catch (error) {
-        alert(error instanceof Error ? error.message : 'Error inesperado.');
-      } finally {
-        button.disabled = false;
-        button.textContent = original;
-      }
+      });
     });
-  });
+  }
+
+  function boot() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initResetPasswords, { once: true });
+    } else {
+      initResetPasswords();
+    }
+    document.addEventListener('astro:page-load', initResetPasswords);
+  }
+
+  boot();
 </script>

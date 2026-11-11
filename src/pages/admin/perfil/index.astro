@@ -70,10 +70,13 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 </AdminLayout>
 
 <script>
-  const form = document.getElementById('admin-profile-form') as HTMLFormElement;
-  const message = document.querySelector<HTMLElement>('[data-form-message]');
+  function initAdminProfile() {
+    const form = document.getElementById('admin-profile-form') as HTMLFormElement | null;
+    if (!form || form.dataset.wtBound === 'true') return;
+    form.dataset.wtBound = 'true';
 
-  if (form) {
+    const message = document.querySelector<HTMLElement>('[data-form-message]');
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (message) { message.hidden = true; message.textContent = ''; }
@@ -111,4 +114,15 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
       }
     });
   }
+
+  function boot() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAdminProfile, { once: true });
+    } else {
+      initAdminProfile();
+    }
+    document.addEventListener('astro:page-load', initAdminProfile);
+  }
+
+  boot();
 </script>

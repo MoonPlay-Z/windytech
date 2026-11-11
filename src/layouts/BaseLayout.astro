@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
@@ -348,6 +349,7 @@ const schemaGraph = {
     />
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />
+    <ClientRouter />
   </head>
   <body data-currency-default={currencyDefault}>
     <a class="skip-link" href="#main">{skipLabel}</a>

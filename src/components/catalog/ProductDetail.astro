@@ -339,65 +339,76 @@ const productSchema: Record<string, unknown> = {
 <script>
   import '../../scripts/cart';
 
-  const priceNode = document.querySelector<HTMLElement>('[data-price-now]');
-  const oldNode = document.querySelector<HTMLElement>('[data-price-old]');
-  const availabilityNote = document.querySelector<HTMLElement>('[data-availability-note]');
-  const addButton = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
-  const mainImage = document.querySelector<HTMLImageElement>('[data-main-image]');
+  function initProductDetail() {
+    const priceNode = document.querySelector<HTMLElement>('[data-price-now]');
+    const oldNode = document.querySelector<HTMLElement>('[data-price-old]');
+    const availabilityNote = document.querySelector<HTMLElement>('[data-availability-note]');
+    const addButton = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
+    const mainImage = document.querySelector<HTMLImageElement>('[data-main-image]');
 
-  document.querySelectorAll<HTMLButtonElement>('[data-variant-option]').forEach((option) => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('[data-variant-option]').forEach((entry) => {
-        entry.setAttribute('aria-pressed', String(entry === option));
-        entry.classList.toggle('is-selected', entry === option);
+    document.querySelectorAll<HTMLButtonElement>('[data-variant-option]').forEach((option) => {
+      if (option.dataset.wtBound === 'true') return;
+      option.dataset.wtBound = 'true';
+
+      option.addEventListener('click', () => {
+        document.querySelectorAll('[data-variant-option]').forEach((entry) => {
+          entry.setAttribute('aria-pressed', String(entry === option));
+          entry.classList.toggle('is-selected', entry === option);
+        });
+
+        const price = Number(option.dataset.price ?? '0');
+        const ves = Number(option.dataset.ves ?? '0');
+        const old = Number(option.dataset.old ?? '0');
+        const oldVes = Number(option.dataset.oldVes ?? '0');
+
+        if (priceNode) {
+          priceNode.dataset.usd = String(price);
+          priceNode.dataset.ves = String(ves);
+        }
+        if (oldNode) {
+          oldNode.dataset.usd = String(old);
+          oldNode.dataset.ves = String(oldVes);
+          oldNode.hidden = old <= price;
+        }
+        if (availabilityNote) {
+          const availability = option.dataset.availability ?? 'IN_STOCK';
+          const label =
+            availability === 'IN_STOCK'
+              ? availabilityNote.dataset.labelInStock
+              : availability === 'PREORDER'
+                ? availabilityNote.dataset.labelPreorder
+                : availabilityNote.dataset.labelOut;
+          availabilityNote.innerHTML = `<span class="product-availability is-${availability.toLowerCase()}">${label}</span>`;
+        }
+        if (addButton) {
+          addButton.dataset.variant = option.dataset.variantId ?? '';
+          addButton.dataset.variantLabel = option.dataset.variantLabel ?? '';
+          addButton.dataset.price = String(price);
+          addButton.dataset.availability = option.dataset.availability ?? 'IN_STOCK';
+          addButton.disabled = option.dataset.availability === 'OUT_OF_STOCK';
+        }
+
+        const image = option.dataset.image;
+        if (mainImage && image) {
+          mainImage.src = image;
+          mainImage.srcset = option.dataset.imageSrcset ?? '';
+        }
+        window.dispatchEvent(new CustomEvent('wt:prices-updated'));
       });
-
-      const price = Number(option.dataset.price ?? '0');
-      const ves = Number(option.dataset.ves ?? '0');
-      const old = Number(option.dataset.old ?? '0');
-      const oldVes = Number(option.dataset.oldVes ?? '0');
-
-      if (priceNode) {
-        priceNode.dataset.usd = String(price);
-        priceNode.dataset.ves = String(ves);
-      }
-      if (oldNode) {
-        oldNode.dataset.usd = String(old);
-        oldNode.dataset.ves = String(oldVes);
-        oldNode.hidden = old <= price;
-      }
-      if (availabilityNote) {
-        const availability = option.dataset.availability ?? 'IN_STOCK';
-        const label =
-          availability === 'IN_STOCK'
-            ? availabilityNote.dataset.labelInStock
-            : availability === 'PREORDER'
-              ? availabilityNote.dataset.labelPreorder
-              : availabilityNote.dataset.labelOut;
-        availabilityNote.innerHTML = `<span class="product-availability is-${availability.toLowerCase()}">${label}</span>`;
-      }
-      if (addButton) {
-        addButton.dataset.variant = option.dataset.variantId ?? '';
-        addButton.dataset.variantLabel = option.dataset.variantLabel ?? '';
-        addButton.dataset.price = String(price);
-        addButton.dataset.availability = option.dataset.availability ?? 'IN_STOCK';
-        addButton.disabled = option.dataset.availability === 'OUT_OF_STOCK';
-      }
-
-      const image = option.dataset.image;
-      if (mainImage && image) {
-        mainImage.src = image;
-        mainImage.srcset = option.dataset.imageSrcset ?? '';
-      }
-      window.dispatchEvent(new CustomEvent('wt:prices-updated'));
     });
-  });
 
-  document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((thumb) => {
-    thumb.addEventListener('click', () => {
-      if (!mainImage) return;
-      mainImage.src = thumb.dataset.full ?? mainImage.src;
-      mainImage.srcset = thumb.dataset.srcset ?? mainImage.srcset;
+    document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((thumb) => {
+      if (thumb.dataset.wtBound === 'true') return;
+      thumb.dataset.wtBound = 'true';
+
+      thumb.addEventListener('click', () => {
+        if (!mainImage) return;
+        mainImage.src = thumb.dataset.full ?? mainImage.src;
+        mainImage.srcset = thumb.dataset.srcset ?? mainImage.srcset;
+      });
     });
-  });
+  }
+
+  initProductDetail();
+  document.addEventListener('astro:page-load', initProductDetail);
 </script>

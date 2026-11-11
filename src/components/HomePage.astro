@@ -421,12 +421,21 @@ const shareText = `${title} — ${shareUrl}`;
 </BaseLayout>
 
 <script>
-  const hero = document.querySelector<HTMLElement>('.hero');
-  const root = hero?.querySelector<HTMLElement>('#heroBg');
-  const canvas = root?.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
-  const canvasContext = canvas?.getContext('2d');
+  let cleanupHero: (() => void) | null = null;
 
-  if (hero && root && canvas && canvasContext) {
+  function initHero() {
+    cleanupHero?.();
+    cleanupHero = null;
+
+    const hero = document.querySelector<HTMLElement>('.hero');
+    const root = hero?.querySelector<HTMLElement>('#heroBg');
+    const canvas = root?.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+    const canvasContext = canvas?.getContext('2d');
+
+    if (!hero || !root || !canvas || !canvasContext) return;
+
+    const controller = new AbortController();
+    const { signal } = controller;
     const context: CanvasRenderingContext2D = canvasContext;
     type NodeKind = 'logo' | 'laptop' | 'phone' | 'chat' | 'insta' | 'desktop' | 'fb' | 'tiktok' | 'inn' | 'yt';
 
@@ -815,12 +824,12 @@ const shareText = `${title} — ${shareUrl}`;
       else requestFrame();
     };
 
-    hero.addEventListener('pointermove', updatePointer, { passive: true });
+    hero.addEventListener('pointermove', updatePointer, { passive: true, signal });
     hero.addEventListener('pointerleave', () => {
       pointer.inside = false;
       if (reduceMotion.matches) draw(0, false);
       else requestFrame();
-    });
+    }, { signal });
     hero.addEventListener('pointerdown', (event) => {
       updatePointer(event);
       const hit = nodes.find((node) => Math.hypot(node.centerX - pointer.x, node.centerY - pointer.y) < node.radius);
@@ -851,7 +860,7 @@ const shareText = `${title} — ${shareUrl}`;
       }
       if (reduceMotion.matches) draw(0, false);
       else requestFrame();
-    }, { passive: true });
+    }, { passive: true, signal });
 
     const updateVisibility = () => {
       active = visible && !document.hidden;
@@ -870,33 +879,67 @@ const shareText = `${title} — ${shareUrl}`;
       updateVisibility();
     });
     observer.observe(hero);
-    document.addEventListener('visibilitychange', updateVisibility);
-    reduceMotion.addEventListener('change', updateVisibility);
-    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(resize).observe(hero);
-    else window.addEventListener('resize', resize, { passive: true });
+    document.addEventListener('visibilitychange', updateVisibility, { signal });
+    reduceMotion.addEventListener('change', updateVisibility, { signal });
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(hero);
+    } else {
+      window.addEventListener('resize', resize, { passive: true, signal });
+    }
+
+    cleanupHero = () => {
+      controller.abort();
+      observer.disconnect();
+      resizeObserver?.disconnect();
+      if (frameId) window.cancelAnimationFrame(frameId);
+      frameId = 0;
+      root.querySelectorAll(':scope > .node, :scope > .fl').forEach((node) => node.remove());
+    };
+
     resize();
   }
 
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-share]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const label = button.querySelector('span');
-      const status = document.querySelector<HTMLElement>('[data-share-status]');
-      if (!label || !status) return;
+  function initShareButtons() {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-share]').forEach((button) => {
+      if (button.dataset.wtBound === 'true') return;
+      button.dataset.wtBound = 'true';
 
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        label.textContent = button.dataset.copiedLabel ?? label.textContent;
-        status.textContent = button.dataset.copiedLabel ?? '';
-      } catch {
-        const errorMessage = button.dataset.errorLabel ?? '';
-        status.textContent = errorMessage;
-        label.textContent = errorMessage;
-      }
+      button.addEventListener('click', async () => {
+        const label = button.querySelector('span');
+        const status = document.querySelector<HTMLElement>('[data-share-status]');
+        if (!label || !status) return;
 
-      window.setTimeout(() => {
-        label.textContent = button.dataset.copyLabel ?? '';
-        status.textContent = '';
-      }, 3000);
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          label.textContent = button.dataset.copiedLabel ?? label.textContent;
+          status.textContent = button.dataset.copiedLabel ?? '';
+        } catch {
+          const errorMessage = button.dataset.errorLabel ?? '';
+          status.textContent = errorMessage;
+          label.textContent = errorMessage;
+        }
+
+        window.setTimeout(() => {
+          label.textContent = button.dataset.copyLabel ?? '';
+          status.textContent = '';
+        }, 3000);
+      });
     });
+  }
+
+  document.addEventListener('astro:before-swap', () => {
+    cleanupHero?.();
+    cleanupHero = null;
   });
+
+  function initPage() {
+    initHero();
+    initShareButtons();
+  }
+
+  initPage();
+  document.addEventListener('astro:page-load', initPage);
 </script>

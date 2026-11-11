@@ -74,7 +74,8 @@ async function submitJson(url: string, method: string, body?: unknown) {
 
 function setupLogin() {
   const form = document.querySelector<HTMLFormElement>('[data-login-form]');
-  if (!form) return;
+  if (!form || form.dataset.wtBound === 'true') return;
+  form.dataset.wtBound = 'true';
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const data = new FormData(form);
@@ -92,6 +93,9 @@ function setupLogin() {
 
 function setupLogout() {
   document.querySelectorAll<HTMLButtonElement>('[data-logout]').forEach((button) => {
+    if (button.dataset.wtBound === 'true') return;
+    button.dataset.wtBound = 'true';
+
     button.addEventListener('click', async () => {
       button.disabled = true;
       try {
@@ -114,6 +118,9 @@ function setupLogout() {
 
 function setupForms() {
   document.querySelectorAll<HTMLFormElement>('[data-admin-form]').forEach((form) => {
+    if (form.dataset.wtBound === 'true') return;
+    form.dataset.wtBound = 'true';
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const endpoint = form.dataset.endpoint ?? '';
@@ -136,6 +143,9 @@ function setupForms() {
 
 function setupDelete() {
   document.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach((button) => {
+    if (button.dataset.wtBound === 'true') return;
+    button.dataset.wtBound = 'true';
+
     button.addEventListener('click', async () => {
       const endpoint = button.dataset.delete ?? '';
       const confirmText = button.dataset.confirm ?? '¿Eliminar este registro?';
@@ -159,6 +169,9 @@ type UploadItem = {
 
 function setupUploaders() {
   document.querySelectorAll<HTMLElement>('[data-uploader]').forEach((root) => {
+    if (root.dataset.wtBound === 'true') return;
+    root.dataset.wtBound = 'true';
+
     const folder = root.dataset.folder ?? 'windytech/media';
     const mode = root.dataset.mode === 'single' ? 'single' : 'multi';
     const hidden = root.querySelector<HTMLInputElement>('[data-upload-value]');
@@ -276,6 +289,9 @@ function setupUploaders() {
 
 function setupQuoteStatus() {
   document.querySelectorAll<HTMLSelectElement>('[data-quote-status]').forEach((select) => {
+    if (select.dataset.wtBound === 'true') return;
+    select.dataset.wtBound = 'true';
+
     select.addEventListener('change', async () => {
       try {
         await submitJson('/api/admin/quotes', 'PATCH', {
@@ -299,5 +315,13 @@ function initAdmin() {
   setupQuoteStatus();
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAdmin);
-else initAdmin();
+function bootAdmin() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin, { once: true });
+  } else {
+    initAdmin();
+  }
+  document.addEventListener('astro:page-load', initAdmin);
+}
+
+bootAdmin();
