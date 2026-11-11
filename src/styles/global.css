@@ -2680,11 +2680,18 @@ a.contact-card:hover {
 }
 
 /* Variables de dirección: los pseudo-elementos de View Transitions heredan
-   las custom properties del elemento raíz. */
+   las custom properties del elemento raíz. El panel de administración las
+   sobrescribe (ver admin.css) para usar otro tipo de transición. */
 :root {
   --wt-page-out-name: wt-page-turn-out;
+  --wt-page-in-name: none;
   --wt-page-out-origin: left center;
   --wt-page-shadow: 40px 0 80px rgba(10, 30, 45, 0.32);
+  --wt-page-out-z: 2;
+  --wt-page-in-z: 1;
+  --wt-page-out-duration: 520ms;
+  --wt-page-in-duration: 520ms;
+  --wt-page-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html[data-astro-transition='back'] {
@@ -2698,20 +2705,23 @@ html[data-astro-transition='back'] {
      como una hoja que se pasa; la entrante espera quieta debajo y queda al
      descubierto. El marco (cabecera, barra, WhatsApp y pie) no se mueve. */
   ::view-transition-old(root) {
-    z-index: 2;
+    z-index: var(--wt-page-out-z, 2);
     backface-visibility: hidden;
     transform-origin: var(--wt-page-out-origin, left center);
     animation-name: var(--wt-page-out-name, wt-page-turn-out);
-    animation-duration: 520ms;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-duration: var(--wt-page-out-duration, 520ms);
+    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
     animation-fill-mode: both;
     box-shadow: var(--wt-page-shadow, 40px 0 80px rgba(10, 30, 45, 0.32));
   }
 
   ::view-transition-new(root) {
-    z-index: 1;
+    z-index: var(--wt-page-in-z, 1);
     backface-visibility: hidden;
-    animation: none;
+    animation-name: var(--wt-page-in-name, none);
+    animation-duration: var(--wt-page-in-duration, 520ms);
+    animation-timing-function: var(--wt-page-easing, cubic-bezier(0.4, 0, 0.2, 1));
+    animation-fill-mode: both;
   }
 
   /* El encabezado, la barra de campaña, el botón flotante y el pie no

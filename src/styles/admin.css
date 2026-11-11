@@ -1077,3 +1077,52 @@
   color: var(--muted);
   font-size: 12px;
 }
+
+/* ---------------------------------------------------------------------------
+   Transiciones del panel (ClientRouter)
+   --------------------------------------------------------------------------- */
+/* En el panel la nueva página se interpone sobre la anterior y esta
+   desaparece con un fundido. El menú lateral queda intacto: nunca se mueve
+   ni se vuelve a dibujar durante la transición. */
+.admin-page .admin-sidebar {
+  view-transition-name: admin-sidebar;
+}
+
+html.admin-page {
+  --wt-page-out-name: wt-admin-out;
+  --wt-page-in-name: wt-admin-in;
+  --wt-page-out-z: 1;
+  --wt-page-in-z: 2;
+  --wt-page-out-duration: 150ms;
+  --wt-page-in-duration: 240ms;
+  --wt-page-easing: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --wt-page-shadow: none;
+}
+
+/* Los pseudo-elementos del menú lateral se fijan: sin fundido ni movimiento.
+   (Los selectores de pseudo-elementos de View Transitions no admiten ancestros,
+   por eso van sin el prefijo `html.admin-page`.) */
+::view-transition-old(admin-sidebar),
+::view-transition-new(admin-sidebar) {
+  animation: none;
+}
+
+@keyframes wt-admin-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes wt-admin-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
