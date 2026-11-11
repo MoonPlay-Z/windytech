@@ -2,7 +2,6 @@
 
 > Fuente canónica: https://windytech.studio/
 > Última actualización: 2026-11-09
-> Idioma principal: español. Versión en inglés: https://windytech.studio/en/
 
 Este documento resume, en texto plano y sin navegación, quién es Windytech, qué servicios
 ofrece, cómo trabaja y qué información es pública. Sirve como contexto para asistentes de IA
@@ -21,7 +20,7 @@ que necesiten citar o describir la empresa. La fuente de verdad sigue siendo el 
 - **Base:** Venezuela.
 - **Cobertura:** servicios digitales de forma remota en cualquier país. Redes,
   infraestructura y entrega física de equipos solo en Venezuela.
-- **Idiomas:** español e inglés.
+- **Idioma:** español.
 - **Medios de pago:** Binance y PayPal.
 - **Modelo de trabajo:** diagnóstico, propuesta con alcance y precio por escrito, anticipo,
   ejecución por hitos, entrega y seguimiento.
@@ -30,11 +29,8 @@ que necesiten citar o describir la empresa. La fuente de verdad sigue siendo el 
 ### Enlaces oficiales
 
 - Inicio (ES): https://windytech.studio/
-- Inicio (EN): https://windytech.studio/en/
 - Servicios (ES): https://windytech.studio/servicios/
-- Servicios (EN): https://windytech.studio/en/services/
 - Nosotros: https://windytech.studio/nosotros/
-- About: https://windytech.studio/en/about/
 - Contacto: https://windytech.studio/#contacto
 - WhatsApp: https://wa.me/584127723148
 - Correo: windytechestudio@gmail.com
@@ -214,26 +210,7 @@ cliente lo pide, pasa la conversación a una persona.
 
 ---
 
-## 4. Resumen en inglés
-
-Windytech is a digital studio based in Venezuela. It builds custom software, automates
-WhatsApp Business, designs fast mobile-ready websites, and supports businesses with SEO,
-digital advertising, office networks and IT equipment. Digital services are delivered
-remotely worldwide; network installation and physical equipment delivery are available in
-Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal. Projects
-start with a 50% deposit. No social profiles, physical address or customer reviews are
-published on the site.
-
-- Home: https://windytech.studio/en/
-- Services: https://windytech.studio/en/services/
-- About: https://windytech.studio/en/about/
-- Contact: https://windytech.studio/en/#contacto
-- WhatsApp: https://wa.me/584127723148
-- Email: windytechestudio@gmail.com
-
----
-
-## 5. Uso de este documento
+## 4. Uso de este documento
 
 Se puede citar a Windytech usando los datos de este archivo. Si un dato no aparece aquí
 —dirección exacta, año de fundación, número de empleados, clientes, testimonios o precios

@@ -22,8 +22,8 @@ const outDir = join(root, 'dist', 'client');
 const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://windytech.studio').replace(/\/$/, '');
 
 type Entry = {
-  es: string;
-  en: string;
+  /** Ruta en español (único idioma del sitio). */
+  path: string;
   changefreq: 'daily' | 'weekly' | 'monthly' | 'yearly';
   priority: string;
   lastmod?: string;
@@ -31,21 +31,20 @@ type Entry = {
 
 /** Rutas fijas del sitio (con su equivalente en inglés). */
 const staticRoutes: Entry[] = [
-  { es: '/', en: '/en/', changefreq: 'weekly', priority: '1.0' },
-  { es: '/servicios/', en: '/en/services/', changefreq: 'weekly', priority: '0.9' },
-  { es: '/catalogo/', en: '/en/catalog/', changefreq: 'daily', priority: '0.9' },
-  { es: '/proyectos/', en: '/en/projects/', changefreq: 'weekly', priority: '0.8' },
-  { es: '/blog/', en: '/en/blog/', changefreq: 'weekly', priority: '0.8' },
-  { es: '/nosotros/', en: '/en/about/', changefreq: 'monthly', priority: '0.6' },
-  { es: '/legal/privacidad/', en: '/en/legal/privacy/', changefreq: 'yearly', priority: '0.3' },
-  { es: '/legal/terminos/', en: '/en/legal/terms/', changefreq: 'yearly', priority: '0.3' },
-  { es: '/carrito/', en: '/en/cart/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/', changefreq: 'weekly', priority: '1.0' },
+  { path: '/servicios/', changefreq: 'weekly', priority: '0.9' },
+  { path: '/catalogo/', changefreq: 'daily', priority: '0.9' },
+  { path: '/proyectos/', changefreq: 'weekly', priority: '0.8' },
+  { path: '/blog/', changefreq: 'weekly', priority: '0.8' },
+  { path: '/nosotros/', changefreq: 'monthly', priority: '0.6' },
+  { path: '/legal/privacidad/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/legal/terminos/', changefreq: 'yearly', priority: '0.3' },
+  { path: '/carrito/', changefreq: 'yearly', priority: '0.3' },
 ];
 
 /** Servicios (páginas de detalle) definidos en el código. */
 const serviceRoutes: Entry[] = services.map((service) => ({
-  es: service.pathEs,
-  en: service.pathEn,
+  path: service.pathEs,
   changefreq: 'monthly',
   priority: '0.8',
 }));
@@ -63,7 +62,7 @@ function lastCommitDate(): string {
   }
 }
 
-type DbEntry = { es: string; en: string; lastmod?: string };
+type DbEntry = { path: string; lastmod?: string };
 
 /** Productos, publicaciones y proyectos que existen ahora mismo en la base. */
 async function dynamicRoutes(): Promise<DbEntry[]> {
@@ -83,17 +82,16 @@ async function dynamicRoutes(): Promise<DbEntry[]> {
          JOIN products p ON p.id = t.product_id
         WHERE p.is_active = true`,
     );
-    const byProduct = new Map<string, { es?: string; en?: string; lastmod?: string }>();
+    const byProduct = new Map<string, { path?: string; lastmod?: string }>();
     for (const row of products.rows) {
       const key = row.slug;
       const item = byProduct.get(key) ?? {};
-      if (row.locale === 'es') item.es = `/catalogo/${row.slug}/`;
-      if (row.locale === 'en') item.en = `/en/catalog/${row.slug}/`;
+      if (row.locale === 'es') item.path = `/catalogo/${row.slug}/`;
       item.lastmod = row.updated_at?.toISOString().slice(0, 10);
       byProduct.set(key, item);
     }
     for (const item of byProduct.values()) {
-      if (item.es) entries.push({ es: item.es, en: item.en ?? item.es, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
     }
 
     const posts = await pool.query<{ locale: string; slug: string; updated_at: Date; published_at: Date | null }>(
@@ -102,16 +100,15 @@ async function dynamicRoutes(): Promise<DbEntry[]> {
          JOIN posts p ON p.id = t.post_id
         WHERE p.is_published = true`,
     );
-    const byPost = new Map<string, { es?: string; en?: string; lastmod?: string }>();
+    const byPost = new Map<string, { path?: string; lastmod?: string }>();
     for (const row of posts.rows) {
       const item = byPost.get(row.slug) ?? {};
-      if (row.locale === 'es') item.es = `/blog/${row.slug}/`;
-      if (row.locale === 'en') item.en = `/en/blog/${row.slug}/`;
+      if (row.locale === 'es') item.path = `/blog/${row.slug}/`;
       item.lastmod = (row.published_at ?? row.updated_at)?.toISOString().slice(0, 10);
       byPost.set(row.slug, item);
     }
     for (const item of byPost.values()) {
-      if (item.es) entries.push({ es: item.es, en: item.en ?? item.es, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
     }
 
     const projects = await pool.query<{ locale: string; slug: string; updated_at: Date }>(
@@ -120,16 +117,15 @@ async function dynamicRoutes(): Promise<DbEntry[]> {
          JOIN projects p ON p.id = t.project_id
         WHERE p.is_published = true`,
     );
-    const byProject = new Map<string, { es?: string; en?: string; lastmod?: string }>();
+    const byProject = new Map<string, { path?: string; lastmod?: string }>();
     for (const row of projects.rows) {
       const item = byProject.get(row.slug) ?? {};
-      if (row.locale === 'es') item.es = `/proyectos/${row.slug}/`;
-      if (row.locale === 'en') item.en = `/en/projects/${row.slug}/`;
+      if (row.locale === 'es') item.path = `/proyectos/${row.slug}/`;
       item.lastmod = row.updated_at?.toISOString().slice(0, 10);
       byProject.set(row.slug, item);
     }
     for (const item of byProject.values()) {
-      if (item.es) entries.push({ es: item.es, en: item.en ?? item.es, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
     }
   } catch (error) {
     console.warn('[sitemap] No se pudieron leer las tablas:', (error as Error).message);
@@ -149,8 +145,7 @@ const entries: Entry[] = [
   ...staticRoutes,
   ...serviceRoutes,
   ...(await dynamicRoutes()).map((item) => ({
-    es: item.es,
-    en: item.en,
+    path: item.path,
     changefreq: 'weekly' as const,
     priority: '0.7',
     lastmod: item.lastmod ?? fallbackLastmod,
@@ -159,36 +154,28 @@ const entries: Entry[] = [
 
 const seen = new Set<string>();
 const unique = entries.filter((entry) => {
-  if (seen.has(entry.es)) return false;
-  seen.add(entry.es);
+  if (seen.has(entry.path)) return false;
+  seen.add(entry.path);
   return true;
 });
 
+// El sitio es solo en español: no hay alternates hreflang en el sitemap.
 const body = unique
   .map((entry) => {
-    const esUrl = new URL(entry.es, siteUrl).toString();
-    const enUrl = new URL(entry.en, siteUrl).toString();
-    const links = [
-      `    <xhtml:link rel="alternate" hreflang="es" href="${escapeXml(esUrl)}"/>`,
-      `    <xhtml:link rel="alternate" hreflang="en" href="${escapeXml(enUrl)}"/>`,
-      `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(esUrl)}"/>`,
-    ].join('\n');
-
+    const url = new URL(entry.path, siteUrl).toString();
     return [
       '  <url>',
-      `    <loc>${escapeXml(esUrl)}</loc>`,
+      `    <loc>${escapeXml(url)}</loc>`,
       `    <lastmod>${entry.lastmod ?? fallbackLastmod}</lastmod>`,
       `    <changefreq>${entry.changefreq}</changefreq>`,
       `    <priority>${entry.priority}</priority>`,
-      links,
       '  </url>',
     ].join('\n');
   })
   .join('\n');
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${body}
 </urlset>
 `;

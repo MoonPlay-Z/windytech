@@ -5,7 +5,6 @@
 El nombre de la empresa es Windytech. `windytech.studio` es su dominio web, no parte del nombre.
 
 - Sitio web: https://windytech.studio/
-- Inglés: https://windytech.studio/en/
 - Servicios: https://windytech.studio/servicios/
 - Acerca de la empresa: https://windytech.studio/nosotros/
 - Contacto: https://windytech.studio/#contacto
@@ -17,7 +16,7 @@ El nombre de la empresa es Windytech. `windytech.studio` es su dominio web, no p
 - **Actividad:** desarrollo de software a medida, automatización de WhatsApp Business, diseño y desarrollo web, SEO, marketing digital, redes e infraestructura, y equipos informáticos.
 - **Base:** Venezuela.
 - **Cobertura:** servicios digitales de forma remota en cualquier país; redes, infraestructura y entrega física de equipos solo en Venezuela.
-- **Idiomas:** español e inglés.
+- **Idioma:** español.
 - **Medios de pago:** Binance y PayPal. Los proyectos inician con el 50% de anticipo.
 - **Modelo de trabajo:** diagnóstico, propuesta con alcance y precio por escrito, anticipo, ejecución por hitos, entrega y seguimiento.
 - **Clientes:** emprendimientos, pequeñas y medianas empresas, y compañías con varias sedes.
@@ -64,12 +63,4 @@ Los proyectos inician con el 50% de anticipo y el saldo se paga contra avance y 
 - Correo: windytechestudio@gmail.com
 - Formulario: https://windytech.studio/#contacto
 
-## English summary
-
-Windytech is a software development, WhatsApp automation, web design and digital marketing studio based in Venezuela. It builds custom software, automates WhatsApp Business support, creates websites and landing pages, and supports businesses with SEO, advertising, networks and IT equipment. Digital services are delivered remotely worldwide; on-site network and equipment work is available in Venezuela only. Languages: Spanish and English. Payments: Binance and PayPal.
-
-- Services: https://windytech.studio/en/services/
-- About: https://windytech.studio/en/about/
-- Contact: https://windytech.studio/en/#contacto
-
-Las páginas en español e inglés son la fuente de verdad sobre alcance, disponibilidad y condiciones de los servicios.
+Las páginas en español son la fuente de verdad sobre alcance, disponibilidad y condiciones de los servicios.

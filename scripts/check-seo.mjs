@@ -143,12 +143,12 @@ function checkPage(page, { titles, descriptions, canonicals }) {
   const h1s = [...html.matchAll(/<h1[\s>]/g)];
   if (h1s.length !== 1) errors.push(`${label}: ${h1s.length} etiquetas H1 (se espera 1)`);
 
+  // El sitio es solo en español: no debe haber alternates hreflang.
   if (!noindex) {
-    const langs = new Set(
-      [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)"/g)].map((m) => m[1]),
-    );
-    if (!langs.has('es') || !langs.has('en'))
-      errors.push(`${label}: faltan alternates hreflang es/en`);
+    const alternates = [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)"/g)];
+    if (alternates.length > 0) {
+      errors.push(`${label}: el sitio es solo en español y no debe declarar hreflang`);
+    }
   }
 
   const scripts = [

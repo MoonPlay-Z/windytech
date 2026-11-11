@@ -3,7 +3,32 @@ import { sameOrigin } from './lib/security';
 
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const ADMIN = /^\/admin(\/|$)/;
-const PRIVATE = /^\/(api|admin)(\/|$)|^\/(cotizacion|en\/quote)\/[^/]+/;
+const PRIVATE = /^\/(api|admin)(\/|$)|^\/cotizacion\/[^/]+/;
+
+/**
+ * El sitio es solo en español: las rutas /en/... se redirigen (301) a su
+ * equivalente en español para no romper los enlaces ya compartidos.
+ */
+const EN_PREFIXES: [string, string][] = [
+  ['/en/services', '/servicios'],
+  ['/en/catalog', '/catalogo'],
+  ['/en/projects', '/proyectos'],
+  ['/en/blog', '/blog'],
+  ['/en/cart', '/carrito'],
+  ['/en/quote', '/cotizacion'],
+  ['/en/about', '/nosotros'],
+  ['/en/legal/privacy', '/legal/privacidad'],
+  ['/en/legal/terms', '/legal/terminos'],
+];
+
+function spanishPath(pathname: string): string | null {
+  for (const [from, to] of EN_PREFIXES) {
+    if (pathname === from) return `${to}/`;
+    if (pathname.startsWith(`${from}/`)) return to + pathname.slice(from.length);
+  }
+  if (pathname === '/en' || pathname === '/en/') return '/';
+  return null;
+}
 
 /** Cabeceras de seguridad que antes vivían en vercel.json / public/_headers. */
 function harden(headers: Headers, pathname: string) {
@@ -23,11 +48,8 @@ function harden(headers: Headers, pathname: string) {
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
   } else if (
     pathname.startsWith('/catalogo') ||
-    pathname.startsWith('/en/catalog') ||
     pathname.startsWith('/proyectos') ||
-    pathname.startsWith('/en/projects') ||
-    pathname.startsWith('/blog') ||
-    pathname.startsWith('/en/blog')
+    pathname.startsWith('/blog')
   ) {
     headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
   }
@@ -35,6 +57,13 @@ function harden(headers: Headers, pathname: string) {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { url, request } = context;
+
+  // Todo el sitio es en español: /en/... va a su equivalente en español.
+  const spanish = spanishPath(url.pathname);
+  if (spanish && spanish !== url.pathname) {
+    const target = new URL(spanish + url.search, url.origin);
+    return new Response(null, { status: 301, headers: { Location: target.toString() } });
+  }
 
   // Protección CSRF propia: compara hosts (no esquema) y tolera proxies.
   // Astro trae `checkOrigin`, pero rechaza antes de poder normalizar
