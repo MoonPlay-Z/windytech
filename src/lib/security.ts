@@ -26,15 +26,25 @@ export function sameOrigin(request: Request): boolean {
     const source = new URL(origin);
     const requestUrl = new URL(request.url);
     const configuredSite = new URL(serverEnv.siteUrl);
-    const normalizeHost = (host: string) => host.replace(/^www\./i, '').toLowerCase();
-    const sameHost = (left: URL, right: URL) =>
-      normalizeHost(left.hostname) === normalizeHost(right.hostname) &&
-      left.port === right.port;
 
-    // Proxies can give the app an internal request URL; also trust the configured public origin.
+    // Detrás de un proxy (Render, Cloudflare…) request.url puede apuntar al
+    // host interno. X-Forwarded-Host / Host reflejan el host público real.
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const publicHost = (forwardedHost ?? request.headers.get('host') ?? requestUrl.host)
+      .split(',')[0]
+      .trim();
+
+    const normalizeHost = (host: string) => host.replace(/^www\./i, '').toLowerCase();
+    const sameHost = (left: string, right: string) =>
+      normalizeHost(left) === normalizeHost(right);
+
+    // El esquema puede cambiar al terminar TLS en el proxy; el límite CSRF
+    // real es el host. Aceptamos el host público, el de la petición y el
+    // configurado en PUBLIC_SITE_URL.
     return (
-      (source.origin === requestUrl.origin && sameHost(source, requestUrl)) ||
-      (source.protocol === configuredSite.protocol && sameHost(source, configuredSite))
+      sameHost(source.host, publicHost) ||
+      sameHost(source.host, requestUrl.host) ||
+      sameHost(source.host, configuredSite.host)
     );
   } catch {
     return false;
