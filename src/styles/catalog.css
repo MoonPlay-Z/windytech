@@ -484,3 +484,15 @@
   justify-content: flex-end;
   margin-top: 10px;
 }
+
+/* La tarjeta abierta queda por encima de las demás para que el menú no se
+   corte. */
+.product-card {
+  position: relative;
+  z-index: 1;
+}
+
+.product-card.has-open-share,
+.product-card:has(.share-menu.is-open) {
+  z-index: 40;
+}

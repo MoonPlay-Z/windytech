@@ -2597,6 +2597,7 @@ html[data-astro-transition='back'] {
 
 .plan-card {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -2606,6 +2607,13 @@ html[data-astro-transition='back'] {
   background: #fff;
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Con el menú de compartir abierto, la tarjeta debe quedar por encima de las
+   demás para que el desplegable no quede cortado. */
+.plan-card.has-open-share,
+.plan-card:has(.share-menu.is-open) {
+  z-index: 40;
 }
 
 .plan-card:hover {
@@ -3123,13 +3131,19 @@ html[data-astro-transition='back'] {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 40;
+  z-index: 60;
   min-width: 210px;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: #fff;
   box-shadow: 0 18px 40px rgba(14, 34, 52, 0.16);
+}
+
+/* Si no hay sitio debajo, el menú se abre hacia arriba. */
+.share-menu.is-up .share-menu-panel {
+  top: auto;
+  bottom: calc(100% + 8px);
 }
 
 .share-menu-title {
@@ -3178,4 +3192,102 @@ html[data-astro-transition='back'] {
 .share-menu-list svg {
   flex: none;
   color: var(--teal);
+}
+
+/* ---------------------------------------------------------------------------
+   Ilustraciones propias (SVG)
+   --------------------------------------------------------------------------- */
+
+.artwork {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+}
+
+.artwork svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* En las tarjetas de servicio la ilustración va detrás del texto. */
+.card--art {
+  position: relative;
+  overflow: hidden;
+}
+
+.card--art .artwork {
+  position: absolute;
+  inset: auto -18px -24px auto;
+  width: 190px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.card--art > *:not(.artwork) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Franja visual de los paquetes en la portada. */
+.plans-teaser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  gap: 32px;
+  align-items: center;
+}
+
+.plans-teaser-list {
+  display: grid;
+  gap: 10px;
+}
+
+.plans-teaser-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.plans-teaser-item strong {
+  display: block;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 16px;
+}
+
+.plans-teaser-item span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.plans-teaser-price {
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .plans-teaser {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ilustración en la cabecera de las páginas de servicio */
+.service-hero-art {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.service-hero-art .artwork {
+  max-width: 260px;
+  opacity: 0.9;
 }

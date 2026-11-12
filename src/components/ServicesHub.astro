@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
+import Artwork from './Artwork.astro';
+import { ARTWORK_BY_ICON } from '../lib/artwork';
 import ServicePlans from './ServicePlans.astro';
 import { site, whatsappLink } from '../data/site';
 import { serviceHub, services } from '../data/services';
@@ -77,7 +79,8 @@ const itemList = {
         {services.map((service) => {
           const s = service.content;
           return (
-            <article class="card">
+            <article class="card card--art">
+              <Artwork theme={ARTWORK_BY_ICON[s.icon] ?? 'software'} height={150} />
               <span class={`icon-badge icon-badge--${s.icon}`}>
                 <Icon name={s.icon} size={28} />
               </span>

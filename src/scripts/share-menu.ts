@@ -8,16 +8,25 @@ function closeMenu(menu: HTMLElement) {
   const panel = menu.querySelector<HTMLElement>('[data-share-panel]');
   trigger?.setAttribute('aria-expanded', 'false');
   if (panel) panel.hidden = true;
-  menu.classList.remove('is-open');
+  menu.classList.remove('is-open', 'is-up');
+  // La tarjeta que contiene el menú deja de estar por encima de las demás.
+  menu.closest('.plan-card, .product-card')?.classList.remove('has-open-share');
+}
+
+/** Abre el menú hacia arriba si no cabe debajo del botón. */
+function direction(menu: HTMLElement, panel: HTMLElement) {
+  const box = panel.getBoundingClientRect();
+  const espacioAbajo = window.innerHeight - box.top;
+  menu.classList.toggle('is-up', espacioAbajo < box.height + 24);
 }
 
 function initShareMenus() {
-  document.querySelectorAll<HTMLElement>('[data-share-menu]').forEach((menu) => {
-    if (menu.dataset.wtBound === 'true') return;
-    menu.dataset.wtBound = 'true';
+  document.querySelectorAll<HTMLElement>('[data-share-menu]').forEach((menuEl) => {
+    if (menuEl.dataset.wtBound === 'true') return;
+    menuEl.dataset.wtBound = 'true';
 
-    const trigger = menu.querySelector<HTMLButtonElement>('[data-share-trigger]');
-    const panel = menu.querySelector<HTMLElement>('[data-share-panel]');
+    const trigger = menuEl.querySelector<HTMLButtonElement>('[data-share-trigger]');
+    const panel = menuEl.querySelector<HTMLElement>('[data-share-panel]');
     if (!trigger || !panel) return;
 
     trigger.addEventListener('click', (event) => {
@@ -25,15 +34,23 @@ function initShareMenus() {
       const abierto = trigger.getAttribute('aria-expanded') === 'true';
       trigger.setAttribute('aria-expanded', String(!abierto));
       panel.hidden = abierto;
-      menu.classList.toggle('is-open', !abierto);
+      menuEl.classList.toggle('is-open', !abierto);
+
+      if (!abierto) {
+        // La tarjeta se coloca por encima para que el menú no se corte.
+        menuEl.closest('.plan-card, .product-card')?.classList.add('has-open-share');
+        direction(menuEl, panel);
+      } else {
+        menuEl.closest('.plan-card, .product-card')?.classList.remove('has-open-share');
+      }
     });
 
     // Cerrar al pulsar fuera o con Escape.
     document.addEventListener('click', (event) => {
-      if (!menu.contains(event.target as Node)) closeMenu(menu);
+      if (!menuEl.contains(event.target as Node)) closeMenu(menuEl);
     });
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMenu(menu);
+      if (event.key === 'Escape') closeMenu(menuEl);
     });
 
     // Copiar enlace.

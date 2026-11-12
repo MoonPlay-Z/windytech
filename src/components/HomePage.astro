@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
+import Artwork from './Artwork.astro';
+import { ARTWORK_BY_ICON } from '../lib/artwork';
+import { listServicePlans } from '../lib/db/queries';
 import ContactForm from './ContactForm.astro';
 import { content, site, whatsappLink } from '../data/site';
 import { aboutContent } from '../data/about';
@@ -18,6 +21,12 @@ const title = t.meta.homeTitle;
 const description = t.meta.homeDescription;
 const markAlt = 'Símbolo gráfico de Windytech';
 const shareUrl = new URL(path, site.url).toString();
+// Los tres paquetes de entrada para enseñar precios sin abarrocar la portada.
+const planes = await listServicePlans();
+// Los tres paquetes con mejor precio de entrada.
+const paquetesDestacados = [...planes]
+  .sort((a, b) => a.priceCents - b.priceCents)
+  .slice(0, 3);
 const shareText = `${title} — ${shareUrl}`;
 ---
 
@@ -125,43 +134,86 @@ const shareText = `${title} — ${shareUrl}`;
     </div>
   </section>
 
-  <section class="share-strip" aria-label={t.share.navLabel}>
-    <div class="container share-strip-inner">
-      <p>{t.share.label}</p>
-      <nav class="share-actions" aria-label={t.share.navLabel}>
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t.share.whatsapp}
-        >
-          <Icon name="whatsapp" size={18} />
-          <span>{t.share.whatsapp}</span>
+  <section class="section section--soft" id="servicios">
+    <div class="container">
+      <div class="section-head">
+        <h2>{t.services.title}</h2>
+        <p>{t.services.subtitle}</p>
+      </div>
+      <div class="service-grid">
+        {t.services.cards.map((service, index) => (
+          <article class="card card--art">
+            <Artwork theme={ARTWORK_BY_ICON[service.icon] ?? 'software'} height={150} />
+            <span class={`icon-badge icon-badge--${service.icon}`}>
+              <Icon name={service.icon} size={28} />
+            </span>
+            <h3>
+              <a href={services[index] ? servicePath(services[index]) : `#servicios`}>
+                {service.title}
+              </a>
+            </h3>
+            <p>{service.text}</p>
+            <a
+              class="text-link"
+              href={services[index] ? servicePath(services[index]) : `#servicios`}
+            >
+              {'Ver servicio'}
+              <Icon name="arrow-right" size={16} />
+            </a>
+            <a
+              class="text-link"
+              href={whatsappLink(service.message)}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="whatsapp"
+            >
+              {t.services.cta}
+              <Icon name="whatsapp" size={16} />
+            </a>
+          </article>
+        ))}
+      </div>
+      <div class="section-foot">
+        <a class="btn btn-dark" href={`${'/servicios/'}#paquetes`}>
+          {'Ver paquetes, costos y tiempos'}
+          <Icon name="arrow-right" size={16} />
         </a>
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t.share.facebook}
-        >
-          <Icon name="facebook" size={18} />
-          <span>{t.share.facebook}</span>
-        </a>
-        <a
-          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t.share.linkedin}
-        >
-          <Icon name="linkedin" size={18} />
-          <span>{t.share.linkedin}</span>
-        </a>
-        <button type="button" data-copy-share data-copy-label={t.share.copy} data-copied-label={t.share.copied} data-error-label={t.share.copyError}>
-          <Icon name="copy" size={18} />
-          <span>{t.share.copy}</span>
-        </button>
-      </nav>
-      <span class="share-status" data-share-status aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="paquetes-portada">
+    <div class="container plans-teaser">
+      <div>
+        <div class="section-head">
+          <span class="eyebrow">PAQUETES Y PRECIOS</span>
+          <h2>Precios cerrados desde 100 USD</h2>
+          <p>
+            Elige el paquete que se ajusta a tu momento. Cada uno indica qué incluye, cuánto
+            cuesta y en cuánto tiempo se aplica.
+          </p>
+        </div>
+        <div class="plans-teaser-list">
+          {paquetesDestacados.map((plan) => (
+            <a class="plans-teaser-item" href={`/servicios/#plan-${plan.slug}`}>
+              <span>
+                <strong>{plan.name}</strong>
+                <span>{plan.deliveryTime}</span>
+              </span>
+              <span class="plans-teaser-price">
+                ${(plan.priceCents / 100).toFixed(0)}
+              </span>
+            </a>
+          ))}
+        </div>
+        <div class="section-foot">
+          <a class="btn btn-primary" href="/servicios/#paquetes">
+            {'Ver los 10 paquetes'}
+            <Icon name="arrow-right" size={16} />
+          </a>
+        </div>
+      </div>
+      <Artwork theme="paquetes" height={220} />
     </div>
   </section>
 
@@ -206,50 +258,49 @@ const shareText = `${title} — ${shareUrl}`;
     </div>
   </section>
 
-  <section class="section section--soft" id="servicios">
-    <div class="container">
-      <div class="section-head">
-        <h2>{t.services.title}</h2>
-        <p>{t.services.subtitle}</p>
-      </div>
-      <div class="service-grid">
-        {t.services.cards.map((service, index) => (
-          <article class="card">
-            <span class={`icon-badge icon-badge--${service.icon}`}>
-              <Icon name={service.icon} size={28} />
-            </span>
-            <h3>
-              <a href={services[index] ? servicePath(services[index]) : `#servicios`}>
-                {service.title}
-              </a>
-            </h3>
-            <p>{service.text}</p>
-            <a
-              class="text-link"
-              href={services[index] ? servicePath(services[index]) : `#servicios`}
-            >
-              {'Ver servicio'}
-              <Icon name="arrow-right" size={16} />
-            </a>
-            <a
-              class="text-link"
-              href={whatsappLink(service.message)}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-track="whatsapp"
-            >
-              {t.services.cta}
-              <Icon name="whatsapp" size={16} />
-            </a>
-          </article>
-        ))}
-      </div>
-      <div class="section-foot">
-        <a class="btn btn-dark" href={`${'/servicios/'}#paquetes`}>
-          {'Ver paquetes, costos y tiempos'}
-          <Icon name="arrow-right" size={16} />
+  <section class="section section--soft" id="equipos">
+    <div class="container split-grid">
+      <article class="equipment-card">
+        <span class="tag">{t.equipment.eyebrow}</span>
+        <h2>{t.equipment.title}</h2>
+        <p>{t.equipment.text}</p>
+        <ul class="equipment-list">
+          {t.equipment.bullets.map((bullet) => (
+            <li>
+              <Icon name="check-simple" size={18} />
+              <span>{bullet}</span>
+            </li>
+          ))}
+        </ul>
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(t.equipment.message)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {t.equipment.cta}
+          <Icon name="whatsapp" size={18} />
         </a>
-      </div>
+        <p class="note">{t.equipment.note}</p>
+      </article>
+
+      <article class="payments-card" id="pagos">
+        <span class="icon-badge icon-badge--light">
+          <Icon name="card" size={28} />
+        </span>
+        <h2>{t.payments.title}</h2>
+        <p>{t.payments.text}</p>
+        <div class="payment-pills">
+          {t.payments.methods.map((method) => (
+            <span class={`payment-pill payment-pill--${method.toLowerCase()}`}>
+              <Icon name={method.toLowerCase()} size={22} />
+              {method}
+            </span>
+          ))}
+        </div>
+        <p class="note">{t.payments.note}</p>
+      </article>
     </div>
   </section>
 
@@ -303,49 +354,21 @@ const shareText = `${title} — ${shareUrl}`;
     </div>
   </section>
 
-  <section class="section section--soft" id="equipos">
-    <div class="container split-grid">
-      <article class="equipment-card">
-        <span class="tag">{t.equipment.eyebrow}</span>
-        <h2>{t.equipment.title}</h2>
-        <p>{t.equipment.text}</p>
-        <ul class="equipment-list">
-          {t.equipment.bullets.map((bullet) => (
-            <li>
-              <Icon name="check-simple" size={18} />
-              <span>{bullet}</span>
-            </li>
-          ))}
-        </ul>
-        <a
-          class="btn btn-primary"
-          href={whatsappLink(t.equipment.message)}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-track="whatsapp"
-        >
-          {t.equipment.cta}
-          <Icon name="whatsapp" size={18} />
-        </a>
-        <p class="note">{t.equipment.note}</p>
-      </article>
-
-      <article class="payments-card" id="pagos">
-        <span class="icon-badge icon-badge--light">
-          <Icon name="card" size={28} />
-        </span>
-        <h2>{t.payments.title}</h2>
-        <p>{t.payments.text}</p>
-        <div class="payment-pills">
-          {t.payments.methods.map((method) => (
-            <span class={`payment-pill payment-pill--${method.toLowerCase()}`}>
-              <Icon name={method.toLowerCase()} size={22} />
-              {method}
-            </span>
-          ))}
-        </div>
-        <p class="note">{t.payments.note}</p>
-      </article>
+  <section class="section section--soft" id="preguntas">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t.faqs.eyebrow}</span>
+        <h2>{t.faqs.title}</h2>
+        <p>{t.faqs.subtitle}</p>
+      </div>
+      <div class="faq-list">
+        {t.faqs.items.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -365,24 +388,6 @@ const shareText = `${title} — ${shareUrl}`;
         {t.cta.button}
         <Icon name="whatsapp" size={18} />
       </a>
-    </div>
-  </section>
-
-  <section class="section section--soft" id="preguntas">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">{t.faqs.eyebrow}</span>
-        <h2>{t.faqs.title}</h2>
-        <p>{t.faqs.subtitle}</p>
-      </div>
-      <div class="faq-list">
-        {t.faqs.items.map((item) => (
-          <details class="faq-item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
-        ))}
-      </div>
     </div>
   </section>
 
@@ -425,6 +430,46 @@ const shareText = `${title} — ${shareUrl}`;
         </div>
         <ContactForm />
       </div>
+    </div>
+  </section>
+
+  <section class="share-strip" aria-label={t.share.navLabel}>
+    <div class="container share-strip-inner">
+      <p>{t.share.label}</p>
+      <nav class="share-actions" aria-label={t.share.navLabel}>
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.whatsapp}
+        >
+          <Icon name="whatsapp" size={18} />
+          <span>{t.share.whatsapp}</span>
+        </a>
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.facebook}
+        >
+          <Icon name="facebook" size={18} />
+          <span>{t.share.facebook}</span>
+        </a>
+        <a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t.share.linkedin}
+        >
+          <Icon name="linkedin" size={18} />
+          <span>{t.share.linkedin}</span>
+        </a>
+        <button type="button" data-copy-share data-copy-label={t.share.copy} data-copied-label={t.share.copied} data-error-label={t.share.copyError}>
+          <Icon name="copy" size={18} />
+          <span>{t.share.copy}</span>
+        </button>
+      </nav>
+      <span class="share-status" data-share-status aria-live="polite"></span>
     </div>
   </section>
 </BaseLayout>

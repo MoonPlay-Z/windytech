@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
+import Artwork from './Artwork.astro';
+import { ARTWORK_BY_ICON } from '../lib/artwork';
 import PlanCard from './PlanCard.astro';
 import ShareBar from './ShareBar.astro';
 import { site, whatsappLink } from '../data/site';
@@ -126,6 +128,9 @@ const serviceSchema = {
         <span aria-hidden="true">/</span>
         <span>{s.title}</span>
       </nav>
+      <div class="service-hero-art">
+        <Artwork theme={ARTWORK_BY_ICON[s.icon] ?? 'software'} height={190} />
+      </div>
       <span class="eyebrow">{s.eyebrow}</span>
       <h1>{s.title}</h1>
       <p class="about-intro">{s.intro}</p>

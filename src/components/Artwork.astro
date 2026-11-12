@@ -1,0 +1,213 @@
+---
+/**
+ * Ilustraciones propias del sitio (SVG, sin pesos de licencia).
+ * Cada tema tiene su propia composición para que las tarjetas, los paquetes y
+ * las secciones de la portada se vean vivos y no como bloques de texto.
+ */
+
+import type { ArtworkTheme } from '../lib/artwork';
+
+interface Props {
+  /** Tema de la ilustración. */
+  theme: ArtworkTheme;
+  class?: string;
+  /** Altura aproximada en píxeles. */
+  height?: number;
+}
+
+const { theme, class: className = '', height = 180 } = Astro.props;
+
+const palettes: Record<string, { a: string; b: string; c: string }> = {
+  software: { a: '#22e6f5', b: '#2fd9b0', c: '#0e2234' },
+  whatsapp: { a: '#25f4ee', b: '#22e6f5', c: '#0b3b3f' },
+  web: { a: '#3b82f6', b: '#22e6f5', c: '#10233a' },
+  marketing: { a: '#fdc830', b: '#f5365c', c: '#3a2436' },
+  redes: { a: '#2fd9b0', b: '#2b9fa8', c: '#0e2234' },
+  equipos: { a: '#5aa9e6', b: '#2fd9b0', c: '#12293d' },
+  paquetes: { a: '#2fd9b0', b: '#22e6f5', c: '#0e2234' },
+  clientes: { a: '#f5365c', b: '#fdc830', c: '#2a1b2c' },
+  acerca: { a: '#22e6f5', b: '#2b9fa8', c: '#0e2234' },
+};
+---
+
+<div class:list={['artwork', `artwork--${theme}`, className]} style={`--art-h:${height}px`}>
+  {
+    theme === 'software' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de desarrollo de software">
+        <defs>
+          <linearGradient id={`g-sw-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.software.a} />
+            <stop offset="1" stop-color={palettes.software.b} />
+          </linearGradient>
+        </defs>
+        <rect x="26" y="30" width="268" height="120" rx="16" fill="none" stroke={`url(#g-sw-${theme})`} stroke-width="2" />
+        <rect x="46" y="52" width="120" height="10" rx="5" fill={`url(#g-sw-${theme})`} opacity=".9" />
+        <rect x="46" y="74" width="196" height="7" rx="3.5" fill={palettes.software.a} opacity=".35" />
+        <rect x="46" y="90" width="160" height="7" rx="3.5" fill={palettes.software.b} opacity=".3" />
+        <rect x="46" y="112" width="88" height="22" rx="11" fill={`url(#g-sw-${theme})`} />
+        <circle cx="262" cy="52" r="12" fill={palettes.software.b} opacity=".85" />
+        <circle cx="240" cy="122" r="7" fill={palettes.software.a} opacity=".7" />
+      </svg>
+    )
+  }
+  {
+    theme === 'whatsapp' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de automatización de WhatsApp">
+        <defs>
+          <linearGradient id={`g-wa-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.whatsapp.a} />
+            <stop offset="1" stop-color={palettes.whatsapp.b} />
+          </linearGradient>
+        </defs>
+        <path
+          d="M118 44c30 0 52 20 52 45 0 24-22 43-52 43-8 0-15-1-22-4l-24 8 7-22c-9-7-13-16-13-25 0-25 22-45 52-45Z"
+          fill={`url(#g-wa-${theme})`}
+          opacity=".92"
+        />
+        <rect x="140" y="72" width="56" height="8" rx="4" fill={palettes.whatsapp.c} opacity=".75" />
+        <rect x="140" y="88" width="40" height="8" rx="4" fill={palettes.whatsapp.c} opacity=".5" />
+        <circle cx="232" cy="60" r="18" fill="none" stroke={palettes.whatsapp.b} stroke-width="2" opacity=".6" />
+        <circle cx="232" cy="60" r="8" fill={palettes.whatsapp.a} opacity=".5" />
+        <circle cx="76" cy="126" r="10" fill={palettes.whatsapp.b} opacity=".45" />
+      </svg>
+    )
+  }
+  {
+    theme === 'web' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de páginas web">
+        <defs>
+          <linearGradient id={`g-web-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.web.a} />
+            <stop offset="1" stop-color={palettes.web.b} />
+          </linearGradient>
+        </defs>
+        <rect x="30" y="28" width="180" height="124" rx="14" fill="#fff" opacity=".92" />
+        <rect x="30" y="28" width="180" height="22" rx="14" fill={`url(#g-web-${theme})`} opacity=".85" />
+        <circle cx="46" cy="39" r="4" fill="#fff" opacity=".8" />
+        <circle cx="58" cy="39" r="4" fill="#fff" opacity=".5" />
+        <rect x="46" y="66" width="90" height="9" rx="4.5" fill={palettes.web.c} opacity=".55" />
+        <rect x="46" y="84" width="140" height="6" rx="3" fill={palettes.web.c} opacity=".22" />
+        <rect x="46" y="98" width="118" height="6" rx="3" fill={palettes.web.c} opacity=".18" />
+        <rect x="46" y="116" width="66" height="18" rx="9" fill={`url(#g-web-${theme})`} />
+        <rect x="196" y="52" width="94" height="72" rx="14" fill="#fff" opacity=".9" />
+        <rect x="210" y="66" width="66" height="8" rx="4" fill={palettes.web.a} opacity=".7" />
+        <rect x="210" y="82" width="48" height="6" rx="3" fill={palettes.web.c} opacity=".2" />
+        <rect x="210" y="96" width="58" height="16" rx="8" fill={palettes.web.b} opacity=".55" />
+      </svg>
+    )
+  }
+  {
+    theme === 'marketing' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de marketing y SEO">
+        <defs>
+          <linearGradient id={`g-mk-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.marketing.a} />
+            <stop offset="1" stop-color={palettes.marketing.b} />
+          </linearGradient>
+        </defs>
+        <rect x="34" y="104" width="34" height="44" rx="8" fill={`url(#g-mk-${theme})`} opacity=".85" />
+        <rect x="80" y="76" width="34" height="72" rx="8" fill={`url(#g-mk-${theme})`} opacity=".65" />
+        <rect x="126" y="50" width="34" height="98" rx="8" fill={`url(#g-mk-${theme})`} opacity=".5" />
+        <circle cx="236" cy="62" r="30" fill="none" stroke={palettes.marketing.a} stroke-width="3" opacity=".7" />
+        <circle cx="236" cy="62" r="16" fill={`url(#g-mk-${theme})`} opacity=".85" />
+        <path d="m226 62 8 8 14-16" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" />
+        <path d="M44 132h230" stroke={palettes.marketing.b} stroke-width="2" opacity=".35" stroke-linecap="round" />
+      </svg>
+    )
+  }
+  {
+    theme === 'redes' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de redes e infraestructura">
+        <defs>
+          <linearGradient id={`g-rd-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.redes.a} />
+            <stop offset="1" stop-color={palettes.redes.b} />
+          </linearGradient>
+        </defs>
+        <circle cx="160" cy="46" r="13" fill={`url(#g-rd-${theme})`} />
+        <circle cx="70" cy="132" r="13" fill={`url(#g-rd-${theme})`} opacity=".75" />
+        <circle cx="250" cy="132" r="13" fill={`url(#g-rd-${theme})`} opacity=".75" />
+        <path d="M160 59 70 119M160 59l90 60M83 132h154" stroke={palettes.redes.b} stroke-width="2.5" opacity=".55" stroke-linecap="round" />
+        <rect x="120" y="72" width="80" height="36" rx="10" fill="#fff" opacity=".9" />
+        <path d="M134 90h52M134 99h34" stroke={palettes.redes.c} stroke-width="3" stroke-linecap="round" opacity=".45" />
+      </svg>
+    )
+  }
+  {
+    theme === 'equipos' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de equipos informáticos">
+        <defs>
+          <linearGradient id={`g-eq-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.equipos.a} />
+            <stop offset="1" stop-color={palettes.equipos.b} />
+          </linearGradient>
+        </defs>
+        <rect x="72" y="34" width="176" height="104" rx="12" fill="#fff" opacity=".94" />
+        <rect x="86" y="48" width="148" height="76" rx="7" fill={`url(#g-eq-${theme})`} opacity=".85" />
+        <rect x="126" y="140" width="68" height="8" rx="4" fill={palettes.equipos.c} opacity=".4" />
+        <rect x="104" y="150" width="112" height="8" rx="4" fill={palettes.equipos.c} opacity=".25" />
+        <circle cx="244" cy="58" r="14" fill={palettes.equipos.b} opacity=".55" />
+        <rect x="42" y="60" width="38" height="52" rx="8" fill={palettes.equipos.a} opacity=".55" />
+      </svg>
+    )
+  }
+  {
+    theme === 'paquetes' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de paquetes de servicios">
+        <defs>
+          <linearGradient id={`g-pk-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.paquetes.a} />
+            <stop offset="1" stop-color={palettes.paquetes.b} />
+          </linearGradient>
+        </defs>
+        <rect x="38" y="52" width="74" height="92" rx="12" fill="#fff" opacity=".92" />
+        <rect x="52" y="68" width="46" height="7" rx="3.5" fill={`url(#g-pk-${theme})`} />
+        <rect x="52" y="84" width="34" height="5" rx="2.5" fill={palettes.paquetes.a} opacity=".45" />
+        <rect x="52" y="96" width="40" height="5" rx="2.5" fill={palettes.paquetes.a} opacity=".3" />
+        <rect x="52" y="116" width="38" height="16" rx="8" fill={`url(#g-pk-${theme})`} />
+        <rect x="126" y="36" width="80" height="108" rx="12" fill={`url(#g-pk-${theme})`} opacity=".95" />
+        <rect x="142" y="54" width="48" height="7" rx="3.5" fill="#fff" opacity=".9" />
+        <rect x="142" y="70" width="34" height="5" rx="2.5" fill="#fff" opacity=".55" />
+        <rect x="142" y="84" width="44" height="5" rx="2.5" fill="#fff" opacity=".4" />
+        <rect x="142" y="108" width="44" height="16" rx="8" fill="#fff" opacity=".85" />
+        <circle cx="252" cy="70" r="24" fill="#fff" opacity=".9" />
+        <path d="m244 70 6 6 12-13" stroke={palettes.paquetes.c} stroke-width="3.5" fill="none" stroke-linecap="round" />
+      </svg>
+    )
+  }
+  {
+    theme === 'clientes' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración de clientes y confianza">
+        <defs>
+          <linearGradient id={`g-cl-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.clientes.a} />
+            <stop offset="1" stop-color={palettes.clientes.b} />
+          </linearGradient>
+        </defs>
+        <circle cx="86" cy="70" r="26" fill={`url(#g-cl-${theme})`} opacity=".9" />
+        <circle cx="160" cy="58" r="32" fill={`url(#g-cl-${theme})`} opacity=".7" />
+        <circle cx="238" cy="76" r="22" fill={`url(#g-cl-${theme})`} opacity=".5" />
+        <path d="M46 148c0-22 18-34 40-34s40 12 40 34" fill={`url(#g-cl-${theme})`} opacity=".55" />
+        <path d="M112 148c0-26 21-40 48-40s48 14 48 40" fill={`url(#g-cl-${theme})`} opacity=".4" />
+        <path d="M210 148c0-18 14-28 30-28s30 10 30 28" fill={`url(#g-cl-${theme})`} opacity=".3" />
+      </svg>
+    )
+  }
+  {
+    theme === 'acerca' && (
+      <svg viewBox="0 0 320 180" role="img" aria-label="Ilustración del equipo de Windytech">
+        <defs>
+          <linearGradient id={`g-ab-${theme}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color={palettes.acerca.a} />
+            <stop offset="1" stop-color={palettes.acerca.b} />
+          </linearGradient>
+        </defs>
+        <rect x="108" y="34" width="104" height="104" rx="24" fill={`url(#g-ab-${theme})`} opacity=".9" />
+        <path d="M138 92h44M160 70v44" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".85" />
+        <circle cx="60" cy="60" r="10" fill={palettes.acerca.a} opacity=".45" />
+        <circle cx="262" cy="128" r="14" fill={palettes.acerca.b} opacity=".4" />
+        <rect x="40" y="110" width="46" height="8" rx="4" fill={palettes.acerca.b} opacity=".3" />
+      </svg>
+    )
+  }
+</div>
