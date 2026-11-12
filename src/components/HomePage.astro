@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import Artwork from './Artwork.astro';
+import SearchPreview from './SearchPreview.astro';
 import { ARTWORK_BY_ICON } from '../lib/artwork';
 import { listServicePlans } from '../lib/db/queries';
 import ContactForm from './ContactForm.astro';
@@ -364,6 +365,49 @@ const shareText = `${title} — ${shareUrl}`;
           </div>
         ))}
       </dl>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="visibilidad">
+    <div class="container visibility-grid">
+      <div class="visibility-copy">
+        <span class="eyebrow">{t.visibility.eyebrow}</span>
+        <h2>{t.visibility.title}</h2>
+        <p>{t.visibility.text}</p>
+        <ul class="check-list">
+          {t.visibility.bullets.map((bullet) => (
+            <li>
+              <Icon name="check" size={22} />
+              <span>
+                <strong>{bullet.title}</strong>
+                {bullet.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <a
+          class="btn btn-primary"
+          href={whatsappLink(t.visibility.message)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="whatsapp"
+        >
+          {t.visibility.cta}
+          <Icon name="whatsapp" size={18} />
+        </a>
+      </div>
+
+      <div class="visibility-preview">
+        <SearchPreview
+          title={t.visibility.previewTitle}
+          url={t.visibility.previewUrl}
+          description={t.visibility.previewDescription}
+        />
+        <p class="visibility-note">
+          <Icon name="info" size={16} />
+          <span>Ejemplo ilustrativo de un resultado de búsqueda de Google.</span>
+        </p>
+      </div>
     </div>
   </section>
 

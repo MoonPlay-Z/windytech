@@ -40,6 +40,8 @@ export const ICON_GROUPS = {
     bell: 'lucide:bell',
     share: 'lucide:share-2',
     minus: 'lucide:minus',
+    search: 'lucide:search',
+    info: 'lucide:info',
   },
 
   /** Comercio: catálogo, carrito y fichas. */

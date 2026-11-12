@@ -2,11 +2,45 @@
 .catalog-hero {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   padding: clamp(62px, 8vw, 104px) 0 clamp(58px, 7vw, 88px);
   background:
     radial-gradient(45% 100% at 100% 0%, rgba(61, 220, 181, 0.19), transparent 75%),
     radial-gradient(45% 100% at 0% 100%, rgba(43, 159, 168, 0.16), transparent 75%),
     linear-gradient(145deg, #f8fbfb 0%, #edf5f5 100%);
+}
+
+/* El banner es el fondo completo del encabezado: ocupa toda la sección y su
+   parte clara se funde con el degradado de la página. */
+.catalog-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 72% center;
+  mix-blend-mode: multiply;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Velo suave sobre la foto para que el texto siempre se lea. */
+.catalog-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(248, 251, 251, 0.97) 0%,
+    rgba(240, 248, 248, 0.9) 34%,
+    rgba(233, 244, 245, 0.55) 56%,
+    rgba(233, 244, 245, 0.08) 78%,
+    rgba(233, 244, 245, 0) 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .catalog-hero::after {
@@ -33,30 +67,45 @@
   gap: clamp(16px, 3vw, 40px);
 }
 
-/* Foto de equipos a la derecha del texto del catálogo. El fondo blanco de la
-   foto se funde con el degradado del encabezado (multiply). */
-.catalog-hero-art {
-  width: 100%;
-  height: auto;
-  mix-blend-mode: multiply;
-  opacity: 0.96;
-}
-
 @media (max-width: 980px) {
   .catalog-hero .container {
     grid-template-columns: 1fr;
   }
 
+  /* En tablet el texto ocupa una sola columna: la foto se atenúa para que
+     el encabezado se lea completo. */
   .catalog-hero-art {
-    max-width: 640px;
-    order: 2;
-    margin-top: 8px;
+    object-position: 78% center;
+    mix-blend-mode: normal;
+    opacity: 0.5;
+  }
+
+  .catalog-hero::before {
+    background: linear-gradient(
+      100deg,
+      rgba(248, 251, 251, 0.96) 0%,
+      rgba(242, 249, 250, 0.92) 46%,
+      rgba(236, 246, 247, 0.72) 70%,
+      rgba(233, 244, 245, 0.5) 100%
+    );
   }
 }
 
 @media (max-width: 620px) {
   .catalog-hero-art {
-    opacity: 0.9;
+    object-position: 88% center;
+    opacity: 0.55;
+  }
+
+  /* En móvil el velo tiene que tapar más: el texto va sobre la foto. */
+  .catalog-hero::before {
+    background: linear-gradient(
+      180deg,
+      rgba(248, 251, 251, 0.97) 0%,
+      rgba(243, 250, 250, 0.93) 42%,
+      rgba(238, 247, 248, 0.78) 68%,
+      rgba(233, 244, 245, 0.55) 100%
+    );
   }
 }
 

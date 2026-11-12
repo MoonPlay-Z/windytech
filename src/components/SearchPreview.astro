@@ -1,0 +1,61 @@
+---
+/**
+ * Mockup de cómo aparece Windytech en un buscador (tipo Google).
+ * Reproduce un resultado real: descripción, título, URL y miniatura.
+ * Es una demostración visual del trabajo de SEO, no una captura real.
+ */
+
+interface Props {
+  /** Título del resultado. */
+  title: string;
+  /** URL que se muestra como enlace del buscador. */
+  url: string;
+  /** Descripción corta que muestra el buscador. */
+  description: string;
+  /** Ruta de la miniatura. */
+  thumbnail?: string;
+  /** Texto alternativo de la miniatura. */
+  thumbnailAlt?: string;
+  class?: string;
+}
+
+const {
+  title,
+  url,
+  description,
+  thumbnail = '/assets/preview-buscador.webp',
+  thumbnailAlt = 'Vista previa de la página de inicio de Windytech',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['search-preview', className]}>
+  <div class="search-preview__bar" aria-hidden="true">
+    <span class="search-preview__dots"><i></i><i></i><i></i></span>
+    <span class="search-preview__url">{url}</span>
+  </div>
+
+  <div class="search-preview__body">
+    <div class="search-preview__text">
+      <p class="search-preview__crumb">
+        <span class="search-preview__favicon" aria-hidden="true">
+          <img src="/assets/logo-mark-96.webp" alt="" width="16" height="16" loading="lazy" />
+        </span>
+        <span class="search-preview__domain">{url}</span>
+      </p>
+      <h3 class="search-preview__title">{title}</h3>
+      <p class="search-preview__desc">{description}</p>
+    </div>
+
+    <div class="search-preview__media">
+      <img
+        src={thumbnail}
+        alt={thumbnailAlt}
+        width="2752"
+        height="1536"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  </div>
+</div>

@@ -288,6 +288,32 @@ export const content = {
     methods: ['Binance', 'PayPal'],
     note: 'Al aceptar tu cotización te enviamos los datos para pagar.',
   },
+  visibility: {
+    eyebrow: 'VISIBILIDAD EN GOOGLE',
+    title: 'Así te ven tus clientes cuando te buscan',
+    text:
+      'Posicionamos tu negocio en Google con SEO local, páginas optimizadas y contenido que responde lo que tu cliente escribe en el buscador. Este es un ejemplo de un resultado de búsqueda.',
+    bullets: [
+      {
+        title: 'Posicionamiento local',
+        text: 'Apareces en las búsquedas de tu ciudad y tu barrio.',
+      },
+      {
+        title: 'Página optimizada',
+        text: 'Títulos, descripciones y palabras clave en cada servicio.',
+      },
+      {
+        title: 'Medición real',
+        text: 'Vemos cuántas visitas trae Google y cuáles piden cotización.',
+      },
+    ],
+    cta: 'Mejorar mi posición en Google',
+    message: 'Hola Windytech, quiero mejorar la posición de mi negocio en Google.',
+    previewTitle: 'Windytech | Software a medida, WhatsApp y páginas web',
+    previewUrl: 'https://windytech.studio',
+    previewDescription:
+      'Desarrollo de software a medida, automatización de WhatsApp, webs y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
+  },
   cta: {
     title: '¿Listo para automatizar tu negocio?',
     text: 'Escríbenos y recibe tu cotización por WhatsApp. Aceptamos Binance y PayPal.',
