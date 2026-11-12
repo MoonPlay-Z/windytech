@@ -130,7 +130,6 @@ export const productSchema = z.object({
         availability: z.enum(['IN_STOCK', 'OUT_OF_STOCK', 'PREORDER']).default('IN_STOCK'),
         imagePublicId: z.string().trim().max(300).nullable().optional(),
         labelEs: z.string().trim().max(120).default(''),
-        labelEn: z.string().trim().max(120).default(''),
         position: z.coerce.number().int().min(0).default(0),
       }),
     )

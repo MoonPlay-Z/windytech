@@ -13,7 +13,6 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const es = true;
 const listHref = projectsPath();
 const href = `${listHref}${project.slug}/`;
 const cover = project.coverPublicId ? projectImage(project.coverPublicId, 1600) : null;
@@ -47,12 +46,12 @@ const schema = {
 >
   <section class="about-hero">
     <div class="container">
-      <nav class="breadcrumb" aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'}>
-        <a href={es ? '/' : '/en/'}>{es ? 'Inicio' : 'Home'}</a>
+      <nav class="breadcrumb" aria-label={'Ruta de navegación'}>
+        <a href={'/'}>{'Inicio'}</a>
         <span aria-hidden="true">/</span>
-        <a href={listHref}>{es ? 'Proyectos' : 'Projects'}</a>
+        <a href={listHref}>{'Proyectos'}</a>
       </nav>
-      <span class="eyebrow">{project.year ?? (es ? 'PROYECTO' : 'PROJECT')}</span>
+      <span class="eyebrow">{project.year ?? ('PROYECTO')}</span>
       <h1>{project.title}</h1>
       <p class="about-intro">{project.summary}</p>
       <div class="product-meta">
@@ -94,20 +93,20 @@ const schema = {
       <div class="quote-actions">
         <a
           class="btn btn-primary"
-          href={whatsappLink(es ? 'Hola Windytech, quiero un proyecto como este.' : 'Hello Windytech, I want a project like this one.')}
+          href={whatsappLink('Hola Windytech, quiero un proyecto como este.')}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {es ? 'Quiero un proyecto así' : 'I want a project like this'}
+          {'Quiero un proyecto así'}
         </a>
-        <a class="btn btn-light" href={listHref}>{es ? 'Ver todos los proyectos' : 'See all projects'}</a>
+        <a class="btn btn-light" href={listHref}>{'Ver todos los proyectos'}</a>
       </div>
 
       <ShareBar
         path={href}
         title={project.title}
         text={project.summary}
-        label={es ? 'Comparte este proyecto y consigue clientes' : 'Share this project and win customers'}
+        label={'Comparte este proyecto y consigue clientes'}
         campaign="project"
         variant="card"
       />

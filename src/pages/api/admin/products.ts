@@ -81,7 +81,6 @@ export const POST: APIRoute = async ({ request }) => {
         availability: variant.availability,
         imagePublicId: variant.imagePublicId ?? null,
         labelEs: variant.labelEs,
-        labelEn: variant.labelEn,
         position: variant.position,
       })),
     });

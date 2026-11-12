@@ -17,7 +17,6 @@ interface Props {
 
 const { categories, brands, action, values } = Astro.props;
 const t = catalogCopy;
-const es = true;
 const conditions = Object.entries(conditionLabels) as [string, string][];
 ---
 
@@ -40,7 +39,7 @@ const conditions = Object.entries(conditionLabels) as [string, string][];
   </label>
 
   <label class="catalog-field">
-    <span>{es ? 'Condición' : 'Condition'}</span>
+    <span>{'Condición'}</span>
     <select name="condition">
       <option value="">{t.allConditions}</option>
       {conditions.map(([value, label]) => (
@@ -50,7 +49,7 @@ const conditions = Object.entries(conditionLabels) as [string, string][];
   </label>
 
   <label class="catalog-field">
-    <span>{es ? 'Marca' : 'Brand'}</span>
+    <span>{'Marca'}</span>
     <select name="brand">
       <option value="">{t.allBrands}</option>
       {brands.map((brand) => (
@@ -60,15 +59,15 @@ const conditions = Object.entries(conditionLabels) as [string, string][];
   </label>
 
   <label class="catalog-field catalog-field--price">
-    <span>{es ? 'Precio (USD)' : 'Price (USD)'}</span>
+    <span>{'Precio (USD)'}</span>
     <div class="catalog-price-range">
-      <input type="number" name="min" min="0" step="1" value={values.min} placeholder={es ? 'Mín.' : 'Min'} />
-      <input type="number" name="max" min="0" step="1" value={values.max} placeholder={es ? 'Máx.' : 'Max'} />
+      <input type="number" name="min" min="0" step="1" value={values.min} placeholder={'Mín.'} />
+      <input type="number" name="max" min="0" step="1" value={values.max} placeholder={'Máx.'} />
     </div>
   </label>
 
   <div class="catalog-filter-actions">
-    <button class="btn btn-primary btn-sm" type="submit">{es ? 'Aplicar' : 'Apply'}</button>
+    <button class="btn btn-primary btn-sm" type="submit">{'Aplicar'}</button>
     <a class="catalog-clear" href={action}>{t.clear}</a>
   </div>
 </form>

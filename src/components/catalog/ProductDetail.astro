@@ -27,11 +27,10 @@ interface Props {
 }
 
 const { product, rate, currencyDefault, categoryName } = Astro.props;
-const es = true;
 const t = catalogCopy;
 const basePrice = priceFor(product, null);
 const image = primaryImage(product);
-const catalogHref = es ? '/catalogo/' : '/en/catalog/';
+const catalogHref = '/catalogo/';
 const href = `${catalogHref}${product.slug}/`;
 const condition = conditionLabels[product.condition];
 const availability = availabilityLabels[product.availability];
@@ -39,9 +38,7 @@ const vesPrice = rate ? Math.round(basePrice.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(Math.max(basePrice.compareAtCents, basePrice.listCents) * rate.rate) : 0;
 const description = product.seoDescription || product.shortDescription;
 const specs = Object.entries(product.specs ?? {});
-const consultMessage = es
-  ? `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`
-  : `Hello Windytech, I would like to check availability of ${product.name}.`;
+const consultMessage = `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`;
 
 const availabilitySchema =
   product.availability === 'IN_STOCK'
@@ -130,7 +127,7 @@ const productSchema: Record<string, unknown> = {
         ],
         hasVariant: product.variants.map((variant) => ({
           '@type': 'Product',
-          name: `${product.name}${variant.labelEs || variant.labelEn ? ` — ${es ? variant.labelEs : variant.labelEn}` : ''}`,
+          name: `${product.name}${variant.labelEs ? ` — ${variant.labelEs}` : ''}`,
           sku: variant.sku || `${product.sku}-${variant.id}`,
           offers: offer(variant),
         })),
@@ -150,15 +147,15 @@ const productSchema: Record<string, unknown> = {
   extraSchema={[productSchema]}
   extraMeta={productMeta}
   breadcrumb={[
-    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: 'Inicio', path: '/' },
     { name: t.navLabel, path: catalogHref },
     { name: product.name, path: href },
   ]}
 >
   <section class="product-hero">
     <div class="container">
-      <nav class="breadcrumb" aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'}>
-        <a href={es ? '/' : '/en/'}>{es ? 'Inicio' : 'Home'}</a>
+      <nav class="breadcrumb" aria-label={'Ruta de navegación'}>
+        <a href={'/'}>{'Inicio'}</a>
         <span aria-hidden="true">/</span>
         <a href={catalogHref}>{t.navLabel}</a>
         <span aria-hidden="true">/</span>
@@ -253,7 +250,7 @@ const productSchema: Record<string, unknown> = {
                 {product.variants.map((variant) => {
                   const variantPrice = priceFor(product, variant.id);
                   const label =
-                    (es ? variant.labelEs : variant.labelEn) ||
+                    variant.labelEs ||
                     Object.entries(variant.attributes ?? {})
                       .map(([key, value]) => `${(attributeLabels as Record<string, string>)[key] ?? key}: ${value}`)
                       .join(' · ');
@@ -329,7 +326,7 @@ const productSchema: Record<string, unknown> = {
                 data-price={basePrice.unitCents}
                 data-availability={product.availability}
                 data-image={image ? productImage(image.cloudinaryPublicId, 400) : ''}
-                data-added-label={es ? 'Añadido' : 'Added'}
+                data-added-label={'Añadido'}
               >
                 <Icon name="shopping-cart" size={18} />
                 {t.addToCart}
@@ -346,7 +343,7 @@ const productSchema: Record<string, unknown> = {
             path={href}
             title={product.name}
             text={product.shortDescription || description}
-            label={es ? 'Comparte este equipo y consigue clientes' : 'Share this item and win customers'}
+            label={'Comparte este equipo y consigue clientes'}
             campaign="product"
             variant="card"
           />

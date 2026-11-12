@@ -6,15 +6,14 @@ interface Props {
 }
 
 const { rate } = Astro.props;
-const es = true;
 ---
 
-<div class="currency-switch" role="group" aria-label={es ? 'Moneda de exhibición' : 'Display currency'}>
+<div class="currency-switch" role="group" aria-label={'Moneda de exhibición'}>
   <button type="button" data-currency-option="USD" aria-pressed="true">USD</button>
   <button type="button" data-currency-option="VES" disabled={!rate}>Bs</button>
 </div>
 {rate && (
   <span class="currency-note">
-    {es ? 'Tasa BCV' : 'BCV rate'}: {rate.rate.toFixed(2)} · {rate.date}
+    {'Tasa BCV'}: {rate.rate.toFixed(2)} · {rate.date}
   </span>
 )}

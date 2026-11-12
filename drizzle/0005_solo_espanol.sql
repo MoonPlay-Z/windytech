@@ -9,3 +9,6 @@ DELETE FROM service_plan_translations WHERE locale = 'en';
 
 -- Las cotizaciones también se emiten en español.
 UPDATE quotes SET locale = 'es' WHERE locale <> 'es';
+
+-- La etiqueta en inglés de las variantes ya no se usa.
+ALTER TABLE product_variants DROP COLUMN IF EXISTS label_en;

@@ -18,7 +18,6 @@ interface Props {
 }
 
 const { product, rate } = Astro.props;
-const es = true;
 const t = catalogCopy;
 const price = priceFor(product, null);
 const image = primaryImage(product);
@@ -27,16 +26,14 @@ const image = primaryImage(product);
 const imageSrc = image ? productImage(image.cloudinaryPublicId, 800) : '';
 const imageSrcSet = image ? productSrcSet(image.cloudinaryPublicId) : '';
 const imageSmall = image ? productImage(image.cloudinaryPublicId, 400) : '';
-const href = `${es ? '/catalogo/' : '/en/catalog/'}${product.slug}/`;
+const href = `${'/catalogo/'}${product.slug}/`;
 const availability = availabilityLabels[product.availability];
 const condition = conditionLabels[product.condition];
 const compareAt = Math.max(price.compareAtCents, price.listCents);
 const vesPrice = rate ? Math.round(price.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(compareAt * rate.rate) : 0;
-const consultMessage = es
-  ? `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`
-  : `Hello Windytech, I would like to check availability of ${product.name}.`;
-const addedLabel = es ? 'Añadido' : 'Added';
+const consultMessage = `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`;
+const addedLabel = 'Añadido';
 ---
 
 <article class="product-card">

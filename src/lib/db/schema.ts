@@ -111,7 +111,6 @@ export const productVariants = pgTable(
     availability: availabilityEnum('availability').notNull().default('IN_STOCK'),
     imagePublicId: text('image_public_id'),
     labelEs: text('label_es').notNull().default(''),
-    labelEn: text('label_en').notNull().default(''),
     position: integer('position').notNull().default(0),
   },
   (table) => [index('product_variants_product_idx').on(table.productId)],

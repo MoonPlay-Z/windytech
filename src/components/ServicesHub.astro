@@ -10,10 +10,9 @@ interface Props {
 }
 
 const hub = serviceHub;
-const es = true;
-const homeHref = es ? '/' : '/en/';
-const homeLabel = es ? 'Inicio' : 'Home';
-const viewLabel = es ? 'Ver servicio' : 'View service';
+const homeHref = '/';
+const homeLabel = 'Inicio';
+const viewLabel = 'Ver servicio';
 
 const plans = await listServicePlans();
 
@@ -35,7 +34,7 @@ const itemList = {
   title={hub.title}
   description={hub.description}
   path={hub.path}
-  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImage='/assets/og.png'
   ogImageAlt={`${hub.h1} — ${site.name}`}
   pageType="CollectionPage"
   extraSchema={[itemList]}
@@ -57,7 +56,7 @@ const itemList = {
       <div class="about-hero-actions">
         <a
           class="btn btn-primary"
-          href={whatsappLink(es ? 'Hola Windytech, quiero una cotización.' : 'Hello Windytech, I would like a quote.')}
+          href={whatsappLink('Hola Windytech, quiero una cotización.')}
           target="_blank"
           rel="noopener noreferrer"
           data-track="whatsapp"
@@ -66,7 +65,7 @@ const itemList = {
           <Icon name="whatsapp" size={18} />
         </a>
         <a class="btn btn-light" href={`${homeHref}#servicios`}>
-          {es ? 'Ver en la página principal' : 'See on the home page'}
+          {'Ver en la página principal'}
         </a>
       </div>
     </div>
@@ -107,7 +106,7 @@ const itemList = {
       </div>
       <a
         class="btn btn-dark"
-        href={whatsappLink(es ? 'Hola Windytech, necesito ayuda para elegir un servicio.' : 'Hello Windytech, I need help choosing a service.')}
+        href={whatsappLink('Hola Windytech, necesito ayuda para elegir un servicio.')}
         target="_blank"
         rel="noopener noreferrer"
         data-track="whatsapp"

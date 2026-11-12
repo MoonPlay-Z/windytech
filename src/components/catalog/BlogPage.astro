@@ -11,26 +11,16 @@ interface Props {
 }
 
 const { posts } = Astro.props;
-const es = true;
 const href = blogPath();
 
-const copy = es
-  ? {
-      eyebrow: 'BLOG',
-      title: 'Notas sobre software, automatización y equipos',
-      intro:
-        'Guías y criterios prácticos para elegir tecnología, automatizar procesos y cuidar la operación de tu negocio.',
-      empty: 'Todavía no hay publicaciones. Vuelve pronto.',
-      read: 'Leer artículo',
-    }
-  : {
-      eyebrow: 'BLOG',
-      title: 'Notes on software, automation and equipment',
-      intro:
-        'Practical guides and criteria to choose technology, automate processes and take care of your business operations.',
-      empty: 'No posts yet. Check back soon.',
-      read: 'Read article',
-    };
+const copy = {
+  eyebrow: 'BLOG',
+  title: 'Notas sobre software, automatización y equipos',
+  intro:
+    'Guías y criterios prácticos para elegir tecnología, automatizar procesos y cuidar la operación de tu negocio.',
+  empty: 'Todavía no hay publicaciones. Vuelve pronto.',
+  read: 'Leer artículo',
+};
 
 const itemList = {
   '@type': 'ItemList',
@@ -48,10 +38,10 @@ const itemList = {
   title={`${copy.title} | ${site.name}`}
   description={copy.intro}
   path={href}
-  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImage='/assets/og.png'
   extraSchema={[itemList]}
   breadcrumb={[
-    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: 'Inicio', path: '/' },
     { name: 'Blog', path: href },
   ]}
 >
@@ -92,7 +82,7 @@ const itemList = {
               <div class="blog-card-body">
                 {post.publishedAt && (
                   <time datetime={post.publishedAt}>
-                    {new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', { dateStyle: 'medium' }).format(new Date(post.publishedAt))}
+                    {new Intl.DateTimeFormat('es-VE', { dateStyle: 'medium' }).format(new Date(post.publishedAt))}
                   </time>
                 )}
                 <h2><a href={`${href}${post.slug}/`}>{post.title}</a></h2>

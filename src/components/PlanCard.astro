@@ -18,19 +18,14 @@ interface Props {
 }
 
 const { plan, serviceHref = '', shareUrl = '', ctaLabel, viewServiceLabel } = Astro.props;
-const es = true;
 const copy = shareCopy;
 
 const money = (value: ServicePlan) =>
   value.currency === 'VES' ? formatVes(value.priceCents) : formatUsd(value.priceCents);
 
-const periodLabel = es
-  ? { one_time: 'pago único', monthly: 'por mes', yearly: 'por año' }
-  : { one_time: 'one-time', monthly: 'per month', yearly: 'per year' };
+const periodLabel = { one_time: 'pago único', monthly: 'por mes', yearly: 'por año' };
 
-const message = es
-  ? `Hola Windytech, quiero el paquete ${plan.name}.`
-  : `Hello Windytech, I would like the ${plan.name} package.`;
+const message = `Hola Windytech, quiero el paquete ${plan.name}.`;
 ---
 
 <article class:list={['plan-card', { 'plan-card--featured': plan.isFeatured }]} id={`plan-${plan.slug}`}>
@@ -47,7 +42,7 @@ const message = es
     <p class="plan-delivery">
       <Icon name="clock" size={16} />
       <span>
-        <strong>{`${es ? 'Tiempo de aplicación' : 'Delivery time'}: `}</strong>
+        <strong>{`${'Tiempo de aplicación'}: `}</strong>
         {plan.deliveryTime}
       </span>
     </p>
@@ -55,7 +50,7 @@ const message = es
 
   {plan.includes.length > 0 && (
     <>
-      <span class="plan-includes-title">{es ? 'Incluye' : 'Includes'}</span>
+      <span class="plan-includes-title">{'Incluye'}</span>
       <ul class="plan-features">
         {plan.includes.map((item) => (
           <li>
@@ -75,12 +70,12 @@ const message = es
       rel="noopener noreferrer"
       data-track="whatsapp"
     >
-      {ctaLabel ?? (es ? 'Contratar por WhatsApp' : 'Start on WhatsApp')}
+      {ctaLabel ?? ('Contratar por WhatsApp')}
       <Icon name="whatsapp" size={18} />
     </a>
     {serviceHref && (
       <a class="plan-link" href={serviceHref}>
-        {viewServiceLabel ?? (es ? 'Ver servicio' : 'View service')}
+        {viewServiceLabel ?? ('Ver servicio')}
         <Icon name="arrow-right" size={16} />
       </a>
     )}

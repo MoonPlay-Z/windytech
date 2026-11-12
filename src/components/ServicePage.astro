@@ -14,32 +14,20 @@ interface Props {
 
 const { service, path } = Astro.props;
 const s = service.content;
-const es = true;
-const homeHref = es ? '/' : '/en/';
-const hubHref = es ? '/servicios/' : '/en/services/';
-const homeLabel = es ? 'Inicio' : 'Home';
-const hubLabel = es ? 'Servicios' : 'Services';
-const labels = es
-  ? {
-      breadcrumb: 'Ruta de navegación',
-      related: 'Otros servicios',
-      cta: 'Pedir cotización',
-      back: 'Ver todos los servicios',
-      plansTitle: 'Paquetes de este servicio',
-      plansIntro:
-        'Elige el paquete que se ajusta a tu momento: verás qué incluye, cuánto cuesta y en cuánto tiempo se aplica.',
-      shareLabel: 'Comparte este servicio y consigue clientes',
-    }
-  : {
-      breadcrumb: 'Breadcrumb',
-      related: 'Other services',
-      cta: 'Request a quote',
-      back: 'See all services',
-      plansTitle: 'Packages for this service',
-      plansIntro:
-        'Pick the package that fits your moment: what it includes, what it costs and how long it takes to apply.',
-      shareLabel: 'Share this service and win customers',
-    };
+const homeHref = '/';
+const hubHref = '/servicios/';
+const homeLabel = 'Inicio';
+const hubLabel = 'Servicios';
+const labels = {
+  breadcrumb: 'Ruta de navegación',
+  related: 'Otros servicios',
+  cta: 'Pedir cotización',
+  back: 'Ver todos los servicios',
+  plansTitle: 'Paquetes de este servicio',
+  plansIntro:
+    'Elige el paquete que se ajusta a tu momento: verás qué incluye, cuánto cuesta y en cuánto tiempo se aplica.',
+  shareLabel: 'Comparte este servicio y consigue clientes',
+};
 
 const canonical = new URL(path, site.url).toString();
 const related = s.related
@@ -117,7 +105,7 @@ const serviceSchema = {
   title={s.metaTitle}
   description={s.metaDescription}
   path={path}
-  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImage='/assets/og.png'
   ogImageAlt={`${s.title} — ${site.name}`}
   pageType="WebPage"
   dateModified={site.contentUpdated}
@@ -256,7 +244,7 @@ const serviceSchema = {
       <section class="section section--white" id="paquetes">
         <div class="container">
           <div class="plans-head">
-            <span class="eyebrow">{es ? 'PAQUETES' : 'PACKAGES'}</span>
+            <span class="eyebrow">{'PAQUETES'}</span>
             <h2>{labels.plansTitle}</h2>
             <p>{labels.plansIntro}</p>
           </div>

@@ -26,7 +26,6 @@ export type CatalogVariant = {
   availability: Availability;
   imagePublicId: string | null;
   labelEs: string;
-  labelEn: string;
   position: number;
 };
 

@@ -169,7 +169,7 @@ export async function getCatalog(filters: CatalogFilters): Promise<CatalogProduc
       sql`SELECT id, product_id AS "productId", sku, attributes,
                  price_cents AS "priceCents", compare_at_cents AS "compareAtCents",
                  availability, image_public_id AS "imagePublicId",
-                 label_es AS "labelEs", label_en AS "labelEn", position
+                 label_es AS "labelEs", position
           FROM product_variants WHERE product_id IN (${inList(ids)})
           ORDER BY position ASC, id ASC`,
     ),
@@ -214,7 +214,7 @@ export async function getProduct(slug: string): Promise<CatalogProduct | null> {
       sql`SELECT id, product_id AS "productId", sku, attributes,
                  price_cents AS "priceCents", compare_at_cents AS "compareAtCents",
                  availability, image_public_id AS "imagePublicId",
-                 label_es AS "labelEs", label_en AS "labelEn", position
+                 label_es AS "labelEs", position
           FROM product_variants WHERE product_id = ${id} ORDER BY position ASC, id ASC`,
     ),
     getPromotionRules(),
@@ -248,7 +248,7 @@ export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]>
     sql`SELECT id, product_id AS "productId", sku, attributes,
                price_cents AS "priceCents", compare_at_cents AS "compareAtCents",
                availability, image_public_id AS "imagePublicId",
-               label_es AS "labelEs", label_en AS "labelEn", position
+               label_es AS "labelEs", position
         FROM product_variants WHERE product_id IN (${inList(ids)})`,
   );
   const rules = await getPromotionRules();
@@ -643,7 +643,7 @@ export async function getProductAdmin(id: number): Promise<ProductAdmin | null> 
     safeRows(sql`SELECT id, sku, attributes, price_cents AS "priceCents",
                         compare_at_cents AS "compareAtCents", availability,
                         image_public_id AS "imagePublicId", label_es AS "labelEs",
-                        label_en AS "labelEn", position
+                        position
                  FROM product_variants WHERE product_id = ${id} ORDER BY position ASC, id ASC`),
     safeRows(sql`SELECT id, variant_id AS "variantId", cloudinary_public_id AS "cloudinaryPublicId",
                         alt, position, is_primary AS "isPrimary"
@@ -683,7 +683,6 @@ export type ProductInput = {
     availability: string;
     imagePublicId: string | null;
     labelEs: string;
-    labelEn: string;
     position: number;
   }[];
 };
@@ -791,10 +790,10 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
       for (const variant of input.variants) {
         await tx.execute(
           sql`INSERT INTO product_variants (product_id, sku, attributes, price_cents, compare_at_cents,
-                  availability, image_public_id, label_es, label_en, position)
+                  availability, image_public_id, label_es, position)
               VALUES (${id}, ${variant.sku}, ${JSON.stringify(variant.attributes)}::jsonb,
                   ${variant.priceCents}, ${variant.compareAtCents}, ${variant.availability},
-                  ${variant.imagePublicId}, ${variant.labelEs}, ${variant.labelEn}, ${variant.position})`,
+                  ${variant.imagePublicId}, ${variant.labelEs}, ${variant.position})`,
         );
       }
     }

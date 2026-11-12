@@ -12,24 +12,21 @@ interface Props {
 }
 
 const { quote } = Astro.props;
-const es = true;
 const t = catalogCopy;
 const expired = new Date(quote.validUntil).getTime() < Date.now();
-const path = es ? `/cotizacion/${quote.publicToken}/` : `/en/quote/${quote.publicToken}/`;
+const path = `/cotizacion/${quote.publicToken}/`;
 const url = new URL(path, site.url).toString();
-const message = es
-  ? `Hola Windytech, quiero cotizar ${quote.number}:\n${url}`
-  : `Hello Windytech, I would like a quote for ${quote.number}:\n${url}`;
+const message = `Hola Windytech, quiero cotizar ${quote.number}:\n${url}`;
 
-const statusLabels: Record<QuoteStatus, { es: string; en: string }> = {
-  NEW: { es: 'Nueva', en: 'New' },
-  CONTACTED: { es: 'Contactada', en: 'Contacted' },
-  QUOTED: { es: 'Cotizada', en: 'Quoted' },
-  CLOSED: { es: 'Cerrada', en: 'Closed' },
-  LOST: { es: 'Perdida', en: 'Lost' },
+const statusLabels: Record<QuoteStatus, string> = {
+  NEW: 'Nueva',
+  CONTACTED: 'Contactada',
+  QUOTED: 'Cotizada',
+  CLOSED: 'Cerrada',
+  LOST: 'Perdida',
 };
 
-const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
+const validUntil = new Intl.DateTimeFormat('es-VE', {
   dateStyle: 'long',
 }).format(new Date(quote.validUntil));
 ---
@@ -94,7 +91,7 @@ const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
           )}
           {quote.taxCents > 0 && (
             <div>
-              <span>{es ? 'IVA' : 'VAT'}</span>
+              <span>{'IVA'}</span>
               <strong>{formatUsd(quote.taxCents)}</strong>
             </div>
           )}
@@ -104,7 +101,7 @@ const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
           </div>
           {quote.totalVesCents !== null && (
             <div class="quote-ves">
-              <span>{es ? 'Equivalente en bolívares' : 'Bolívar equivalent'}</span>
+              <span>{'Equivalente en bolívares'}</span>
               <strong>{formatVes(quote.totalVesCents)}</strong>
             </div>
           )}
@@ -147,7 +144,7 @@ const validUntil = new Intl.DateTimeFormat(es ? 'es-VE' : 'en-US', {
             <Icon name="whatsapp" size={18} />
             {t.sendWhatsapp}
           </a>
-          <a class="btn btn-light" href={es ? '/catalogo/' : '/en/catalog/'}>{t.continue}</a>
+          <a class="btn btn-light" href={'/catalogo/'}>{t.continue}</a>
         </div>
       </div>
     </div>

@@ -11,31 +11,18 @@ interface Props {
 }
 
 const { projects } = Astro.props;
-const es = true;
 
-const copy = es
-  ? {
-      eyebrow: 'PROYECTOS',
-      title: 'Trabajo real, con permiso del cliente',
-      intro:
-        'Una selección de proyectos entregados. Publicamos nombre y detalles solo cuando el cliente lo autoriza; el resto se describe de forma general.',
-      empty: 'Estamos preparando los primeros casos. Mientras tanto, cuéntanos qué necesitas.',
-      cta: 'Quiero un proyecto así',
-      read: 'Ver caso',
-      year: 'Año',
-      services: 'Servicios',
-    }
-  : {
-      eyebrow: 'PROJECTS',
-      title: 'Real work, with client permission',
-      intro:
-        'A selection of delivered projects. We publish names and details only when the client authorizes it; the rest is described in general terms.',
-      empty: 'We are preparing the first case studies. In the meantime, tell us what you need.',
-      cta: 'I want a project like this',
-      read: 'View case',
-      year: 'Year',
-      services: 'Services',
-    };
+const copy = {
+  eyebrow: 'PROYECTOS',
+  title: 'Trabajo real, con permiso del cliente',
+  intro:
+    'Una selección de proyectos entregados. Publicamos nombre y detalles solo cuando el cliente lo autoriza; el resto se describe de forma general.',
+  empty: 'Estamos preparando los primeros casos. Mientras tanto, cuéntanos qué necesitas.',
+  cta: 'Quiero un proyecto así',
+  read: 'Ver caso',
+  year: 'Año',
+  services: 'Servicios',
+};
 
 const href = projectsPath();
 const itemList = {
@@ -54,10 +41,10 @@ const itemList = {
   title={`${copy.title} | ${site.name}`}
   description={copy.intro}
   path={href}
-  ogImage={es ? '/assets/og.png' : '/assets/og-en.png'}
+  ogImage='/assets/og.png'
   extraSchema={[itemList]}
   breadcrumb={[
-    { name: es ? 'Inicio' : 'Home', path: es ? '/' : '/en/' },
+    { name: 'Inicio', path: '/' },
     { name: copy.eyebrow, path: href },
   ]}
 >
@@ -77,7 +64,7 @@ const itemList = {
           <p>{copy.empty}</p>
           <a
             class="btn btn-primary"
-            href={whatsappLink(es ? 'Hola Windytech, quiero un proyecto como los de su portafolio.' : 'Hello Windytech, I want a project like the ones in your portfolio.')}
+            href={whatsappLink('Hola Windytech, quiero un proyecto como los de su portafolio.')}
             target="_blank"
             rel="noopener noreferrer"
           >
