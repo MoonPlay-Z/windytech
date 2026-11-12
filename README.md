@@ -109,6 +109,10 @@ responden con un **301** a su equivalente en español (`src/middleware.ts`).
 - `/catalogo/` — catálogo de equipos
 - `/proyectos/`, `/blog/`, `/carrito/`
 - `/legal/privacidad/` y `/legal/terminos/`
+- `/cuenta/` — cuenta del cliente (registro, perfil, clave)
+- `/cuenta/seguimientos/` — panel del cliente con el estado de sus servicios,
+  suscripciones, proyectos, cotizaciones y equipos comprados
+- `/admin/seguimientos/` — panel de administración de esos seguimientos
 
 ## Base de datos
 

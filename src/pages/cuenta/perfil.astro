@@ -50,6 +50,9 @@ if (!customer) return Astro.redirect('/cuenta/login/', 302);
             <dd>{customer.email}</dd>
           </div>
         </dl>
+        <a class="btn btn-light account-submit" href="/cuenta/seguimientos/">
+          Ver mis seguimientos
+        </a>
         <p class="account-message" data-auth-message role="alert" hidden></p>
         <button class="btn btn-primary account-submit" type="button" data-logout-button>
           Cerrar sesión

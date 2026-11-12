@@ -171,6 +171,10 @@ export const quotes = pgTable(
     customerName: text('customer_name').notNull(),
     phone: text('phone').notNull(),
     email: text('email').notNull().default(''),
+    /** Cliente de la cuenta que pidió la cotización (si está registrado). */
+    customerId: integer('customer_id').references(() => customerAccounts.id, {
+      onDelete: 'set null',
+    }),
     notes: text('notes').notNull().default(''),
     locale: localeEnum('locale').notNull().default('es'),
     currency: quoteCurrencyEnum('currency').notNull().default('USD'),
@@ -395,6 +399,48 @@ export const customerSessions = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('customer_sessions_customer_idx').on(table.customerId)],
+);
+
+/* Seguimiento que ve el cliente: servicios, suscripciones, proyectos,
+   cotizaciones y equipos comprados. */
+export const serviceTrackings = pgTable(
+  'service_trackings',
+  {
+    id: serial('id').primaryKey(),
+    customerId: integer('customer_id')
+      .notNull()
+      .references(() => customerAccounts.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull().default('service'),
+    title: text('title').notNull(),
+    reference: text('reference').notNull().default(''),
+    status: text('status').notNull().default('solicitado'),
+    progress: integer('progress').notNull().default(0),
+    summary: text('summary').notNull().default(''),
+    eta: timestamp('eta', { mode: 'date' }),
+    publicToken: text('public_token').notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('service_trackings_customer_idx').on(table.customerId),
+    index('service_trackings_kind_idx').on(table.kind),
+  ],
+);
+
+export const trackingEvents = pgTable(
+  'tracking_events',
+  {
+    id: serial('id').primaryKey(),
+    trackingId: integer('tracking_id')
+      .notNull()
+      .references(() => serviceTrackings.id, { onDelete: 'cascade' }),
+    status: text('status').notNull(),
+    progress: integer('progress').notNull().default(0),
+    note: text('note').notNull().default(''),
+    author: text('author').notNull().default('Windytech'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('tracking_events_tracking_idx').on(table.trackingId)],
 );
 
 export const auditLog = pgTable(

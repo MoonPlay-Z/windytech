@@ -1,6 +1,6 @@
 import { randomToken } from './security';
 import { computeTotals, resolvePrice } from './pricing';
-import { getProductsByIds, createQuote } from './db/queries';
+import { createQuote, createTracking, findCustomerByEmail, getProductsByIds } from './db/queries';
 import { currentRate } from './rate';
 import { quotePath } from './catalog';
 import { site } from '../data/site';
@@ -106,12 +106,16 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
   const token = randomToken(16);
   const validUntil = new Date(now.getTime() + QUOTE_VALID_DAYS * 24 * 60 * 60 * 1000);
 
+  // Si el cliente tiene cuenta, su cotización queda registrada en su panel.
+  const customer = input.email ? await findCustomerByEmail(input.email) : null;
+
   const created = await createQuote({
     number: null,
     publicToken: token,
     customerName: input.customerName,
     phone: input.phone,
     email: input.email,
+    customerId: customer?.id ?? null,
     notes: input.notes,
     locale,
     currency: input.currency,
@@ -125,6 +129,22 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
     validUntil,
     items,
   });
+
+  if (customer && created?.number) {
+    await createTracking({
+      customerId: customer.id,
+      kind: 'quote',
+      title: `Cotización ${created.number}`,
+      reference: created.number,
+      status: 'recibida',
+      progress: 15,
+      summary: `Presupuesto por ${totals.totalCents / 100} USD para ${
+        items.length
+      } producto(s). Te avisamos cuando lo revises.`,
+      publicToken: randomToken(12),
+      note: 'Cotización creada desde el sitio.',
+    });
+  }
 
   if (!created) {
     return {

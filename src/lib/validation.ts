@@ -272,3 +272,17 @@ export const customerChangePasswordSchema = z.object({
 export function dollarsToCents(value: number): number {
   return Math.round(value * 100);
 }
+
+export const trackingSchema = z.object({
+  id: z.coerce.number().int().positive().optional(),
+  customerId: z.coerce.number().int().positive().optional(),
+  customerEmail: z.string().trim().email().max(200).optional(),
+  kind: z.enum(['service', 'subscription', 'project', 'quote', 'equipment']),
+  title: z.string().trim().min(2).max(180),
+  reference: z.string().trim().max(80).default(''),
+  status: z.string().trim().min(2).max(40),
+  progress: z.coerce.number().int().min(0).max(100).default(0),
+  summary: z.string().trim().max(1000).default(''),
+  eta: z.string().trim().max(40).nullable().optional(),
+  note: z.string().trim().max(500).default(''),
+});

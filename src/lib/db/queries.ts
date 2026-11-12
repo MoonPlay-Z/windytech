@@ -354,6 +354,7 @@ export async function createQuote(data: {
   customerName: string;
   phone: string;
   email: string;
+  customerId?: number | null;
   notes: string;
   locale: string;
   currency: 'USD' | 'VES';
@@ -380,11 +381,11 @@ export async function createQuote(data: {
 
   return client.transaction(async (tx) => {
     const inserted = await tx.execute(
-      sql`INSERT INTO quotes (number, public_token, customer_name, phone, email, notes, locale,
+      sql`INSERT INTO quotes (number, public_token, customer_name, phone, email, customer_id, notes, locale,
               currency, rate_snapshot, rate_date, subtotal_cents, discount_cents, tax_cents,
               total_cents, total_ves_cents, status, valid_until)
           VALUES (${data.number}, ${data.publicToken}, ${data.customerName}, ${data.phone},
-              ${data.email}, ${data.notes}, ${data.locale}, ${data.currency},
+              ${data.email}, ${data.customerId ?? null}, ${data.notes}, ${data.locale}, ${data.currency},
               ${data.rateSnapshot}, ${data.rateDate}, ${data.subtotalCents}, ${data.discountCents},
               ${data.taxCents}, ${data.totalCents}, ${data.totalVesCents}, 'NEW', ${data.validUntil})
           RETURNING id, number`,
@@ -1394,4 +1395,168 @@ export async function countQuotesByStatus() {
     sql`SELECT status, COUNT(*)::int AS total FROM quotes GROUP BY status`,
   );
   return Object.fromEntries(rows.map((row) => [row.status, Number(row.total)]));
+}
+
+/* ------------------------------------------------------------------ */
+/* Seguimientos del cliente                                            */
+/* ------------------------------------------------------------------ */
+
+export type TrackingRow = {
+  id: number;
+  customerId: number;
+  customerName: string;
+  customerEmail: string;
+  kind: string;
+  title: string;
+  reference: string;
+  status: string;
+  progress: number;
+  summary: string;
+  eta: string | null;
+  publicToken: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TrackingEventRow = {
+  id: number;
+  trackingId: number;
+  status: string;
+  progress: number;
+  note: string;
+  author: string;
+  createdAt: string;
+};
+
+const TRACKING_SELECT = `
+  SELECT t.id, t.customer_id AS "customerId", c.name AS "customerName", c.email AS "customerEmail",
+         t.kind, t.title, t.reference, t.status, t.progress, t.summary,
+         t.eta::text AS eta, t.public_token AS "publicToken",
+         t.created_at::text AS "createdAt", t.updated_at::text AS "updatedAt"
+    FROM service_trackings t
+    JOIN customer_accounts c ON c.id = t.customer_id`;
+
+/** Seguimientos de un cliente (vista del panel privado). */
+export async function listTrackingsForCustomer(customerId: number): Promise<TrackingRow[]> {
+  return safeRows<TrackingRow>(
+    sql`${sql.raw(TRACKING_SELECT)}
+          WHERE t.customer_id = ${customerId}
+          ORDER BY t.updated_at DESC, t.id DESC`,
+  );
+}
+
+/** Todos los seguimientos (panel de administración). */
+export async function listTrackingsAdmin(): Promise<TrackingRow[]> {
+  return safeRows<TrackingRow>(
+    sql`${sql.raw(TRACKING_SELECT)}
+          ORDER BY t.updated_at DESC, t.id DESC`,
+  );
+}
+
+export async function getTracking(id: number): Promise<TrackingRow | null> {
+  return one<TrackingRow>(sql`${sql.raw(TRACKING_SELECT)} WHERE t.id = ${id} LIMIT 1`);
+}
+
+export async function getTrackingForCustomer(
+  id: number,
+  customerId: number,
+): Promise<TrackingRow | null> {
+  return one<TrackingRow>(
+    sql`${sql.raw(TRACKING_SELECT)} WHERE t.id = ${id} AND t.customer_id = ${customerId} LIMIT 1`,
+  );
+}
+
+export async function listTrackingEvents(trackingId: number): Promise<TrackingEventRow[]> {
+  return safeRows<TrackingEventRow>(
+    sql`SELECT id, tracking_id AS "trackingId", status, progress, note, author,
+               created_at::text AS "createdAt"
+        FROM tracking_events WHERE tracking_id = ${trackingId}
+        ORDER BY created_at DESC, id DESC`,
+  );
+}
+
+/** Crea un seguimiento y su primer evento de historial. */
+export async function createTracking(data: {
+  customerId: number;
+  kind: string;
+  title: string;
+  reference?: string;
+  status: string;
+  progress: number;
+  summary?: string;
+  eta?: string | null;
+  publicToken: string;
+  note?: string;
+}): Promise<number | null> {
+  const client = db();
+  if (!client) return null;
+
+  return client.transaction(async (tx) => {
+    const result = await tx.execute(
+      sql`INSERT INTO service_trackings (customer_id, kind, title, reference, status, progress,
+                summary, eta, public_token)
+            VALUES (${data.customerId}, ${data.kind}, ${data.title}, ${data.reference ?? ''},
+                ${data.status}, ${data.progress}, ${data.summary ?? ''}, ${data.eta ?? null},
+                ${data.publicToken})
+            RETURNING id`,
+    );
+    const id = Number((result.rows[0] as { id: number }).id);
+    await tx.execute(
+      sql`INSERT INTO tracking_events (tracking_id, status, progress, note, author)
+            VALUES (${id}, ${data.status}, ${data.progress}, ${data.note || 'Seguimiento creado.'}, 'Windytech')`,
+    );
+    return id;
+  });
+}
+
+/** Actualiza el seguimiento y deja constancia en el historial. */
+export async function updateTracking(
+  id: number,
+  data: {
+    title?: string;
+    reference?: string;
+    status: string;
+    progress: number;
+    summary?: string;
+    eta?: string | null;
+    note?: string;
+  },
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+
+  return client.transaction(async (tx) => {
+    const result = await tx.execute(
+      sql`UPDATE service_trackings
+              SET title = COALESCE(${data.title ?? null}, title),
+                  reference = COALESCE(${data.reference ?? null}, reference),
+                  status = ${data.status},
+                  progress = ${data.progress},
+                  summary = COALESCE(${data.summary ?? null}, summary),
+                  eta = ${data.eta ?? null},
+                  updated_at = now()
+            WHERE id = ${id}
+            RETURNING id`,
+    );
+    if (result.rows.length === 0) return false;
+    await tx.execute(
+      sql`INSERT INTO tracking_events (tracking_id, status, progress, note, author)
+            VALUES (${id}, ${data.status}, ${data.progress}, ${data.note || 'Estado actualizado.'}, 'Windytech')`,
+    );
+    return true;
+  });
+}
+
+export async function deleteTracking(id: number): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  const result = await client.execute(sql`DELETE FROM service_trackings WHERE id = ${id} RETURNING id`);
+  return result.rows.length > 0;
+}
+
+/** Cliente al que pertenece un seguimiento (para crear seguimientos desde el admin). */
+export async function findCustomerByEmail(email: string): Promise<{ id: number; name: string } | null> {
+  return one<{ id: number; name: string }>(
+    sql`SELECT id, name FROM customer_accounts WHERE lower(email) = lower(${email}) LIMIT 1`,
+  );
 }

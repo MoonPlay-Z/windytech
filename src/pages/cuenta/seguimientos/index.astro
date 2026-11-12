@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import '../../../styles/account.css';
+import { customerSessionFromRequest } from '../../../lib/customer-auth';
+import { listTrackingsForCustomer } from '../../../lib/db/queries';
+import { TRACKING_KIND_LIST, trackingMeta, trackingStatus } from '../../../lib/trackings';
+
+export const prerender = false;
+
+const customer = await customerSessionFromRequest(Astro.request);
+if (!customer) return Astro.redirect('/cuenta/login/', 302);
+
+const trackings = await listTrackingsForCustomer(customer.id);
+const porTipo = TRACKING_KIND_LIST.map((kind) => ({
+  kind,
+  items: trackings.filter((item: (typeof trackings)[number]) => item.kind === kind.id),
+})).filter((grupo: { items: unknown[] }) => grupo.items.length > 0);
+
+const fecha = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat('es-VE', { day: '2-digit', month: 'short', year: 'numeric' }).format(
+        new Date(value),
+      )
+    : null;
+---
+
+<BaseLayout
+  title="Mis seguimientos | Windytech"
+  description="Sigue el estado de tus servicios, suscripciones, proyectos, cotizaciones y equipos comprados."
+  path="/cuenta/seguimientos/"
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft account-section">
+    <div class="container account-layout account-layout--wide">
+      <aside class="account-intro">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">Tu espacio Windytech</p>
+        <h1>Mis seguimientos.</h1>
+        <p class="account-intro-copy">
+          Aquí ves en qué punto está cada servicio, suscripción, proyecto, cotización y equipo
+          que tienes con nosotros.
+        </p>
+        <nav class="account-links" aria-label="Secciones de tu cuenta">
+          <a href="/cuenta/perfil/">← Mis datos</a>
+          <a href="/">Volver al sitio</a>
+        </nav>
+      </aside>
+
+      <div class="tracking-panel">
+        <header class="account-card-heading">
+          <p class="eyebrow">Seguimientos</p>
+          <h2>{trackings.length > 0 ? `${trackings.length} en marcha` : 'Todavía no hay seguimientos'}</h2>
+          <p>
+            Actualizamos el estado en cuanto hay avances. Si necesitas algo, escríbenos por
+            WhatsApp con el número de referencia.
+          </p>
+        </header>
+
+        {
+          trackings.length === 0 ? (
+            <div class="tracking-empty">
+              <p>Cuando solicites una cotización o contrates un servicio, aquí aparecerá su seguimiento.</p>
+              <a class="btn btn-primary" href="/catalogo/">Ver el catálogo</a>
+            </div>
+          ) : (
+            porTipo.map((grupo) => (
+              <section class="tracking-group" aria-labelledby={`grupo-${grupo.kind.id}`}>
+                <h3 id={`grupo-${grupo.kind.id}`} class="tracking-group-title">
+                  {grupo.kind.plural}
+                  <span>{grupo.items.length}</span>
+                </h3>
+                <ul class="tracking-list">
+                  {grupo.items.map((item) => {
+                    const estado = trackingStatus(item.kind, item.status);
+                    return (
+                      <li class="tracking-card">
+                        <div class="tracking-card-head">
+                          <div>
+                            <span class={`tracking-badge is-${estado?.tone ?? 'neutral'}`}>
+                              {estado?.label ?? item.status}
+                            </span>
+                            <h4>
+                              <a href={`/cuenta/seguimientos/${item.id}/`}>{item.title}</a>
+                            </h4>
+                          </div>
+                          {item.reference && <span class="tracking-ref">{item.reference}</span>}
+                        </div>
+
+                        {item.summary && <p class="tracking-summary">{item.summary}</p>}
+
+                        <div class="tracking-progress" role="img" aria-label={`Avance ${item.progress}%`}>
+                          <span style={`width:${item.progress}%`} />
+                        </div>
+                        <p class="tracking-meta">
+                          <span>Avance {item.progress}%</span>
+                          {item.eta && <span>Entrega estimada: {fecha(item.eta)}</span>}
+                          <span>Actualizado: {fecha(item.updatedAt)}</span>
+                        </p>
+
+                        <a class="tracking-link" href={`/cuenta/seguimientos/${item.id}/`}>
+                          Ver detalle
+                          <Icon name="arrow-right" size={16} />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ))
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../../../scripts/customer-auth';
+  </script>
+</BaseLayout>

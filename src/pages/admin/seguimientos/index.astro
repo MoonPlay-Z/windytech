@@ -1,0 +1,179 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listTrackingsAdmin } from '../../../lib/db/queries';
+import { TRACKING_KIND_LIST, trackingMeta, trackingStatus } from '../../../lib/trackings';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const trackings = await listTrackingsAdmin();
+
+const fecha = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat('es-VE', { day: '2-digit', month: 'short', year: 'numeric' }).format(
+        new Date(value),
+      )
+    : null;
+---
+
+<AdminLayout title="Seguimientos" admin={admin} active="trackings">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <a class="admin-btn" href="#nuevo">+ Nuevo seguimiento</a>
+      <span class="admin-text-muted">{trackings.length} seguimientos</span>
+    </header>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Cliente</th>
+          <th>Seguimiento</th>
+          <th>Tipo</th>
+          <th style="width:220px">Estado</th>
+          <th>Avance</th>
+          <th>Entrega</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          trackings.map((item) => {
+            const estado = trackingStatus(item.kind, item.status);
+            return (
+              <tr data-tracking-row={item.id}>
+                <td>{item.id}</td>
+                <td>
+                  <strong>{item.customerName}</strong>
+                  <small class="admin-text-muted">{item.customerEmail}</small>
+                </td>
+                <td>
+                  <strong>{item.title}</strong>
+                  {item.reference && <small class="admin-text-muted">{item.reference}</small>}
+                </td>
+                <td>{trackingMeta(item.kind).label}</td>
+                <td>
+                  <select
+                    class="admin-select"
+                    data-tracking-status={item.id}
+                    data-tracking-kind={item.kind}
+                    aria-label="Estado del seguimiento"
+                  >
+                    {TRACKING_KIND_LIST.find((k) => k.id === item.kind)?.statuses.map((s) => (
+                      <option value={s.id} selected={s.id === item.status}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <span class="admin-progress" title={`${item.progress}%`}>
+                    <span style={`width:${item.progress}%`} />
+                  </span>
+                  <small class="admin-text-muted">{item.progress}%</small>
+                </td>
+                <td>{fecha(item.eta) ?? '—'}</td>
+                <td>
+                  <button
+                    class="admin-btn admin-btn--danger admin-btn--sm"
+                    data-delete={`/api/admin/trackings?id=${item.id}`}
+                    data-confirm="¿Eliminar este seguimiento?"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            );
+          })
+        }
+        {
+          trackings.length === 0 && (
+            <tr>
+              <td colspan="8">Sin seguimientos. Crea el primero con el formulario de abajo.</td>
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section class="admin-card" id="nuevo">
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">ALTA</p>
+        <h2>Nuevo seguimiento</h2>
+      </div>
+    </div>
+
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/trackings"
+      data-success="Seguimiento creado."
+      data-redirect="/admin/seguimientos/"
+    >
+      <div class="admin-form-row">
+        <label>
+          <span>Cliente (coro)</span>
+          <input type="email" name="customerEmail" data-field="customerEmail" placeholder="cliente@ejemplo.com" required />
+        </label>
+        <label>
+          <span>Tipo</span>
+          <select name="kind" data-field="kind" data-tracking-kind-select>
+            {TRACKING_KIND_LIST.map((kind) => (
+              <option value={kind.id}>{kind.plural}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Estado</span>
+          <select name="status" data-field="status" data-tracking-status-select>
+            {TRACKING_KIND_LIST[0].statuses.map((status) => (
+              <option value={status.id}>{status.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Título</span>
+          <input type="text" name="title" data-field="title" placeholder="Automatización de WhatsApp" required />
+        </label>
+        <label>
+          <span>Referencia</span>
+          <input type="text" name="reference" data-field="reference" placeholder="WQ-2026-0001" />
+        </label>
+        <label>
+          <span>Avance (%)</span>
+          <input type="number" name="progress" data-field="progress" data-type="number" min="0" max="100" value="0" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Entrega estimada</span>
+          <input type="date" name="eta" data-field="eta" />
+        </label>
+        <label>
+          <span>Nota inicial</span>
+          <input type="text" name="note" data-field="note" placeholder="Seguimiento creado desde el panel" />
+        </label>
+      </div>
+      <label>
+        <span>Resumen para el cliente</span>
+        <textarea name="summary" data-field="summary" rows="3"></textarea>
+      </label>
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear seguimiento</button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    import '../../../scripts/trackings';
+  </script>
+</AdminLayout>
