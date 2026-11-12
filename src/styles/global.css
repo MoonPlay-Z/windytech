@@ -3484,3 +3484,146 @@ html[data-astro-transition='back'] {
     object-fit: cover;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Ficha de la empresa (página "Nosotros")
+   --------------------------------------------------------------------------- */
+
+.about-company-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 24px 0 0;
+}
+
+.about-company-grid > div {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.about-company-grid dt {
+  margin-bottom: 6px;
+  color: var(--teal-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-company-grid dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.about-company-grid dd a {
+  color: var(--navy);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.about-company-grid dd a:hover {
+  color: var(--teal-dark);
+}
+
+.about-company-note {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+@media (max-width: 720px) {
+  .about-company-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Redes sociales en el pie de página
+   --------------------------------------------------------------------------- */
+
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: var(--ice);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+
+.footer-social a:hover {
+  border-color: var(--mint);
+  color: var(--mint);
+}
+
+.footer-social svg {
+  flex: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Precio de entrada en las fichas de servicio
+   --------------------------------------------------------------------------- */
+
+.about-price-card {
+  background: linear-gradient(135deg, var(--mint-soft), #fff);
+  border-color: rgba(43, 159, 168, 0.25);
+}
+
+.about-price-value {
+  margin: 6px 0 4px;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.about-price-value span {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.about-price-note {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+   Preguntas frecuentes locales (páginas por ciudad)
+   --------------------------------------------------------------------------- */
+
+.city-faq .section-head {
+  margin-bottom: 36px;
+}
+
+.city-faq .faq-list {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+}
+
+.city-faq .faq-item summary {
+  min-height: 60px;
+  font-size: 16px;
+}

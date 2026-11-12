@@ -27,6 +27,16 @@ type AboutContent = {
   process: Step[];
   coverageTitle: string;
   coverage: string[];
+  companyCardTitle: string;
+  companyCardText: string;
+  companyCardName: string;
+  companyCardFounded: string;
+  companyCardCategory: string;
+  companyCardHours: string;
+  companyCardPhone: string;
+  companyCardEmail: string;
+  companyCardCoverage: string;
+  companyCardPrices: string;
   factsTitle: string;
   facts: Fact[];
   ctaTitle: string;
@@ -127,6 +137,17 @@ export const aboutContent: AboutContent = {
     'La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.',
     'La atención y la documentación de los proyectos están disponibles en español e inglés.',
   ],
+  companyCardTitle: 'Ficha de la empresa',
+  companyCardText:
+    'Estos son los datos que usamos para que los buscadores (Google, Bing y Brave) reconozcan a Windytech como una empresa y muestren su panel con los servicios, el contacto y el horario.',
+  companyCardName: 'Nombre',
+  companyCardFounded: 'Fundación',
+  companyCardCategory: 'Categoría',
+  companyCardHours: 'Horario',
+  companyCardPhone: 'Teléfono',
+  companyCardEmail: 'Correo',
+  companyCardCoverage: 'Cobertura',
+  companyCardPrices: 'Precios',
   factsTitle: 'Datos de la empresa',
   facts: [
     { label: 'Nombre', value: 'Windytech' },

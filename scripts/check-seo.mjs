@@ -63,15 +63,20 @@ async function loadHtml() {
     const res = await fetch(`${site}/sitemap.xml`);
     if (!res.ok) throw new Error(`sitemap.xml respondió ${res.status}`);
     const xml = await res.text();
+    // El sitemap guarda las URLs canónicas (dominio real). Al revisar en
+    // local se reescriben al host servido para poder analizar la página.
     const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     const pages = [];
     for (const url of urls) {
-      const res = await fetch(url);
+      const local = site.startsWith('http://') || site.startsWith('https://')
+        ? url.replace(/^https?:\/\/[^/]+/, site)
+        : url;
+      const res = await fetch(local);
       if (!res.ok) {
-        errors.push(`[live] ${url} respondió ${res.status}`);
+        errors.push(`[live] ${local} respondió ${res.status}`);
         continue;
       }
-      pages.push({ url, html: await res.text() });
+      pages.push({ url: local, html: await res.text() });
     }
     return pages;
   }
@@ -137,7 +142,9 @@ function checkPage(page, { titles, descriptions, canonicals }) {
     if (canonicals.has(canonical))
       errors.push(`${label}: canonical duplicado con ${canonicals.get(canonical)}`);
     canonicals.set(canonical, label);
-    if (site && !canonical.startsWith(site)) warnings.push(`${label}: canonical fuera del dominio`);
+    // El canonical siempre debe apuntar al dominio real, también en local.
+    if (!canonical.startsWith('https://windytech.studio'))
+      warnings.push(`${label}: canonical fuera del dominio de producción`);
   }
 
   const h1s = [...html.matchAll(/<h1[\s>]/g)];
@@ -177,6 +184,98 @@ async function checkAssets(page) {
   }
 }
 
+/**
+ * Señales de entidad del panel de empresa.
+ *
+ * Google, Bing y Brave muestran el bloque lateral de una empresa cuando
+ * detectan las mismas señales en su web: perfil social enlazado, horarios,
+ * área de servicio, datos de contacto y un logo. Se revisan en la portada,
+ * que es la que los buscadores usan como fuente principal de la entidad.
+ */
+function checkEntitySignals(page) {
+  const { html } = page;
+  const label = site ? page.url : page.url.replace(dist, '');
+
+  const scripts = [
+    ...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
+  ];
+
+  const grafos = [];
+  for (const [, raw] of scripts) {
+    try {
+      const parsed = JSON.parse(raw);
+      grafos.push(parsed);
+    } catch {
+      // El error de sintaxis ya lo reporta checkPage.
+    }
+  }
+
+  // Se busca el nodo Organization dentro de cualquier grafo.
+  const nodos = [];
+  const recorrer = (nodo) => {
+    if (!nodo || typeof nodo !== 'object') return;
+    if (Array.isArray(nodo)) {
+      nodo.forEach(recorrer);
+      return;
+    }
+    if (nodo['@graph']) recorrer(nodo['@graph']);
+    const tipo = nodo['@type'];
+    // El @type puede ser una cadena o una lista ("Organization" +
+    // "ProfessionalService"), como hace el sitio.
+    const tipos = Array.isArray(tipo) ? tipo : [tipo];
+    if (tipos.some((t) => typeof t === 'string' && t.includes('Organization'))) {
+      nodos.push(nodo);
+    }
+  };
+  grafos.forEach(recorrer);
+
+  if (nodos.length === 0) {
+    errors.push(`${label}: el JSON-LD no declara ninguna Organization`);
+    return;
+  }
+
+  const org = nodos[0];
+
+  const avisos = [];
+
+  // 1. Perfiles sociales (sameAs): la señal más importante del panel.
+  const sameAs = Array.isArray(org.sameAs) ? org.sameAs : [];
+  if (sameAs.length === 0) {
+    avisos.push(
+      'sin sameAs: rellena profiles[].url en src/data/empresa.ts para que Google, Bing y Brave reconozcan la empresa',
+    );
+  } else {
+    for (const url of sameAs) {
+      if (!/^https:\/\//.test(url)) avisos.push(`sameAs con URL no válida: ${url}`);
+    }
+  }
+
+  // 2. Horario de atención: lo muestra el panel.
+  if (!org.openingHoursSpecification) {
+    avisos.push('sin openingHoursSpecification: el panel no podrá mostrar el horario');
+  }
+
+  // 3. Área de servicio.
+  if (!org.areaServed || (Array.isArray(org.areaServed) && org.areaServed.length === 0)) {
+    avisos.push('sin areaServed: falta indicar dónde se presta el servicio');
+  }
+
+  // 4. Contacto: teléfono y correo.
+  if (!org.telephone) avisos.push('sin telephone');
+  if (!org.email) avisos.push('sin email');
+
+  // 5. Logo e imagen: el panel los necesita para el bloque.
+  if (!org.logo) avisos.push('sin logo: el panel no mostrará el símbolo de la marca');
+  if (!org.image) avisos.push('sin image: falta la imagen principal de la empresa');
+
+  // 6. Categoría: define en qué se clasifica la empresa.
+  if (!org.additionalType) {
+    avisos.push('sin additionalType: falta la categoría principal de Google Business Profile');
+  }
+
+  for (const aviso of avisos) warnings.push(`${label}: ${aviso}`);
+}
+
 const pages = await loadHtml();
 const titles = new Map();
 const descriptions = new Map();
@@ -186,6 +285,11 @@ for (const page of pages) {
   checkPage(page, { titles, descriptions, canonicals });
   await checkAssets(page);
 }
+
+// La portada es la fuente principal de la entidad: se revisa en detalle.
+const portada =
+  pages.find((p) => (site ? p.url === `${site}/` : p.url.endsWith('/index.html'))) ?? pages[0];
+if (portada) checkEntitySignals(portada);
 
 if (!site) {
   const sitemap = await findSitemap();

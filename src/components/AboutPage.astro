@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from './Icon.astro';
 import { aboutContent } from '../data/about';
+import { company } from '../data/empresa';
 import { site, whatsappLink } from '../data/site';
 import { servicePath, services } from '../data/services';
 
@@ -20,7 +21,7 @@ const whatsappMessage = 'Hola Windytech, quiero una cotización para mi negocio.
   title={a.pageTitle}
   description={a.pageDescription}
   path={path}
-  ogImage={'/assets/og.png'}
+  ogImage={'/assets/og.webp'}
   ogImageAlt={`${a.pageH1} — ${site.name}`}
   pageType="AboutPage"
   breadcrumb={[
@@ -114,6 +115,53 @@ const whatsappMessage = 'Hola Windytech, quiero una cotización para mi negocio.
 
         <h2>{a.coverageTitle}</h2>
         {a.coverage.map((paragraph) => <p>{paragraph}</p>)}
+
+        <h2>{a.companyCardTitle}</h2>
+        <p>{a.companyCardText}</p>
+        <dl class="about-company-grid">
+          <div>
+            <dt>{a.companyCardName}</dt>
+            <dd>{company.name}</dd>
+          </div>
+          <div>
+            <dt>{a.companyCardFounded}</dt>
+            <dd>{company.foundingDate}</dd>
+          </div>
+          <div>
+            <dt>{a.companyCardCategory}</dt>
+            <dd>{company.categories.main}</dd>
+          </div>
+          <div>
+            <dt>{a.companyCardHours}</dt>
+            <dd>
+              {company.openingHours.days
+                .map((day) => day.slice(0, 3))
+                .join(', ')}{' '}
+              · {company.openingHours.opens}–{company.openingHours.closes}
+            </dd>
+          </div>
+          <div>
+            <dt>{a.companyCardPhone}</dt>
+            <dd>
+              <a href={`tel:${company.phone}`}>{company.phoneDisplay}</a>
+            </dd>
+          </div>
+          <div>
+            <dt>{a.companyCardEmail}</dt>
+            <dd>
+              <a href={`mailto:${company.email}`}>{company.email}</a>
+            </dd>
+          </div>
+          <div>
+            <dt>{a.companyCardCoverage}</dt>
+            <dd>{company.areaServed.map((area) => area.name).join(' · ')}</dd>
+          </div>
+          <div>
+            <dt>{a.companyCardPrices}</dt>
+            <dd>{company.priceRange} — {company.priceRangeReason}</dd>
+          </div>
+        </dl>
+        <p class="about-company-note">{company.remoteNote}</p>
       </article>
 
       <aside class="about-page-aside">

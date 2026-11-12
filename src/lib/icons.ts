@@ -42,6 +42,7 @@ export const ICON_GROUPS = {
     minus: 'lucide:minus',
     search: 'lucide:search',
     info: 'lucide:info',
+    star: 'lucide:star',
   },
 
   /** Comercio: catálogo, carrito y fichas. */
@@ -73,6 +74,9 @@ export const ICON_GROUPS = {
     facebook: 'simple-icons:facebook',
     x: 'simple-icons:x',
     telegram: 'simple-icons:telegram',
+    github: 'simple-icons:github',
+    youtube: 'simple-icons:youtube',
+    tiktok: 'simple-icons:tiktok',
   },
 } as const;
 

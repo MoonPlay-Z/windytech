@@ -38,6 +38,22 @@ const related = s.related
 
 const plans = await listServicePlans(service.id);
 
+/*
+ * Precio de entrada del servicio: el paquete más barato que lo incluye.
+ * Se muestra en la barra lateral porque "cuánto cuesta" es una de las
+ * búsquedas más comunes y el buscador favorece los datos de precio.
+ */
+const precioDesde = (() => {
+  const masBarato = [...plans].sort((a, b) => a.priceCents - b.priceCents)[0];
+  if (!masBarato) return null;
+  return {
+    priceCents: masBarato.priceCents,
+    nota: masBarato.deliveryTime
+      ? `${masBarato.name} · ${masBarato.deliveryTime}`
+      : masBarato.name,
+  };
+})();
+
 const serviceSchema = {
   '@type': 'Service',
   '@id': `${canonical}#service`,
@@ -54,6 +70,17 @@ const serviceSchema = {
           { '@type': 'Place', name: 'Worldwide' },
         ],
   availableLanguage: ['Spanish', 'English'],
+  // Precio de entrada: el buscador lo muestra como "desde $X" en el resumen.
+  ...(precioDesde
+    ? {
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'USD',
+          lowPrice: (precioDesde.priceCents / 100).toFixed(2),
+          offerCount: plans.length,
+        },
+      }
+    : {}),
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: s.includesTitle,
@@ -107,7 +134,7 @@ const serviceSchema = {
   title={s.metaTitle}
   description={s.metaDescription}
   path={path}
-  ogImage='/assets/og.png'
+  ogImage='/assets/og.webp'
   ogImageAlt={`${s.title} — ${site.name}`}
   pageType="WebPage"
   dateModified={site.contentUpdated}
@@ -198,6 +225,17 @@ const serviceSchema = {
       </article>
 
       <aside class="about-page-aside">
+        {precioDesde && (
+          <div class="about-facts-card about-price-card">
+            <p class="eyebrow">Precio desde</p>
+            <p class="about-price-value">
+              ${precioDesde.priceCents / 100}
+              <span>USD</span>
+            </p>
+            <p class="about-price-note">{precioDesde.nota}</p>
+          </div>
+        )}
+
         <div class="about-facts-card">
           <h2>{s.title}</h2>
           <dl class="about-page-facts">

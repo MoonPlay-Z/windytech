@@ -1,38 +1,40 @@
+import { company, sameAsProfiles } from './empresa';
+
 export const site = {
-  name: 'Windytech',
-  legalName: 'Windytech',
-  /* Nombre anterior de la marca: alias para buscadores, nunca nombre principal. */
-  alternateName: ['Windy Tech'] as string[],
-  slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
+  name: company.name,
+  legalName: company.legalName,
+  /* Alias y grafías alternativas: los buscadores agrupan la entidad con ellos. */
+  alternateName: company.alternateNames,
+  slogan: company.slogan,
   url: 'https://windytech.studio',
   domain: 'windytech.studio',
   whatsappNumber: '584127723148',
-  whatsappDisplay: '+58 412-7723148',
-  email: 'windytechestudio@gmail.com',
-  year: 2026,
-  ogImage: '/assets/og.png',
+  whatsappDisplay: company.phoneDisplay,
+  email: company.email,
+  year: Number(company.foundingDate),
+  ogImage: '/assets/og.webp',
   logo: '/assets/logo-square.png',
   // Fecha de referencia para datos estructurados. Ajusta si la empresa existe desde antes.
-  foundingDate: '2026',
-  contentUpdated: '2026-11-09',
+  foundingDate: company.foundingDate,
+  contentUpdated: company.contentUpdated,
   address: {
-    country: 'VE',
-    countryName: 'Venezuela',
+    country: company.address.country,
+    countryName: company.address.countryName,
     /* Rellenar solo con una ciudad/estado reales; si están vacíos no se publican. */
-    locality: '',
-    region: '',
+    locality: company.address.locality,
+    region: company.address.region,
   },
   /* Cuenta de X/Twitter oficial (@usuario) cuando exista. */
   twitter: '',
-  areaServed: ['Venezuela', 'Worldwide'],
-  currenciesAccepted: 'USD',
-  paymentAccepted: 'Binance, PayPal',
+  areaServed: company.areaServed.map((a) => a.name),
+  currenciesAccepted: company.currenciesAccepted,
+  paymentAccepted: company.paymentAccepted,
   /*
    * Enlaces oficiales de la empresa (Instagram, LinkedIn, Facebook, Google Business
    * Profile, Bing Places, GitHub...). Añadirlos aquí refuerza la entidad de marca
    * que Google y Bing usan para mostrar el panel "Acerca de".
    */
-  sameAs: [] as string[],
+  sameAs: sameAsProfiles() as string[],
   /*
    * Códigos de verificación de los buscadores. Se pegan tal cual los entrega cada
    * consola y la etiqueta <meta> solo se renderiza cuando el valor no está vacío.
@@ -41,6 +43,7 @@ export const site = {
     google: 'de7be1f2-4139-4e1c-8932-3fcb990ee688',
     bing: '1A53073E9F99FBDBD7E6229B2FCBB9B2',
     yandex: '',
+    brave: '',
   },
 };
 

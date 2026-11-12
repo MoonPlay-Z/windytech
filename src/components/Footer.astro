@@ -1,7 +1,9 @@
 ---
 import { content, site } from '../data/site';
+import { company } from '../data/empresa';
 import { servicePath, services } from '../data/services';
 import { CITIES } from '../data/ciudades';
+import Icon from './Icon.astro';
 
 interface Props {
 }
@@ -15,6 +17,8 @@ const servicesHub = '/servicios/';
 const servicesHubLabel = 'Todos los servicios';
 const wordmarkAlt =
   'Windytech — desarrollo de software y automatización';
+/* Perfiles sociales reales: enlazados desde el pie para reforzar la entidad. */
+const socialLinks = company.profiles.filter((profile) => profile.url.trim().length > 0);
 ---
 
 <footer class="site-footer">
@@ -29,6 +33,23 @@ const wordmarkAlt =
         loading="lazy"
       />
       <span class="footer-tagline">{t.footer.tagline}</span>
+      {
+        socialLinks.length > 0 && (
+          <nav class="footer-social" aria-label="Redes sociales de Windytech">
+            {socialLinks.map((profile) => (
+              <a
+                href={profile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="social"
+              >
+                <Icon name={profile.name.toLowerCase() === 'x' ? 'x' : profile.name.toLowerCase()} size={18} />
+                <span>{profile.name}</span>
+              </a>
+            ))}
+          </nav>
+        )
+      }
     </div>
 
     <nav class="footer-nav" aria-label={navAria}>

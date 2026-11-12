@@ -18,6 +18,34 @@ if (!city) {
 
 const products = await getCatalog({ limit: 3 });
 
+/*
+ * Preguntas frecuentes propias de cada ciudad. Se construyen con los datos
+ * reales de la ficha (ciudad, estado, zonas y plazos) para que cada página
+ * tenga contenido propio y el buscador no las considere duplicadas.
+ */
+const faqsLocales = [
+  {
+    question: `¿Windytech trabaja en ${city.name}?`,
+    answer: `Sí. Atendemos negocios de ${city.name} y municipios cercanos del estado de ${city.state}, entre ellos ${city.zones.slice(0, 3).join(', ')}. Todo el trabajo se realiza en remoto, así que no hay costos de desplazamiento ni Loss de tiempo por visitas.`,
+  },
+  {
+    question: `¿Cuánto cuesta un servicio en ${city.name}?`,
+    answer: `Los servicios digitales arrancan en 100 USD y los paquetes completos van de 100 a 1.200 USD. La cotización final depende del alcance, el número de usuarios y las integraciones necesarias, y siempre se entrega por escrito antes de empezar.`,
+  },
+  {
+    question: `¿Cuánto tarda un proyecto en ${city.name}?`,
+    answer: `${city.delivery}. Los proyectos de software se entregan por etapas, así que ya tienes una versión usable mientras el resto avanza, y recibes demostraciones en cada hito.`,
+  },
+  {
+    question: `¿Atienden empresas fuera de ${city.name}?`,
+    answer: `Sí. Los servicios digitales —software, páginas web, automatización de WhatsApp, marketing y SEO— se prestan a clientes de cualquier país, con el mismo alcance, los mismos entregables y soporte por WhatsApp. La instalación de redes y la entrega física de equipos se coordinan en Venezuela.`,
+  },
+  {
+    question: `¿Puedo pagar desde ${city.name}?`,
+    answer: `Sí. Aceptamos Binance y PayPal, así que puedes pagar desde cualquier país y en dólares. Al aceptar la cotización te enviamos los datos exactos para pagar.`,
+  },
+];
+
 const title = `${city.name} | Software, automatización y equipos | Windytech`;
 // Hasta 160 caracteres: es lo que Google muestra completo en los resultados.
 const description = `${city.claim}. Trabajamos en ${city.name} y municipios cercanos. ${city.delivery}.`;
@@ -33,16 +61,25 @@ const schema = {
   provider: { '@id': `${site.url}/#organization` },
   areaServed: [
     { '@type': 'City', name: city.name },
+    { '@type': 'State', name: city.state },
     ...city.zones.map((zone) => ({ '@type': 'Place', name: zone })),
   ],
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: city.name,
-    addressRegion: city.state,
-    addressCountry: 'VE',
+  /*
+   * No se publica `address`: la empresa trabaja 100% en remoto y no tiene
+   * local en esta ciudad. Anunciar una dirección física que no existe es
+   * penalizado por Google y contradice lo que se le dice al visitante.
+   */
+  serviceArea: {
+    '@type': 'GeoCircle',
+    geoMidpoint: {
+      '@type': 'GeoCoordinates',
+      latitude: 10.4806,
+      longitude: -66.9036,
+    },
+    geoRadius: '80000',
   },
   telephone: `+${site.whatsappNumber}`,
-  availableLanguage: ['Spanish'],
+  availableLanguage: ['Spanish', 'English'],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: `Servicios en ${city.name}`,
@@ -65,9 +102,10 @@ const schema = {
   title={title}
   description={description}
   path={path}
-  ogImage="/assets/og.png"
+  ogImage="/assets/og.webp"
   ogImageAlt={`Servicios de Windytech en ${city.name}`}
   pageType="CollectionPage"
+  faq={faqsLocales}
   extraSchema={[schema]}
   breadcrumb={[
     { name: 'Inicio', path: '/' },
@@ -154,6 +192,28 @@ const schema = {
               <Icon name="arrow-right" size={16} />
             </a>
           </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/*
+    Preguntas frecuentes propias de la ciudad: es el bloque que más ayuda a
+    posicionar en búsquedas locales ("servicios en X", "cuánto cuesta en X") y
+    le da al buscador contenido distinto en cada página.
+  */}
+  <section class="section section--white">
+    <div class="container city-faq">
+      <div class="section-head">
+        <h2>Preguntas frecuentes sobre servicios en {city.name}</h2>
+        <p>Lo que más preguntan los negocios de {city.name} antes de empezar.</p>
+      </div>
+      <div class="faq-list">
+        {faqsLocales.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
         ))}
       </div>
     </div>

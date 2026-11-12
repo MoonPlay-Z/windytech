@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Icon from '../../../components/Icon.astro';
+import ReviewRequest from '../../../components/ReviewRequest.astro';
 import '../../../styles/account.css';
 import { customerSessionFromRequest } from '../../../lib/customer-auth';
 import { getTrackingForCustomer, listTrackingEvents } from '../../../lib/db/queries';
@@ -126,6 +127,15 @@ const fecha = (value: string | null) =>
           </a>
           <a class="btn btn-light" href="/cuenta/seguimientos/">Ver todos</a>
         </div>
+
+        {
+          tracking.status === 'entregado' && (
+            <ReviewRequest
+              serviceTitle={tracking.title}
+              customerName={customer.name}
+            />
+          )
+        }
       </div>
     </div>
   </section>

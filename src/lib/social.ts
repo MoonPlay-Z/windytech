@@ -152,3 +152,25 @@ export function trackedWhatsappLink(message: string, campaign: string): string {
   const base = whatsappShareUrl(message);
   return `${base}${base.includes('?') ? '&' : '?'}utm_source=whatsapp&utm_medium=social&utm_campaign=${encodeURIComponent(campaign)}`;
 }
+
+/*
+ * Tráfico orgánico: los buscadores no avisan de la visita, así que el
+ * enlace se marca con UTM desde las consolas (Search Console, Bing Webmaster
+ * Tools, Brave Webmaster Tools) para saber qué palabra y qué buscador traen
+ * clientes reales.
+ */
+export type OrganicSource = 'google' | 'bing' | 'brave';
+
+/** Enlace de la portada marcado como tráfico orgánico. */
+export function organicUrl(
+  source: OrganicSource,
+  keyword: string,
+  path = '/',
+): string {
+  return trackedUrl(
+    path,
+    source,
+    keyword ? `seo-${keyword}` : 'seo',
+    'organic',
+  );
+}

@@ -623,3 +623,63 @@
     gap: 24px;
   }
 }
+@layer base {
+/* ---------------------------------------------------------------------------
+   Solicitud de reseña (panel del cliente)
+   --------------------------------------------------------------------------- */
+
+.review-request {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid var(--mint-2);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f2fbf8, #ffffff);
+}
+
+.review-request__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #fff;
+  color: #f0a500;
+  box-shadow: 0 8px 18px rgba(14, 34, 52, 0.08);
+}
+
+.review-request__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.review-request__body strong {
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.review-request__body p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.review-request__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.review-request__actions .text-link {
+  margin-top: 0;
+}
+}
+

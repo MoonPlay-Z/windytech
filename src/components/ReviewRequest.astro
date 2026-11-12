@@ -1,0 +1,75 @@
+---
+/**
+ * Solicitud de reseña para el cliente.
+ *
+ * Aparece en el panel del cliente cuando un seguimiento ya está entregado.
+ * El botón lleva a la ficha de Google Business Profile (el atajo de reseña)
+ * y el enlace de WhatsApp permite pedirla por mensaje, que es donde más
+ * fácil se acepta.
+ *
+ * Si no hay URL de reseña configurada, el bloque no se muestra: es preferible
+ * no ofrecer nada antes que un enlace roto.
+ */
+
+import Icon from './Icon.astro';
+import { company } from '../data/empresa';
+
+interface Props {
+  /** Título del seguimiento entregado (opcional). */
+  serviceTitle?: string;
+  /** Nombre del cliente, para personalizar el mensaje. */
+  customerName?: string | null;
+}
+
+const { serviceTitle, customerName } = Astro.props;
+
+const reviewUrl = company.reviewUrl.trim();
+const saludo = customerName ? `Hola ${customerName.split(' ')[0]}` : 'Hola';
+const mensaje = [
+  `${saludo}, ¿cómo estás?`,
+  serviceTitle
+    ? `Terminamos «${serviceTitle}». Si quedó bien para tu negocio, nos ayudaría mucho con una reseña en Google:`
+    : 'Si el trabajo quedó bien para tu negocio, nos ayudaría mucho con una reseña en Google:',
+  reviewUrl,
+  '¡Gracias!',
+].join(' ');
+---
+
+{
+  reviewUrl && (
+    <div class="review-request">
+      <span class="review-request__icon">
+        <Icon name="star" size={22} />
+      </span>
+      <div class="review-request__body">
+        <strong>¿Te sirvió? Cuéntaselo a otros</strong>
+        <p>
+          Una reseña en Google nos ayuda a que más negocios nos encuentren. Es un minuto y
+          no tienes que escribir nada: basta con valorar el servicio.
+        </p>
+        <div class="review-request__actions">
+          <a
+            class="btn btn-primary btn-sm"
+            href={reviewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="review"
+          >
+            Dejar reseña en Google
+            <Icon name="arrow-up-right" size={16} />
+          </a>
+          <a
+            class="text-link"
+            href={`https://wa.me/${company.phone.replace('+', '')}?text=${encodeURIComponent(mensaje)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            {'Pedirla por WhatsApp'}
+            <Icon name="whatsapp" size={16} />
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
