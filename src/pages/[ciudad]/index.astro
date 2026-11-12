@@ -19,7 +19,8 @@ if (!city) {
 const products = await getCatalog({ limit: 3 });
 
 const title = `${city.name} | Software, automatización y equipos | Windytech`;
-const description = `${city.claim}. Trabajo en ${city.name} y municipios cercanos: ${city.zones.slice(0, 4).join(', ')}. ${city.delivery}. Cotiza sin compromiso.`;
+// Hasta 160 caracteres: es lo que Google muestra completo en los resultados.
+const description = `${city.claim}. Trabajamos en ${city.name} y municipios cercanos. ${city.delivery}.`;
 const path = `/${city.slug}/`;
 const canonical = new URL(path, site.url).toString();
 
