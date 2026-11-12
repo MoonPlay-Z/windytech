@@ -31,12 +31,12 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
   `og:image:secure_url`, `og:image:type`, `og:image:width` (1200), `og:image:height` (630),
   `og:image:alt`, `og:locale` y `og:locale:alternate`.
 - Twitter/X con `summary_large_image`.
-- Imágenes `og.png` (español) y `og-en.png` (inglés) de 1200×630 px y menos de 300 KB.
+- Imagen `og.png` de 1200×630 px y menos de 300 KB.
 - URLs absolutas con el dominio canónico `https://windytech.studio`.
 
 ### Entidad de empresa ("Acerca de")
 
-- Nueva página `/nosotros/` y su versión inglesa `/en/about/`.
+- Nueva página `/nosotros/`.
 - Sección "Acerca de Windytech" en la portada, enlazada desde el pie de página.
 - Datos estructurados JSON-LD:
   - `Organization` + `ProfessionalService` con nombre, actividad, fundación, correo,
@@ -49,7 +49,7 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
 
 ### Páginas de servicio (Fase 2)
 
-- Hub `/servicios/` + 6 páginas en español y `/en/services/` + 6 en inglés.
+- Hub `/servicios/` + sus 6 páginas de detalle.
 - Cada página tiene título y descripción propios, un solo H1, respuesta directa al
   inicio, qué incluye, proceso, casos de uso, cómo se cotiza y 5 preguntas frecuentes.
 - Datos estructurados `Service` + `OfferCatalog` + `FAQPage` + `BreadcrumbList`.
@@ -59,11 +59,11 @@ cambie. Se actualiza solo tras volver a rastrear el sitio (días o semanas).
 ### Indexación
 
 - `dist/sitemap.xml` se genera con `npm run sitemap` (`scripts/generate-sitemap.mjs`)
-  sobre un build estático: recorre el HTML, lee canonical y `hreflang` y excluye las
+  sobre el sitio publicado: recorre el sitemap y comprueba canonical, títulos,
   páginas `noindex`. Con SSR el sitemap se sirve desde el sitio desplegado.
 - `robots.txt` con el sitemap declarado y permisos para Google, Bing, Brave, DuckDuckGo,
   Apple, Yandex, Naver, Seznam, Qwant y rastreadores de IA.
-- `canonical` y `hreflang` en todas las páginas.
+- `canonical` en todas las páginas (el sitio es solo en español, sin `hreflang`).
 - Cabeceras de seguridad y caché en `src/middleware.ts` (independientes del hosting).
 - `llms.txt` (resumen) y `llms-full.txt` (perfil completo) enlazados con
   `rel="alternate" type="text/plain"`.
@@ -110,7 +110,7 @@ Después de editar, ejecuta `npm run build` y vuelve a desplegar.
 3. Si usas meta tag, pega el código en `site.verification.google`, despliega y verifica.
 4. Envía `https://windytech.studio/sitemap.xml`.
 5. Usa **Inspección de URLs** → *Solicitar indexación* en `/`, `/servicios/`, cada página
-   de servicio, `/nosotros/` y `/en/`.
+   de servicio, `/nosotros/` y `/servicios/`.
 
 ### Bing Webmaster Tools (alimenta Bing, Copilot, DuckDuckGo y Yahoo)
 

@@ -1,6 +1,6 @@
 # Windytech — sitio web
 
-Sitio bilingüe (español / inglés) para Windytech, construido con Astro y CSS propio.
+Sitio en español para Windytech, construido con Astro y CSS propio.
 La primera versión está enfocada en **servicios**: desarrollo de software, automatización,
 webs, marketing, redes y equipos. El catálogo de equipos queda para una fase posterior.
 
@@ -19,7 +19,7 @@ npm run preview   # previsualiza el build
 npm run check     # revisión de tipos y plantillas Astro
 npm test          # pruebas unitarias (node:test + tsx)
 npm run sitemap   # genera dist/sitemap.xml sobre un build estático
-npm run seo:check # valida canonical, hreflang, títulos, JSON-LD y enlaces
+npm run seo:check # valida canonical, títulos, JSON-LD y enlaces
 npm run indexnow  # avisa a Bing/Brave/Yandex de las URLs del sitemap
 npm run db:push   # sincroniza el esquema Drizzle con la base de datos
 npm run db:studio # abre Drizzle Studio
@@ -35,7 +35,7 @@ chequeo automático se hace contra el sitio desplegado, no en el CI.
 ```
 src/
   components/     Header, Footer, Icon, ContactForm, HomePage, AboutPage, ServicePage, admin/*
-  data/           site.ts (contenido bilingüe), services.ts, about.ts, legal.ts
+  data/           site.ts (contenido en español), services.ts, about.ts, legal.ts
   layouts/        BaseLayout.astro (SEO, iconos, Open Graph, schema)
   lib/            API, auth, base de datos Drizzle, catálogo, precios, seguridad
   pages/          marketing (/, /servicios/*, /nosotros/…), /cuenta/*, /admin/*, /api/*
@@ -97,17 +97,18 @@ Web3Forms, Resend o un endpoint propio.
 
 ## Rutas
 
-- `/` — español
-- `/en/` — inglés
-- `/servicios/` — hub de servicios (español)
+El sitio se publica **solo en español**. Las rutas `/en/...` de la anterior versión
+responden con un **301** a su equivalente en español (`src/middleware.ts`).
+
+- `/` — portada
+- `/servicios/` — hub de servicios
 - `/servicios/desarrollo-de-software/`, `/servicios/automatizacion-whatsapp/`,
   `/servicios/paginas-web/`, `/servicios/marketing-seo/`,
   `/servicios/redes-e-infraestructura/`, `/servicios/equipos-informaticos/`
-- `/en/services/` — services hub (English), con sus 6 páginas equivalentes
-- `/nosotros/` — acerca de la empresa (español)
-- `/en/about/` — acerca de la empresa (inglés)
+- `/nosotros/` — acerca de la empresa
+- `/catalogo/` — catálogo de equipos
+- `/proyectos/`, `/blog/`, `/carrito/`
 - `/legal/privacidad/` y `/legal/terminos/`
-- `/en/legal/privacy/` y `/en/legal/terms/`
 
 ## Base de datos
 
@@ -145,7 +146,7 @@ Las cabeceras de seguridad y caché se aplican desde `src/middleware.ts`, así q
 dependen del proveedor de hosting. El sitemap estático se genera con `npm run sitemap`
 sobre un build estático o se sirve desde el sitio publicado.
 
-El sitio incluye metadatos estructurados bilingües, páginas de servicio, una página
+El sitio incluye metadatos estructurados en español, páginas de servicio, una página
 `/nosotros/`, preguntas frecuentes visibles, iconos para resultados de búsqueda, Open Graph
 para vistas previas, directivas para rastreadores y `llms.txt` + `llms-full.txt`. Estas
 mejoras ayudan a interpretar el contenido y a construir la entidad de la empresa, pero no
@@ -201,7 +202,7 @@ Al borrar un producto o una publicación, sus imágenes se eliminan de Cloudinar
 Cuando el catálogo esté listo, se puede agregar:
 
 - `src/data/catalog.ts` con SKUs, categorías, condición, precio y stock.
-- `/catalogo/` y `/en/catalog/` con filtros.
+- `/catalogo/` con filtros.
 - Ficha por producto con botón de WhatsApp y mensaje precargado.
 - Administración por JSON o CMS ligero (Sanity/Decap).
 
