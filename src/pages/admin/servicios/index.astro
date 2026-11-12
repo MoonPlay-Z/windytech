@@ -17,7 +17,9 @@ const periodLabels: Record<string, string> = {
 };
 ---
 
-<AdminLayout title="Paquetes de servicios" admin={admin} active="services">
+<AdminLayout title="Paquetes de servicios" admin={admin} active="services"
+  crumbs={[{ label: 'Paquetes', icon: 'paquetes' }, { label: 'Servicios' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Nuevo paquete</a>

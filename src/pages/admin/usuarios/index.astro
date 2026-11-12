@@ -13,7 +13,9 @@ if (!requireOwner(admin)) return Astro.redirect('/admin/', 302);
 const users = await listAdmins();
 ---
 
-<AdminLayout title="Usuarios" admin={admin} active="users">
+<AdminLayout title="Usuarios" admin={admin} active="users"
+  crumbs={[{ label: 'Ajustes', href: '/admin/perfil/', icon: 'ajustes' }, { label: 'Usuarios', icon: 'usuarios' }]}
+>
   <section class="admin-card">
     <table class="admin-table">
       <thead>

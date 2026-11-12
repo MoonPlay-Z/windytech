@@ -31,7 +31,9 @@ const tags = Array.isArray(post.tags) ? (post.tags as string[]).join(', ') : Str
 const publishedAtValue = toLocalInput(post.publishedAt);
 ---
 
-<AdminLayout title="Editar publicación" admin={admin} active="posts">
+<AdminLayout title="Editar publicación" admin={admin} active="posts"
+  crumbs={[{ label: 'Contenido', href: '/admin/proyectos/', icon: 'proyectos' }, { label: 'Publicaciones', href: '/admin/publicaciones/', icon: 'publicaciones' }, { label: 'Editar publicación' }]}
+>
   <section class="admin-card">
     <h2>Editar publicación</h2>
     <form

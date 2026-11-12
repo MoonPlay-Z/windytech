@@ -8,7 +8,9 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 ---
 
-<AdminLayout title="Mi perfil" admin={admin} active="profile">
+<AdminLayout title="Mi perfil" admin={admin} active="profile"
+  crumbs={[{ label: 'Ajustes', icon: 'ajustes' }, { label: 'Mi perfil', icon: 'perfil' }]}
+>
   <section class="admin-card">
     <div class="admin-card-heading">
       <div>

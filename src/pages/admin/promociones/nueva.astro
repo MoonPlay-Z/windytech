@@ -8,7 +8,9 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 ---
 
-<AdminLayout title="Nueva promoción" admin={admin} active="promotions">
+<AdminLayout title="Nueva promoción" admin={admin} active="promotions"
+  crumbs={[{ label: 'Catálogo', href: '/admin/productos/', icon: 'productos' }, { label: 'Promociones', href: '/admin/promociones/', icon: 'promociones' }, { label: 'Nueva promoción' }]}
+>
   <section class="admin-card">
     <h2>Nueva promoción</h2>
     <form class="admin-form" data-admin-form data-endpoint="/api/admin/promotions" data-success="Promoción guardada." data-redirect="/admin/promociones/">

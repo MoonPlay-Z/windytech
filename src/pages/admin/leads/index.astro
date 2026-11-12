@@ -29,7 +29,9 @@ const wa = (lead: (typeof leads)[number]) => {
 };
 ---
 
-<AdminLayout title="Leads" admin={admin} active="leads">
+<AdminLayout title="Leads" admin={admin} active="leads"
+  crumbs={[{ label: 'Ventas', href: '/admin/cotizaciones/', icon: 'cotizaciones' }, { label: 'Consultas', icon: 'leads' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <span class="admin-text-muted">{leads.length} consultas recibidas</span>

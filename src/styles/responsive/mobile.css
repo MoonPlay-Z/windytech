@@ -289,6 +289,59 @@
     }
   }
 
+  /* --- admin-desktop.css (escritorio Windows) --- */
+  @media (max-width: 720px) {
+    /* La barra de menús se desplaza en horizontal: no cabe entera. */
+    .win-menubar {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .win-menubar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .win-menubar-trigger {
+      padding: 0 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .win-caption button {
+      width: 42px;
+    }
+
+    .win-addressbar {
+      gap: 6px;
+      padding: 0 10px;
+    }
+
+    .win-addressbar-home span {
+      display: none;
+    }
+
+    .win-toolbar {
+      gap: 8px;
+      padding: 8px 10px;
+    }
+
+    .win-toolbar-status {
+      display: none;
+    }
+
+    .win-workspace {
+      padding: 12px 12px 20px;
+    }
+
+    .win-taskbar-apps {
+      display: none;
+    }
+
+    .win-taskbar-start span {
+      display: none;
+    }
+  }
+
   /* --- admin.css --- */
   @media (max-width: 600px) {
     .admin-main {

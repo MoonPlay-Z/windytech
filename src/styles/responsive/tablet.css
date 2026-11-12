@@ -224,7 +224,7 @@
     }
   }
 
-  /* --- admin.css --- */
+  /* --- admin.css (escritorio Windows) --- */
   @media (max-width: 860px) {
     .admin-shell {
       grid-template-columns: 1fr;
@@ -249,6 +249,110 @@
       display: block;
       overflow-x: auto;
       white-space: nowrap;
+    }
+  }
+
+  /* --- admin-desktop.css (escritorio Windows) --- */
+  @media (max-width: 860px) {
+    /* El panel lateral pasa a ser una barra horizontal desplegable. */
+    .win-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .win-sidebar {
+      position: relative;
+      max-height: 46vh;
+      border-right: 0;
+      border-bottom: 1px solid var(--win-border);
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-sidebar {
+      display: none;
+    }
+
+    .win-sidebar-head {
+      padding: 8px 12px;
+    }
+
+    .win-tree {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 12px 12px;
+      overflow: visible;
+    }
+
+    .win-tree-group {
+      flex: none;
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-tree-group + .win-tree-group {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .win-tree-label {
+      min-height: 24px;
+      padding: 0 8px;
+    }
+
+    .win-tree-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-tree-label,
+    .admin-page[data-sidebar='collapsed'] .win-tree-items {
+      display: flex;
+    }
+
+    .win-tree-link {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--win-border);
+      border-radius: var(--win-radius);
+      background: var(--win-field);
+      font-size: 12px;
+    }
+
+    .win-tree-link.is-active {
+      border-color: var(--win-accent);
+      box-shadow: none;
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-tree-link {
+      justify-content: flex-start;
+      padding: 0 10px;
+    }
+
+    .win-sidebar-foot {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+    }
+
+    .win-sidebar-user {
+      justify-content: flex-start;
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-sidebar-user span,
+    .admin-page[data-sidebar='collapsed'] .win-sidebar-foot .admin-btn {
+      display: block;
+    }
+
+    .win-workspace {
+      padding: 14px 14px 22px;
+    }
+
+    .win-toolbar-search {
+      min-width: 160px;
+      flex: 1;
     }
   }
 

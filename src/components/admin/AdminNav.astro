@@ -1,34 +1,134 @@
 ---
+/**
+ * Panel lateral del administrador, al estilo del árbol de archivos de
+ * Windows: grupos plegables, un icono por sección y contadores con lo que
+ * hay pendiente de revisar.
+ */
+
+import Icon from '../Icon.astro';
+
 interface Props {
   active: string;
   role: 'OWNER' | 'EDITOR';
+  /** Consultas nuevas pendientes de responder. */
+  leads?: number;
+  /** Cotizaciones nuevas sin responder. */
+  quotes?: number;
 }
 
-const { active, role } = Astro.props;
+const { active, role, leads = 0, quotes = 0 } = Astro.props;
 
-const links = [
-  { key: 'dashboard', label: 'Resumen', href: '/admin/' },
-  { key: 'profile', label: 'Perfil', href: '/admin/perfil/' },
-  { key: 'services', label: 'Paquetes', href: '/admin/servicios/' },
-  { key: 'products', label: 'Productos', href: '/admin/productos/' },
-  { key: 'categories', label: 'Categorías', href: '/admin/categorias/' },
-  { key: 'promotions', label: 'Promociones', href: '/admin/promociones/' },
-  { key: 'quotes', label: 'Cotizaciones', href: '/admin/cotizaciones/' },
-  { key: 'leads', label: 'Leads', href: '/admin/leads/' },
-  { key: 'trackings', label: 'Seguimientos', href: '/admin/seguimientos/' },
-  { key: 'projects', label: 'Proyectos', href: '/admin/proyectos/' },
-  { key: 'posts', label: 'Publicaciones', href: '/admin/publicaciones/' },
+type Item = {
+  key: string;
+  label: string;
+  href: string;
+  icon: string;
+  badge?: number;
+  /** Se oculta a los editores. */
+  ownerOnly?: boolean;
+};
+
+type Group = {
+  id: string;
+  label: string;
+  items: Item[];
+  /** Grupo abierto por defecto. */
+  open?: boolean;
+};
+
+const grupos: Group[] = [
+  {
+    id: 'resumen',
+    label: 'Resumen',
+    open: true,
+    items: [
+      { key: 'dashboard', label: 'Resumen', href: '/admin/', icon: 'dashboard' },
+    ],
+  },
+  {
+    id: 'ventas',
+    label: 'Ventas',
+    open: true,
+    items: [
+      {
+        key: 'quotes',
+        label: 'Cotizaciones',
+        href: '/admin/cotizaciones/',
+        icon: 'cotizaciones',
+        badge: quotes,
+      },
+      { key: 'leads', label: 'Consultas', href: '/admin/leads/', icon: 'leads', badge: leads },
+      { key: 'trackings', label: 'Seguimientos', href: '/admin/seguimientos/', icon: 'seguimientos' },
+    ],
+  },
+  {
+    id: 'catalogo',
+    label: 'Catálogo',
+    open: true,
+    items: [
+      { key: 'products', label: 'Productos', href: '/admin/productos/', icon: 'productos' },
+      { key: 'categories', label: 'Categorías', href: '/admin/categorias/', icon: 'categorias' },
+      { key: 'promotions', label: 'Promociones', href: '/admin/promociones/', icon: 'promociones' },
+    ],
+  },
+  {
+    id: 'contenido',
+    label: 'Contenido',
+    open: true,
+    items: [
+      { key: 'projects', label: 'Proyectos', href: '/admin/proyectos/', icon: 'proyectos' },
+      { key: 'posts', label: 'Publicaciones', href: '/admin/publicaciones/', icon: 'publicaciones' },
+    ],
+  },
+  {
+    id: 'paquetes',
+    label: 'Paquetes',
+    items: [
+      { key: 'services', label: 'Servicios', href: '/admin/servicios/', icon: 'paquetes' },
+    ],
+  },
+  {
+    id: 'ajustes',
+    label: 'Ajustes',
+    items: [
+      { key: 'profile', label: 'Mi perfil', href: '/admin/perfil/', icon: 'perfil' },
+      { key: 'users', label: 'Usuarios', href: '/admin/usuarios/', icon: 'usuarios', ownerOnly: true },
+    ],
+  },
 ];
 
-if (role === 'OWNER') {
-  links.push({ key: 'users', label: 'Usuarios', href: '/admin/usuarios/' });
-}
+const visibles = grupos
+  .map((grupo) => ({
+    ...grupo,
+    items: grupo.items.filter((item) => !(item.ownerOnly && role !== 'OWNER')),
+  }))
+  .filter((grupo) => grupo.items.length > 0);
 ---
 
-<nav class="admin-nav" aria-label="Navegación del panel">
-  {links.map((link) => (
-    <a href={link.href} class:list={['admin-nav-link', { 'is-active': active === link.key }]}>
-      {link.label}
-    </a>
-  ))}
-</nav>
+<div class="win-tree" data-tree>
+  {
+    visibles.map((grupo) => (
+      <div class:list={['win-tree-group', { 'is-open': grupo.open }]} data-tree-group={grupo.id}>
+        <button type="button" class="win-tree-label" data-tree-toggle aria-expanded={grupo.open ? 'true' : 'false'}>
+          <Icon name="expandir" size={13} />
+          <span class="win-tree-label-text">{grupo.label}</span>
+        </button>
+        <div class="win-tree-items">
+          {grupo.items.map((item) => (
+            <a
+              class:list={['win-tree-link', { 'is-active': active === item.key }]}
+              href={item.href}
+              title={item.label}
+            >
+              <Icon name={item.icon} size={15} />
+              <span class="win-tree-label-text">{item.label}</span>
+              {item.badge !== undefined && item.badge > 0 && (
+                <span class="win-tree-badge">{item.badge}</span>
+              )}
+            </a>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>

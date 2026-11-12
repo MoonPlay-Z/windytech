@@ -33,7 +33,9 @@ const preorder = product.availability === 'PREORDER';
 const activeChecked = product.isActive ? 'checked' : '';
 const featuredChecked = product.isFeatured ? 'checked' : '';
 ---
-<AdminLayout title="Editar producto" admin={admin} active="products">
+<AdminLayout title="Editar producto" admin={admin} active="products"
+  crumbs={[{ label: 'Catálogo', href: '/admin/productos/', icon: 'productos' }, { label: 'Productos', href: '/admin/productos/', icon: 'productos' }, { label: 'Editar producto' }]}
+>
   <section class="admin-card">
     <h2>Editar producto</h2>
     <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto guardado." data-redirect="/admin/productos/">

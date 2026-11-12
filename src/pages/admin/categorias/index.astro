@@ -11,7 +11,9 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const categories = await listCategoriesAdmin();
 ---
 
-<AdminLayout title="Categorías" admin={admin} active="categories">
+<AdminLayout title="Categorías" admin={admin} active="categories"
+  crumbs={[{ label: 'Catálogo', href: '/admin/productos/', icon: 'productos' }, { label: 'Categorías', icon: 'categorias' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nueva/">Nueva categoría</a>

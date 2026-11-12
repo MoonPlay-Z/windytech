@@ -11,7 +11,9 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const quotes = await listQuotes();
 ---
 
-<AdminLayout title="Cotizaciones" admin={admin} active="quotes">
+<AdminLayout title="Cotizaciones" admin={admin} active="quotes"
+  crumbs={[{ label: 'Ventas', href: '/admin/leads/', icon: 'leads' }, { label: 'Cotizaciones', icon: 'cotizaciones' }]}
+>
   <section class="admin-card">
     <table class="admin-table">
       <thead>

@@ -9,7 +9,9 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 ---
 
-<AdminLayout title="Nueva publicación" admin={admin} active="posts">
+<AdminLayout title="Nueva publicación" admin={admin} active="posts"
+  crumbs={[{ label: 'Contenido', href: '/admin/proyectos/', icon: 'proyectos' }, { label: 'Publicaciones', href: '/admin/publicaciones/', icon: 'publicaciones' }, { label: 'Nueva publicación' }]}
+>
   <section class="admin-card">
     <h2>Nueva publicación</h2>
     <form

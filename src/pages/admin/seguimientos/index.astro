@@ -20,7 +20,9 @@ const fecha = (value: string | null) =>
     : null;
 ---
 
-<AdminLayout title="Seguimientos" admin={admin} active="trackings">
+<AdminLayout title="Seguimientos" admin={admin} active="trackings"
+  crumbs={[{ label: 'Ventas', href: '/admin/cotizaciones/', icon: 'cotizaciones' }, { label: 'Seguimientos', icon: 'seguimientos' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="#nuevo">+ Nuevo seguimiento</a>

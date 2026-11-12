@@ -1,0 +1,1178 @@
+@layer base {
+/* ==========================================================================
+   Panel de administración — estilo escritorio Windows 10 clásico
+   --------------------------------------------------------------------------
+   Este archivo se carga DESPUÉS de admin.css, dentro de la misma capa
+   `base`, así que sus reglas mandan sobre las anteriores sin necesidad de
+   usar `!important`.
+
+   La idea es que el panel se comporte como una aplicación de escritorio:
+   marco de ventana, barra de menús, barra de direcciones, barra de
+   herramientas, panel de árbol lateral y barra de tareas.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. Tokens del tema
+   --------------------------------------------------------------------------- */
+
+html.admin-page {
+  /* Superficies */
+  --win-desktop: #e9ecef;
+  --win-chrome: #f3f3f3;
+  --win-chrome-dark: #e4e4e4;
+  --win-field: #ffffff;
+  --win-border: #d3d3d3;
+  --win-border-soft: #e2e2e2;
+  --win-border-strong: #b4b4b4;
+
+  /* Texto */
+  --win-text: #1b1b1b;
+  --win-text-soft: #4a4a4a;
+  --win-muted: #707070;
+
+  /* Barra de título (Windows 10) */
+  --win-title: #1f4e79;
+  --win-title-hi: #2c6ca8;
+  --win-title-text: #ffffff;
+
+  /* Acento (selección de Windows) */
+  --win-accent: #0078d7;
+  --win-accent-dark: #005a9e;
+  --win-accent-soft: #e5f1fb;
+  --win-accent-ring: rgba(0, 120, 215, 0.32);
+
+  /* Barra de tareas */
+  --win-taskbar: #1c1c1c;
+  --win-taskbar-text: #e8e8e8;
+  --win-taskbar-hover: rgba(255, 255, 255, 0.12);
+  --win-taskbar-active: rgba(255, 255, 255, 0.2);
+
+  /* Semáforo de estados */
+  --win-ok: #107c10;
+  --win-ok-bg: #dff6dd;
+  --win-warn: #9a6700;
+  --win-warn-bg: #fff4ce;
+  --win-error: #c42b1c;
+  --win-error-bg: #fde7e9;
+  --win-info: #0067c0;
+  --win-info-bg: #e3f0fb;
+
+  /* Métricas */
+  --win-titlebar-h: 34px;
+  --win-menubar-h: 30px;
+  --win-taskbar-h: 40px;
+  --win-addrbar-h: 34px;
+  --win-toolbar-h: 46px;
+  --win-sidebar-w: 246px;
+  --win-sidebar-w-collapsed: 56px;
+  --win-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   2. Marco de la aplicación
+   --------------------------------------------------------------------------- */
+
+.admin-body {
+  min-height: 100vh;
+  background: var(--win-desktop);
+  color: var(--win-text);
+  overflow: hidden;
+}
+
+/* El contenedor con forma de ventana. */
+.win {
+  display: grid;
+  grid-template-rows: var(--win-titlebar-h) var(--win-menubar-h) minmax(0, 1fr) var(--win-taskbar-h);
+  height: 100vh;
+  background: var(--win-desktop);
+}
+
+/* --- Barra de título --- */
+.win-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  background: linear-gradient(180deg, var(--win-title-hi) 0%, var(--win-title) 100%);
+  color: var(--win-title-text);
+  user-select: none;
+}
+
+.win-titlebar-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  opacity: 0.95;
+}
+
+.win-titlebar-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.win-titlebar-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botones de ventana, a la derecha como en Windows 10. */
+.win-caption {
+  display: flex;
+  align-self: stretch;
+}
+
+.win-caption button {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  border: 0;
+  background: transparent;
+  color: var(--win-title-text);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.win-caption button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.win-caption button:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.win-caption button[data-window-action='close']:hover {
+  background: #e81123;
+}
+
+.win-caption svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- Barra de menús --- */
+.win-menubar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--win-border);
+  background: var(--win-chrome);
+  font-size: 12.5px;
+  user-select: none;
+}
+
+.win-menubar-item {
+  position: relative;
+}
+
+.win-menubar-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.win-menubar-trigger:hover,
+.win-menubar-trigger[aria-expanded='true'] {
+  background: var(--win-accent-soft);
+}
+
+.win-menubar-trigger[aria-expanded='true'] {
+  outline: 1px solid var(--win-accent-ring);
+}
+
+/* Menú desplegable. */
+.win-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  z-index: 200;
+  min-width: 226px;
+  padding: 4px;
+  border: 1px solid var(--win-border-strong);
+  background: var(--win-field);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+.win-menu[hidden] {
+  display: none;
+}
+
+.win-menu button,
+.win-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.win-menu button:hover,
+.win-menu a:hover {
+  background: var(--win-accent-soft);
+}
+
+.win-menu button:disabled {
+  color: #9a9a9a;
+  cursor: default;
+}
+
+.win-menu button:disabled:hover {
+  background: transparent;
+}
+
+.win-menu svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: #5a5a5a;
+}
+
+.win-menu-sep {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--win-border-soft);
+}
+
+.win-menu-key {
+  margin-left: auto;
+  color: var(--win-muted);
+  font-size: 11.5px;
+}
+
+/* --- Cuerpo: panel lateral + contenido --- */
+.win-body {
+  display: grid;
+  grid-template-columns: var(--win-sidebar-w) minmax(0, 1fr);
+  min-height: 0;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-body {
+  grid-template-columns: var(--win-sidebar-w-collapsed) minmax(0, 1fr);
+}
+
+/* --- Contenido --- */
+.win-content {
+  display: grid;
+  grid-template-rows: var(--win-addrbar-h) auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* --- Barra de direcciones (migas de pan) --- */
+.win-addressbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--win-border-soft);
+  background: var(--win-chrome);
+  font-size: 12.5px;
+}
+
+.win-addressbar-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--win-text-soft);
+  text-decoration: none;
+}
+
+.win-addressbar-home:hover {
+  color: var(--win-accent);
+  text-decoration: underline;
+}
+
+.win-addressbar-home svg {
+  width: 15px;
+  height: 15px;
+}
+
+.win-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.win-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--win-text-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.win-crumb:hover {
+  color: var(--win-accent);
+  text-decoration: underline;
+}
+
+.win-crumb[aria-current='page'] {
+  color: var(--win-text);
+  font-weight: 600;
+}
+
+.win-crumb svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.75;
+}
+
+.win-crumb-sep {
+  color: #9a9a9a;
+  font-size: 12px;
+}
+
+/* --- Barra de herramientas --- */
+.win-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: var(--win-toolbar-h);
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--win-border);
+  background: var(--win-chrome);
+}
+
+.win-toolbar-spacer {
+  flex: 1;
+}
+
+.win-toolbar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 230px;
+}
+
+.win-toolbar-search svg {
+  position: absolute;
+  left: 9px;
+  width: 15px;
+  height: 15px;
+  color: var(--win-muted);
+  pointer-events: none;
+}
+
+.win-toolbar-search input {
+  width: 100%;
+  min-height: 30px;
+  padding: 0 10px 0 30px;
+  border: 1px solid var(--win-border-strong);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  color: var(--win-text);
+  font: inherit;
+  font-size: 12.5px;
+}
+
+.win-toolbar-search input:focus {
+  outline: 2px solid var(--win-accent-ring);
+  outline-offset: -1px;
+  border-color: var(--win-accent);
+}
+
+/* --- Área de trabajo --- */
+.win-workspace {
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 20px 28px;
+  background: var(--win-desktop);
+}
+
+/* --- Barra de tareas --- */
+.win-taskbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: var(--win-taskbar);
+  color: var(--win-taskbar-text);
+  font-size: 12px;
+  user-select: none;
+}
+
+.win-taskbar-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 12px 0 8px;
+  border: 0;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-taskbar-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.win-taskbar-start:hover {
+  background: var(--win-taskbar-hover);
+}
+
+.win-taskbar-start img {
+  width: 22px;
+  height: 22px;
+}
+
+.win-taskbar-apps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.win-taskbar-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 190px;
+  min-height: 30px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-taskbar-text);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.win-taskbar-app:hover {
+  background: var(--win-taskbar-hover);
+}
+
+.win-taskbar-app.is-active {
+  background: var(--win-taskbar-active);
+  box-shadow: inset 0 -2px 0 var(--win-accent);
+}
+
+.win-taskbar-app span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.win-taskbar-app svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.win-taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+.win-taskbar-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+.win-taskbar-clock strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.win-taskbar-clock small {
+  color: #b9b9b9;
+  font-size: 10.5px;
+}
+
+/* ---------------------------------------------------------------------------
+   3. Panel lateral tipo Explorador de archivos
+   --------------------------------------------------------------------------- */
+
+.win-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--win-border);
+  background: var(--win-chrome);
+}
+
+.win-sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--win-border-soft);
+}
+
+.win-sidebar-head img {
+  width: 26px;
+  height: 26px;
+}
+
+.win-sidebar-head span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.win-sidebar-head strong {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.win-sidebar-head small {
+  color: var(--win-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.win-sidebar-toggle {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  border: 1px solid transparent;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-text-soft);
+  cursor: pointer;
+}
+
+.win-sidebar-toggle:hover {
+  border-color: var(--win-border);
+  background: var(--win-chrome-dark);
+}
+
+.win-sidebar-toggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Árbol de secciones. */
+.win-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 0 12px;
+}
+
+.win-tree-group + .win-tree-group {
+  margin-top: 2px;
+}
+
+.win-tree-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 27px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--win-text-soft);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.win-tree-label:hover {
+  background: var(--win-accent-soft);
+}
+
+.win-tree-label svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  transition: transform 140ms ease;
+}
+
+.win-tree-group.is-open .win-tree-label svg {
+  transform: rotate(90deg);
+}
+
+.win-tree-items {
+  display: none;
+}
+
+.win-tree-group.is-open .win-tree-items {
+  display: block;
+}
+
+.win-tree-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 30px;
+  padding: 0 12px 0 26px;
+  border-left: 2px solid transparent;
+  color: var(--win-text-soft);
+  font-size: 12.5px;
+  text-decoration: none;
+}
+
+.win-tree-link:hover {
+  background: var(--win-accent-soft);
+  color: var(--win-text);
+}
+
+.win-tree-link.is-active {
+  border-left-color: var(--win-accent);
+  background: var(--win-accent-soft);
+  color: var(--win-text);
+  font-weight: 600;
+}
+
+.win-tree-link > svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  opacity: 0.72;
+}
+
+.win-tree-link.is-active > svg {
+  color: var(--win-accent-dark);
+  opacity: 1;
+}
+
+.win-tree-label-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Contador en el menú. */
+.win-tree-badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--win-accent);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.win-tree-badge[data-tone='quiet'] {
+  background: #cfcfcf;
+  color: #404040;
+}
+
+/* Pie del panel lateral. */
+.win-sidebar-foot {
+  display: grid;
+  gap: 7px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--win-border-soft);
+  background: var(--win-chrome-dark);
+  font-size: 11.5px;
+}
+
+.win-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.win-sidebar-user svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--win-muted);
+}
+
+.win-sidebar-user span {
+  overflow: hidden;
+  color: var(--win-text-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sidebar plegado: solo iconos, como el Explorador de Windows. */
+.admin-page[data-sidebar='collapsed'] .win-sidebar-head span,
+.admin-page[data-sidebar='collapsed'] .win-tree-label,
+.admin-page[data-sidebar='collapsed'] .win-tree-badge,
+.admin-page[data-sidebar='collapsed'] .win-sidebar-user span,
+.admin-page[data-sidebar='collapsed'] .win-sidebar-foot .admin-btn {
+  display: none;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-sidebar-head {
+  justify-content: center;
+  padding: 10px 6px;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-sidebar-toggle {
+  margin-left: 0;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-tree-link {
+  justify-content: center;
+  min-height: 38px;
+  padding: 0;
+  border-left: 0;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-tree-link.is-active {
+  box-shadow: inset 2px 0 0 var(--win-accent);
+}
+
+.admin-page[data-sidebar='collapsed'] .win-sidebar-user {
+  justify-content: center;
+}
+
+.admin-page[data-sidebar='collapsed'] .win-tree-items {
+  display: block;
+}
+
+/* Separador visual entre secciones cuando no hay título. */
+.admin-page[data-sidebar='collapsed'] .win-tree-group + .win-tree-group {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--win-border-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   4. Adaptación de los componentes existentes al tema
+   --------------------------------------------------------------------------- */
+
+.win-workspace .admin-card {
+  border: 1px solid var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.win-workspace .admin-card h2 {
+  color: var(--win-text);
+}
+
+.win-workspace .admin-btn {
+  min-height: 30px;
+  padding: 0 13px;
+  border: 1px solid var(--win-border-strong);
+  border-radius: var(--win-radius);
+  background: linear-gradient(180deg, #fefefe 0%, #f0f0f0 100%);
+  color: var(--win-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.win-workspace .admin-btn:hover {
+  border-color: #8a8a8a;
+  background: linear-gradient(180deg, #ffffff 0%, #e9e9e9 100%);
+}
+
+.win-workspace .admin-btn:active {
+  background: #e0e0e0;
+  box-shadow: none;
+}
+
+.win-workspace .admin-btn--ghost {
+  background: transparent;
+  border-color: var(--win-border);
+  color: var(--win-text-soft);
+}
+
+.win-workspace .admin-btn--danger {
+  border-color: #e0a3a0;
+  background: linear-gradient(180deg, #fdf3f2 0%, #f8dedc 100%);
+  color: var(--win-error);
+}
+
+.win-workspace .admin-btn--danger:hover {
+  border-color: var(--win-error);
+  background: linear-gradient(180deg, #fbe6e4 0%, #f5d3d0 100%);
+}
+
+.win-workspace .admin-table th {
+  border-top: 0;
+  border-bottom: 1px solid var(--win-border);
+  background: var(--win-chrome);
+  color: var(--win-text-soft);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.win-workspace .admin-table th:first-child {
+  border-top-left-radius: 0;
+}
+
+.win-workspace .admin-table th:last-child {
+  border-top-right-radius: 0;
+}
+
+.win-workspace .admin-table td {
+  border-bottom: 1px solid var(--win-border-soft);
+  color: var(--win-text-soft);
+  font-size: 13px;
+}
+
+.win-workspace .admin-table tbody tr:hover td {
+  background: var(--win-accent-soft);
+}
+
+.win-workspace .admin-table td a {
+  color: var(--win-accent-dark);
+  font-weight: 600;
+}
+
+.win-workspace .admin-badge {
+  border: 1px solid var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-chrome);
+  color: var(--win-text-soft);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.win-workspace .admin-form input,
+.win-workspace .admin-form select,
+.win-workspace .admin-form textarea {
+  border: 1px solid var(--win-border-strong);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  color: var(--win-text);
+  font-size: 13px;
+}
+
+.win-workspace .admin-form input:focus,
+.win-workspace .admin-form select:focus,
+.win-workspace .admin-form textarea:focus {
+  outline: 2px solid var(--win-accent-ring);
+  outline-offset: -1px;
+  border-color: var(--win-accent);
+}
+
+.win-workspace .admin-form label > span {
+  color: var(--win-text-soft);
+  font-size: 12px;
+}
+
+.win-workspace .admin-select {
+  border: 1px solid var(--win-border-strong);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  color: var(--win-text);
+}
+
+.win-workspace .admin-progress {
+  background: var(--win-chrome-dark);
+  border: 1px solid var(--win-border-soft);
+}
+
+.win-workspace .admin-progress span {
+  background: linear-gradient(90deg, #107c10, #4caf50);
+}
+
+/* Encabezado de la página, ahora dentro del área de trabajo. */
+.admin-topbar {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   5. Panel de acceso y notificaciones
+   --------------------------------------------------------------------------- */
+
+.win-toast-area {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--win-taskbar-h) + 16px);
+  z-index: 300;
+  display: grid;
+  gap: 8px;
+  width: 330px;
+  pointer-events: none;
+}
+
+.win-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--win-border-strong);
+  border-left: 3px solid var(--win-accent);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  color: var(--win-text);
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+  animation: winToastIn 180ms ease;
+}
+
+.win-toast[data-kind='ok'] {
+  border-left-color: var(--win-ok);
+}
+
+.win-toast[data-kind='error'] {
+  border-left-color: var(--win-error);
+}
+
+.win-toast svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.win-toast[data-kind='ok'] svg {
+  color: var(--win-ok);
+}
+
+.win-toast[data-kind='error'] svg {
+  color: var(--win-error);
+}
+
+@keyframes winToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+}
+
+/* ---------------------------------------------------------------------------
+   6. Barra de herramientas
+   --------------------------------------------------------------------------- */
+
+.win-toolbar-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--win-muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.win-toolbar-status svg {
+  color: var(--win-ok);
+}
+
+/* ---------------------------------------------------------------------------
+   7. Resumen (dashboard) con estética de escritorio
+   --------------------------------------------------------------------------- */
+
+.win-workspace .admin-welcome {
+  margin-bottom: 18px;
+  padding: 20px 22px;
+  border: 1px solid var(--win-border);
+  border-left: 3px solid var(--win-accent);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.win-workspace .admin-welcome-kicker,
+.win-workspace .admin-section-kicker,
+.win-workspace .admin-overline {
+  color: var(--win-accent-dark);
+  font-size: 10px;
+  letter-spacing: 0.11em;
+}
+
+.win-workspace .admin-welcome h2 {
+  margin-bottom: 3px;
+  color: var(--win-text);
+  font-size: 21px;
+}
+
+.win-workspace .admin-welcome p:last-child {
+  color: var(--win-muted);
+  font-size: 13px;
+}
+
+.win-workspace .admin-welcome .admin-btn {
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: var(--win-radius);
+  background: linear-gradient(180deg, #4aa6ec 0%, #0078d7 100%);
+  border-color: #0067c0;
+  color: #fff;
+  font-size: 12.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.win-workspace .admin-welcome .admin-btn:hover {
+  background: linear-gradient(180deg, #63b4f0 0%, #1a86e0 100%);
+}
+
+/* Tarjetas de métrica: aspecto de panel de Windows. */
+.win-workspace .admin-stat {
+  border: 1px solid var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.win-workspace .admin-stat:hover {
+  transform: none;
+  border-color: var(--win-accent);
+  background: var(--win-accent-soft);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.win-workspace .admin-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--win-radius);
+  background: var(--win-accent-soft);
+  color: var(--win-accent-dark);
+  font-size: 19px;
+}
+
+.win-workspace .admin-stat strong {
+  color: var(--win-text);
+  font-size: 28px;
+}
+
+.win-workspace .admin-stat-label {
+  color: var(--win-muted);
+}
+
+.win-workspace .admin-stat-caption {
+  color: var(--win-text-soft);
+  font-size: 12px;
+}
+
+.win-workspace .admin-stat-link {
+  margin-top: 6px;
+  padding-top: 9px;
+  border-top: 1px solid var(--win-border-soft);
+  color: var(--win-accent-dark);
+  font-size: 11px;
+}
+
+/* Accesos rápidos: miniaturas de Windows. */
+.win-workspace .admin-quick-links a {
+  border: 1px solid var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.win-workspace .admin-quick-links a:hover {
+  transform: none;
+  border-color: var(--win-accent);
+  background: var(--win-accent-soft);
+}
+
+.win-workspace .admin-quick-links a > span {
+  border-radius: var(--win-radius);
+  background: var(--win-accent-soft);
+  color: var(--win-accent-dark);
+}
+
+/* Embudo comercial. */
+.win-workspace .admin-funnel-step {
+  border: 1px solid var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-field);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.win-workspace .admin-funnel-step:hover {
+  transform: none;
+  border-color: var(--win-accent);
+  background: var(--win-accent-soft);
+}
+
+.win-workspace .admin-funnel-step strong {
+  color: var(--win-text);
+}
+
+.win-workspace .admin-funnel-step span {
+  color: var(--win-muted);
+}
+
+/* Encabezado de tarjeta con borde inferior, como los paneles de Windows. */
+.win-workspace .admin-card-heading {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--win-border-soft);
+}
+
+.win-workspace .admin-card-heading h2 {
+  color: var(--win-text);
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------------------------
+   8. Ajustes finos de la barra lateral y la barra de tareas
+   --------------------------------------------------------------------------- */
+
+/* Los botones del pie usan el mismo estilo plano que el resto del panel. */
+.win-sidebar-foot .admin-btn {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--win-border-strong);
+  border-radius: var(--win-radius);
+  background: linear-gradient(180deg, #fefefe 0%, #f0f0f0 100%);
+  color: var(--win-text);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.win-sidebar-foot .admin-btn:hover {
+  border-color: var(--win-accent);
+  background: var(--win-accent-soft);
+}
+
+/* El reloj de la barra de tareas no debe ocupar más de lo necesario. */
+.win-taskbar-clock {
+  min-width: 74px;
+  text-align: right;
+}
+
+/* Los iconos de la barra de tareas y el reloj se alinean al centro. */
+.win-taskbar-tray svg {
+  width: 16px;
+  height: 16px;
+  color: #c9c9c9;
+}

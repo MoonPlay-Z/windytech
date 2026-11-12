@@ -11,7 +11,9 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const projects = await listProjectsAdmin();
 ---
 
-<AdminLayout title="Proyectos" admin={admin} active="projects">
+<AdminLayout title="Proyectos" admin={admin} active="projects"
+  crumbs={[{ label: 'Contenido', icon: 'proyectos' }, { label: 'Proyectos' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Nuevo proyecto</a>

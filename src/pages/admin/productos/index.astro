@@ -11,7 +11,9 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const products = await listProductsAdmin();
 ---
 
-<AdminLayout title="Productos" admin={admin} active="products">
+<AdminLayout title="Productos" admin={admin} active="products"
+  crumbs={[{ label: 'Catálogo', icon: 'productos' }, { label: 'Productos' }]}
+>
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Añadir producto</a>
