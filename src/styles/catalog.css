@@ -27,6 +27,37 @@
 .catalog-hero .container {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 620px);
+  align-items: center;
+  gap: clamp(16px, 3vw, 40px);
+}
+
+/* Foto de equipos a la derecha del texto del catálogo. El fondo blanco de la
+   foto se funde con el degradado del encabezado (multiply). */
+.catalog-hero-art {
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  opacity: 0.96;
+}
+
+@media (max-width: 980px) {
+  .catalog-hero .container {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-hero-art {
+    max-width: 640px;
+    order: 2;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 620px) {
+  .catalog-hero-art {
+    opacity: 0.9;
+  }
 }
 
 .catalog-hero .eyebrow {

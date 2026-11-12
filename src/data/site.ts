@@ -270,15 +270,15 @@ export const content = {
   },
   equipment: {
     eyebrow: 'EQUIPOS INFORMÁTICOS',
-    title: 'Catálogo en preparación',
-    text: 'Estamos preparando el catálogo con precios y disponibilidad. Mientras tanto, cuéntanos qué equipo necesitas y te cotizamos.',
+    title: 'Equipos listos para tu puesto de trabajo',
+    text: 'Tenemos laptops, desktops, monitores y accesorios con precio en dólares. Mira el catálogo, pide tu cotización y te confirmamos la entrega.',
     bullets: [
       'Laptops y computadoras de escritorio',
       'Monitores, impresoras y accesorios',
       'Redes y conectividad para tu local',
       'Asesoría para importar o exportar equipos',
     ],
-    cta: 'Cotizar equipo por WhatsApp',
+    cta: 'Ver el catálogo',
     message: 'Hola Windytech, quiero cotizar un equipo informático.',
     note: 'Te confirmamos disponibilidad, precio y tiempo de entrega al cotizar.',
   },

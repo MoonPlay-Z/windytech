@@ -261,6 +261,15 @@ const shareText = `${title} — ${shareUrl}`;
   <section class="section section--soft" id="equipos">
     <div class="container split-grid">
       <article class="equipment-card">
+        <img
+          class="equipment-card-art"
+          src="/assets/banner-equipos.webp"
+          alt="Equipos informáticos: computadoras de escritorio, monitores, teclado y periféricos"
+          width="3168"
+          height="1344"
+          loading="lazy"
+          decoding="async"
+        />
         <span class="tag">{t.equipment.eyebrow}</span>
         <h2>{t.equipment.title}</h2>
         <p>{t.equipment.text}</p>
@@ -272,15 +281,19 @@ const shareText = `${title} — ${shareUrl}`;
             </li>
           ))}
         </ul>
+        <a class="btn btn-primary" href="/catalogo/">
+          {t.equipment.cta}
+          <Icon name="arrow-right" size={18} />
+        </a>
         <a
-          class="btn btn-primary"
+          class="text-link"
           href={whatsappLink(t.equipment.message)}
           target="_blank"
           rel="noopener noreferrer"
           data-track="whatsapp"
         >
-          {t.equipment.cta}
-          <Icon name="whatsapp" size={18} />
+          {'O pídelo por WhatsApp'}
+          <Icon name="whatsapp" size={16} />
         </a>
         <p class="note">{t.equipment.note}</p>
       </article>

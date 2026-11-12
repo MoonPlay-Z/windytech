@@ -62,13 +62,25 @@ const itemListSchema = {
 >
   <section class="catalog-hero">
     <div class="container">
-      <span class="eyebrow">{t.eyebrow}</span>
-      <h1>{t.title}</h1>
-      <p class="catalog-intro">{t.intro}</p>
-      <div class="catalog-hero-meta">
-        <span>{t.noTaxNote}</span>
-        <CurrencySwitch rate={rate} />
+      <div class="catalog-hero-copy">
+        <span class="eyebrow">{t.eyebrow}</span>
+        <h1>{t.title}</h1>
+        <p class="catalog-intro">{t.intro}</p>
+        <div class="catalog-hero-meta">
+          <span>{t.noTaxNote}</span>
+          <CurrencySwitch rate={rate} />
+        </div>
       </div>
+      <img
+        class="catalog-hero-art"
+        src="/assets/banner-catalogo.webp"
+        alt="Computadoras de escritorio, monitores, teclados y equipos de escritorio"
+        width="3168"
+        height="1344"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
     </div>
   </section>
 

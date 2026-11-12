@@ -1450,8 +1450,19 @@ section[id],
 }
 
 .equipment-card {
+  overflow: hidden;
   border: 1px solid var(--line);
   background: #fff;
+}
+
+/* Banner de equipos dentro de la tarjeta de la portada: ocupa el ancho
+   completo de la tarjeta y se apoya en su borde superior. */
+.equipment-card-art {
+  display: block;
+  width: calc(100% + 72px);
+  max-width: none;
+  height: auto;
+  margin: -36px -36px 4px;
 }
 
 .equipment-card h2,
