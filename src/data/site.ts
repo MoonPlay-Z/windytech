@@ -286,9 +286,26 @@ export const content = {
     note: 'Te confirmamos disponibilidad, precio y tiempo de entrega al cotizar.',
   },
   payments: {
+    eyebrow: 'PAGOS INTERNACIONALES',
     title: 'Medios de pago',
     text: 'Pagas de forma segura desde cualquier país con las plataformas que ya usas.',
     methods: ['Binance', 'PayPal'],
+    methodDetails: {
+      Binance: 'USDT · Sin comisiones',
+      PayPal: 'Saldo o tarjeta',
+    },
+    /* Nombre que se muestra en la tarjeta (el método sigue siendo Binance). */
+    methodLabels: {
+      Binance: 'Binance Pay',
+      PayPal: 'PayPal',
+    },
+    stepsTitle: '¿Cómo funciona el pago?',
+    steps: [
+      'Solicitas tu cotización en el catálogo.',
+      'Confirmamos stock y tiempo de entrega.',
+      'Recibes los datos oficiales para transferir.',
+    ],
+    secureNote: 'Transacción verificada directamente con nuestro equipo',
     note: 'Al aceptar tu cotización te enviamos los datos para pagar.',
   },
   visibility: {

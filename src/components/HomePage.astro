@@ -300,20 +300,43 @@ const shareText = `${title} — ${shareUrl}`;
       </article>
 
       <article class="payments-card" id="pagos">
-        <span class="icon-badge icon-badge--light">
-          <Icon name="card" size={28} />
-        </span>
+        <div class="payments-card-head">
+          <span class="icon-badge icon-badge--light">
+            <Icon name="card" size={26} />
+          </span>
+          <span class="payments-eyebrow">{t.payments.eyebrow}</span>
+        </div>
         <h2>{t.payments.title}</h2>
         <p>{t.payments.text}</p>
+
         <div class="payment-pills">
           {t.payments.methods.map((method) => (
-            <span class={`payment-pill payment-pill--${method.toLowerCase()}`}>
-              <Icon name={method.toLowerCase()} size={22} />
-              {method}
-            </span>
+            <div class={`payment-pill payment-pill--${method.toLowerCase()}`}>
+              <Icon name={method.toLowerCase()} size={26} />
+              <span class="payment-pill-text">
+                <strong>{t.payments.methodLabels[method] ?? method}</strong>
+                <small>{t.payments.methodDetails[method]}</small>
+              </span>
+            </div>
           ))}
         </div>
-        <p class="note">{t.payments.note}</p>
+
+        <div class="payment-steps">
+          <h3>{t.payments.stepsTitle}</h3>
+          <ol>
+            {t.payments.steps.map((step, index) => (
+              <li>
+                <span class="payment-step-number" aria-hidden="true">{index + 1}</span>
+                <span class="payment-step-text">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <p class="payment-secure">
+          <Icon name="lock" size={16} />
+          <span>{t.payments.secureNote}</span>
+        </p>
       </article>
     </div>
   </section>

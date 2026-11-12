@@ -32,19 +32,26 @@ export const CITIES: City[] = [
       'El Hatillo',
       'Las Mercedes',
       'Baruta',
-      'La Guaira',
-      'Caracas Norte',
+      'Sucre',
+      'Carlos María Bello',
     ],
     delivery: 'Instalación en 1 a 3 días dentro de la capital',
-    note: 'Atención presencial en laboratories de redes y equipos; el resto del trabajo se hace en remoto.',
+    note: 'Atención presencial en laboratorios de redes y equipos; el resto del trabajo se hace en remoto.',
   },
   {
     slug: 'valencia',
     name: 'Valencia',
     state: 'Carabobo',
     claim: 'Automatización y sistemas para empresas de Carabobo',
-    zones: ['Valencia centro', 'Naguanagua', 'San Diego', 'Los Guayos', 'Bejuma'],
-    delivery: 'Instalación en 2 a 5 días en la zona metropolitan',
+    zones: [
+      'Valencia centro',
+      'Naguanagua',
+      'San Diego',
+      'Los Guayos',
+      'Guacara',
+      'Bejuma',
+    ],
+    delivery: 'Instalación en 2 a 5 días en el área metropolitana',
     note: 'Proyecto local: redes, equipos y servidores en oficina, con soporte a distancia.',
   },
   {
@@ -52,7 +59,14 @@ export const CITIES: City[] = [
     name: 'Maracay',
     state: 'Aragua',
     claim: 'Tecnología y equipos para comercios de Aragua',
-    zones: ['Maracay centro', 'San Antonio', 'Las Delicias', 'Camatagua', 'Choroní'],
+    zones: [
+      'Maracay centro',
+      'San Antonio',
+      'Las Delicias',
+      'Camatagua',
+      'Villa de Cura',
+      'Choroní',
+    ],
     delivery: 'Instalación en 2 a 5 días en Maracay y San Antonio',
     note: 'Mantenimiento y soporte para empresas con sucursales en el centro y la zona industrial.',
   },
@@ -61,7 +75,14 @@ export const CITIES: City[] = [
     name: 'Barquisimeto',
     state: 'Lara',
     claim: 'Equipos, redes y páginas web para negocios de Lara',
-    zones: ['Barquisimeto centro', 'Cabudare', 'El Tocuyo', 'Jiménez', 'Torres'],
+    zones: [
+      'Barquisimeto centro',
+      'Cabudare',
+      'El Tocuyo',
+      'Jiménez',
+      'Torres',
+      'Santa Rosa',
+    ],
     delivery: 'Entrega de 3 a 7 días según disponibilidad',
     note: 'Trabajamos con proveedores locales de hardware para reducir los tiempos de entrega.',
   },
@@ -70,7 +91,14 @@ export const CITIES: City[] = [
     name: 'Maracaibo',
     state: 'Zulia',
     claim: 'Automatización y páginas web en el occidente',
-    zones: ['Maracaibo centro', 'La Guajira', 'Santa Rita', 'Machiques', 'Los Puertos'],
+    zones: [
+      'Maracaibo centro',
+      'La Guajira',
+      'Santa Rita',
+      'Machiques',
+      'Los Puertos',
+      'Catatumbo',
+    ],
     delivery: 'Atención remota inmediata; instalación presencial en 3 a 6 días',
     note: 'El soporte remoto cubre toda la región; las visitas se coordinan con cita previa.',
   },
@@ -79,7 +107,14 @@ export const CITIES: City[] = [
     name: 'Puerto Cabello',
     state: 'Carabobo',
     claim: 'Redes y equipos para la zona portuaria',
-    zones: ['Puerto Cabello centro', 'San Juan de los Morros', 'Boca de Tocuyo', 'Cagigal'],
+    zones: [
+      'Puerto Cabello centro',
+      'San Juan de los Morros',
+      'Boca de Tocuyo',
+      'Cagigal',
+      'Píritu',
+      'Los Places',
+    ],
     delivery: 'Instalación en 3 a 6 días',
     note: 'Proyectos de red y virtualización con atención en horario de oficina.',
   },
@@ -88,7 +123,14 @@ export const CITIES: City[] = [
     name: 'Valle de Aragua',
     state: 'Aragua',
     claim: 'Soporte y mantenimiento en el centro del país',
-    zones: ['La Victoria', 'San Rafael', 'San Casimiro', 'Zamora', 'Guaicaipuro'],
+    zones: [
+      'La Victoria',
+      'San Rafael',
+      'San Casimiro',
+      'Zamora',
+      'Guaicaipuro',
+      'El Limón',
+    ],
     delivery: 'Atención remota el mismo día; visita en 2 a 4 días',
     note: 'Plan de mantenimiento mensual para empresas con varias sedes en el estado.',
   },
@@ -97,11 +139,33 @@ export const CITIES: City[] = [
     name: 'Mérida',
     state: 'Mérida',
     claim: 'Sistemas y equipos para negocios de los Andes',
-    zones: ['Mérida centro', 'El Chía', 'Cacute', 'Pueblo Llano', 'Cardenal Quintero'],
+    zones: [
+      'Mérida centro',
+      'El Chía',
+      'Cácute',
+      'Cardenal Quintero',
+      'Rangel',
+      'Tanakuy',
+    ],
     delivery: 'Entrega en 4 a 8 días',
     note: 'Proyectos de software y automatización con alcance cerrado por etapas.',
   },
 ];
+
+/**
+ * Estados donde se presta el servicio, sin repetir.
+ *
+ * Cada estado agrupa las ciudades de su zona. Se usa en el pie de página y
+ * en el schema para que los buscadores entiendan la cobertura real.
+ */
+export const STATES = Array.from(
+  new Map(CITIES.map((city) => [city.state, { name: city.state, cities: [] as string[] }])).values(),
+);
+
+for (const city of CITIES) {
+  const state = STATES.find((item) => item.name === city.state);
+  if (state) state.cities.push(city.name);
+}
 
 export function cityBySlug(slug: string): City | undefined {
   return CITIES.find((city) => city.slug === slug);

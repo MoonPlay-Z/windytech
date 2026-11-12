@@ -2,7 +2,7 @@
 import { content, site } from '../data/site';
 import { company } from '../data/empresa';
 import { servicePath, services } from '../data/services';
-import { CITIES } from '../data/ciudades';
+import { CITIES, STATES } from '../data/ciudades';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -15,10 +15,16 @@ const servicesAria = 'Servicios de Windytech';
 const servicesTitle = 'Servicios';
 const servicesHub = '/servicios/';
 const servicesHubLabel = 'Todos los servicios';
+const statesTitle = 'Estados donde trabajamos';
 const wordmarkAlt =
   'Windytech — desarrollo de software y automatización';
 /* Perfiles sociales reales: enlazados desde el pie para reforzar la entidad. */
 const socialLinks = company.profiles.filter((profile) => profile.url.trim().length > 0);
+/* Cada estado lleva sus ciudades para que el visitante sepa dónde hay base. */
+const estados = STATES.map((state) => ({
+  name: state.name,
+  cities: CITIES.filter((city) => city.state === state.name),
+}));
 ---
 
 <footer class="site-footer">
@@ -33,6 +39,7 @@ const socialLinks = company.profiles.filter((profile) => profile.url.trim().leng
         loading="lazy"
       />
       <span class="footer-tagline">{t.footer.tagline}</span>
+      <p class="footer-description">{company.description}</p>
       {
         socialLinks.length > 0 && (
           <nav class="footer-social" aria-label="Redes sociales de Windytech">
@@ -43,7 +50,10 @@ const socialLinks = company.profiles.filter((profile) => profile.url.trim().leng
                 rel="noopener noreferrer"
                 data-track="social"
               >
-                <Icon name={profile.name.toLowerCase() === 'x' ? 'x' : profile.name.toLowerCase()} size={18} />
+                <Icon
+                  name={profile.name.toLowerCase() === 'x' ? 'x' : profile.name.toLowerCase()}
+                  size={18}
+                />
                 <span>{profile.name}</span>
               </a>
             ))}
@@ -53,12 +63,15 @@ const socialLinks = company.profiles.filter((profile) => profile.url.trim().leng
     </div>
 
     <nav class="footer-nav" aria-label={navAria}>
-      {t.nav.items.map((item) => (
-        <a href={item.href.startsWith('/') ? item.href : `${homeHref}${item.href}`}>
-          {`Ir a ${item.label}`}
-        </a>
-      ))}
-      <a href={t.nav.aboutHref}>{t.nav.about}</a>
+      <span class="footer-nav-title">Navegación</span>
+      <div class="footer-nav-links">
+        {t.nav.items.map((item) => (
+          <a href={item.href.startsWith('/') ? item.href : `${homeHref}${item.href}`}>
+            {item.label}
+          </a>
+        ))}
+        <a href={t.nav.aboutHref}>{t.nav.about}</a>
+      </div>
     </nav>
   </div>
 
@@ -73,11 +86,18 @@ const socialLinks = company.profiles.filter((profile) => profile.url.trim().leng
   </div>
 
   <div class="container footer-services">
-    <span class="footer-services-title">Ciudades donde trabajamos</span>
-    <nav class="footer-services-links" aria-label="Ciudades donde trabajamos">
-      {CITIES.map((city) => (
-        <a href={`/${city.slug}/`}>{city.name}</a>
-      ))}
+    <span class="footer-services-title">{statesTitle}</span>
+    <nav class="footer-services-links" aria-label={statesTitle}>
+      {
+        estados.map((state) => (
+          <div class="footer-state">
+            <span class="footer-state-name">{state.name}</span>
+            <span class="footer-state-cities">
+              {state.cities.map((city) => city.name).join(', ')}
+            </span>
+          </div>
+        ))
+      }
     </nav>
   </div>
 

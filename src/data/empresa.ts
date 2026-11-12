@@ -97,7 +97,7 @@ export type CompanyProfile = {
   /** Ciudad y zona horaria. */
   timeZone: string;
 
-  /** Áreas donde se presta el servicio. */
+  /** Áreas donde se presta el servicio: estados y países. */
   areaServed: { name: string; type: 'Country' | 'Place' | 'City' | 'State' }[];
 
   /** Métodos de pago. */
@@ -130,7 +130,7 @@ export const company: CompanyProfile = {
   alternateNames: ['Windy Tech', 'Windytech Studio', 'Windy Tech Studio'],
   slogan: 'Desarrollo de software, automatización de WhatsApp y marketing digital',
   description:
-    'Windytech es un estudio digital-fondado en Venezuela que desarrolla software a la medida, automatiza la atención por WhatsApp Business, diseña páginas web y landing pages, y trabaja con SEO, publicidad y equipamiento informático. Los servicios digitales se prestan en remoto para clientes de cualquier país; la instalación de redes, la infraestructura y la entrega física de equipos se coordinan en Venezuela.',
+    'Windytech es un estudio digital fundado en Venezuela que desarrolla software a la medida, automatiza la atención por WhatsApp Business, diseña páginas web y landing pages, y trabaja con SEO, publicidad y equipamiento informático. Los servicios digitales se prestan en remoto para clientes de cualquier país; la instalación de redes, la infraestructura y la entrega física de equipos se coordinan en Venezuela.',
   foundingDate: '2026',
   contentUpdated: '2026-11-09',
 
@@ -185,14 +185,12 @@ export const company: CompanyProfile = {
   timeZone: 'America/Caracas',
   areaServed: [
     { name: 'Venezuela', type: 'Country' },
-    { name: 'Caracas', type: 'City' },
-    { name: 'Valencia', type: 'City' },
-    { name: 'Maracay', type: 'City' },
-    { name: 'Barquisimeto', type: 'City' },
-    { name: 'Maracaibo', type: 'City' },
-    { name: 'Puerto Cabello', type: 'City' },
-    { name: 'Valle de Aragua', type: 'City' },
-    { name: 'Mérida', type: 'City' },
+    { name: 'Distrito Capital', type: 'State' },
+    { name: 'Carabobo', type: 'State' },
+    { name: 'Aragua', type: 'State' },
+    { name: 'Lara', type: 'State' },
+    { name: 'Zulia', type: 'State' },
+    { name: 'Mérida', type: 'State' },
     { name: 'Latinoamérica', type: 'Place' },
     { name: 'Worldwide', type: 'Place' },
   ],

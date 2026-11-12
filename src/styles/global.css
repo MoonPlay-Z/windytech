@@ -1515,32 +1515,68 @@ section[id],
   line-height: 1.6;
 }
 
-.payment-pills {
+/* Encabezado de la tarjeta de pago: icono + etiqueta de la categoría. */
+.payments-card-head {
   display: flex;
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
+}
+
+.payments-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.payment-pills {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding-top: 4px;
 }
 
 .payment-pill {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 54px;
-  padding: 0 24px;
-  border-radius: 14px;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 16px;
   background: #fff;
   color: var(--navy);
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
 }
 
 .payment-pill svg {
   flex: none;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+}
+
+.payment-pill-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.payment-pill-text strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.payment-pill-text small {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
 }
 
 .payment-pill--binance svg {
@@ -1549,6 +1585,87 @@ section[id],
 
 .payment-pill--paypal svg {
   color: #0070e0;
+}
+
+/* Pasos del pago, numerados y unidos por una línea. */
+.payment-steps {
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.payment-steps h3 {
+  margin-bottom: 16px;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.payment-steps ol {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: payment-step;
+}
+
+.payment-steps li {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.payment-steps li:not(:last-child)::before {
+  position: absolute;
+  top: 26px;
+  left: 13px;
+  width: 1px;
+  height: calc(100% - 6px);
+  background: rgba(255, 255, 255, 0.2);
+  content: "";
+}
+
+.payment-step-number {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--mint);
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.payment-step-text {
+  color: #fff;
+  font-size: 14.5px;
+  line-height: 1.5;
+  padding-top: 3px;
+}
+
+/* Aviso de seguridad al pie de la tarjeta. */
+.payment-secure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ice);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.payment-secure svg {
+  flex: none;
+  color: var(--mint);
 }
 
 .note {
@@ -1781,20 +1898,21 @@ a.contact-card:hover {
   color: var(--ice);
 }
 
+/* Pie de página: marca a la izquierda, navegación a la derecha. */
 .footer-main {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px 48px;
-  padding-top: 40px;
-  padding-bottom: 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 32px 56px;
+  padding-top: 52px;
+  padding-bottom: 36px;
 }
 
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+  max-width: 520px;
 }
 
 .footer-wordmark {
@@ -1810,10 +1928,31 @@ a.contact-card:hover {
   letter-spacing: 0.08em;
 }
 
+.footer-description {
+  color: var(--footer-muted);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+/* Navegación del pie: título y enlaces en columna. */
 .footer-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-nav-title {
+  color: var(--footer-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.footer-nav-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px 24px;
   font-size: 15px;
 }
 
@@ -1821,12 +1960,13 @@ a.contact-card:hover {
   color: var(--mint);
 }
 
+/* Filas de servicios y estados. */
 .footer-services {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 20px;
-  padding-bottom: 28px;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px 32px;
+  padding-bottom: 26px;
   font-size: 15px;
 }
 
@@ -1836,16 +1976,48 @@ a.contact-card:hover {
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  padding-top: 4px;
 }
 
 .footer-services-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 10px 24px;
 }
 
 .footer-services a:hover {
   color: var(--mint);
+}
+
+/* Cada estado con sus ciudades: la cobertura se lee de un vistazo. */
+.footer-state {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 150px;
+}
+
+.footer-state-name {
+  color: #fff;
+  font-weight: 700;
+}
+
+.footer-state-cities {
+  color: var(--footer-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .footer-services {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .footer-bottom {
@@ -3626,4 +3798,16 @@ html[data-astro-transition='back'] {
 .city-faq .faq-item summary {
   min-height: 60px;
   font-size: 16px;
+}
+
+/* En pantallas pequeñas las tarjetas de pago pasan a una columna para que
+   el nombre y el detalle no se partan en varias líneas. */
+@media (max-width: 460px) {
+  .payment-pills {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-pill {
+    padding: 14px 16px;
+  }
 }
