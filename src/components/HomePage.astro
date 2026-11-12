@@ -185,13 +185,20 @@ const shareText = `${title} — ${shareUrl}`;
             <p>{card.text}</p>
             <a
               class="btn btn-primary"
+              href={`/#contacto?utm_source=home&utm_campaign=${card.slug}`}
+              data-track={`campaign-${card.slug}`}
+            >
+              {card.cta}
+              <Icon name="arrow-right" size={18} />
+            </a>
+            <a
+              class="text-link"
               href={whatsappLink(card.message)}
               target="_blank"
               rel="noopener noreferrer"
               data-track="whatsapp"
             >
-              {card.cta}
-              <Icon name="whatsapp" size={18} />
+              Prefiero WhatsApp
             </a>
           </article>
         ))}

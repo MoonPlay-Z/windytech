@@ -116,10 +116,34 @@ const f = t.contact.form;
 </form>
 
 <script>
+  import { content } from '../data/site';
+  import { readAttribution } from '../lib/attribution';
+
+  // Si la visita viene de una campaña, dejamos el formulario preparado.
+  function prefillFromCampaign(form: HTMLFormElement) {
+    // La atribución puede llegar por la URL o por la cookie de la visita.
+    const params = new URLSearchParams(window.location.search);
+    const campaign = params.get('utm_campaign') ?? readAttribution().campaign ?? '';
+    if (!campaign) return;
+    const card = content.campaigns.cards.find((item: (typeof content.campaigns.cards)[number]) => item.slug === campaign);
+    if (!card) return;
+
+    const select = form.querySelector<HTMLSelectElement>('[name="service"]');
+    if (select) {
+      const option = [...select.options].find((item) => item.value === card.service);
+      if (option) select.value = option.value;
+    }
+    const message = form.querySelector<HTMLTextAreaElement>('[name="message"]');
+    if (message && !message.value) {
+      message.value = `Me interesa la campaña «${card.tag}».`;
+    }
+  }
+
   function initContactForms() {
     document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
       if (form.dataset.wtBound === 'true') return;
       form.dataset.wtBound = 'true';
+      prefillFromCampaign(form);
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();

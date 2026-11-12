@@ -141,6 +141,8 @@ export const content = {
       'Cada campaña abre un chat de WhatsApp con su nombre. Al responderte, te contamos la promoción vigente.',
     cards: [
       {
+        slug: 'software-a-medida',
+        service: 'Desarrollo de software',
         tag: 'Software a medida',
         icon: 'code',
         title: 'Un sistema que trabaja como tu negocio',
@@ -149,6 +151,8 @@ export const content = {
         message: 'Hola Windytech, vengo de la campaña Software a medida',
       },
       {
+        slug: 'whatsapp-24-7',
+        service: 'Automatización de WhatsApp',
         tag: 'WhatsApp 24/7',
         icon: 'bot',
         title: 'Atiende a tus clientes sin parar',
@@ -157,6 +161,8 @@ export const content = {
         message: 'Hola Windytech, vengo de la campaña WhatsApp 24/7',
       },
       {
+        slug: 'pagina-web',
+        service: 'Landing page o sitio web',
         tag: 'Página web',
         icon: 'layout',
         title: 'Tu landing page lista para vender',
@@ -165,6 +171,8 @@ export const content = {
         message: 'Hola Windytech, vengo de la campaña Página web',
       },
       {
+        slug: 'marketing-seo',
+        service: 'Marketing, SEO y publicidad',
         tag: 'Marketing y SEO',
         icon: 'chart',
         title: 'Atrae clientes nuevos cada semana',
