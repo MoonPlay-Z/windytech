@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import pg from 'pg';
 import { services } from '../src/data/services';
+import { CITIES } from '../src/data/ciudades';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const outDir = join(root, 'dist', 'client');
@@ -47,6 +48,13 @@ const serviceRoutes: Entry[] = services.map((service) => ({
   path: service.path,
   changefreq: 'monthly',
   priority: '0.8',
+}));
+
+// Páginas locales por ciudad (SEO local).
+const cityRoutes: Entry[] = CITIES.map((city) => ({
+  path: `/${city.slug}/`,
+  changefreq: 'monthly',
+  priority: '0.7',
 }));
 
 function lastCommitDate(): string {
@@ -144,6 +152,7 @@ const fallbackLastmod = lastCommitDate();
 const entries: Entry[] = [
   ...staticRoutes,
   ...serviceRoutes,
+  ...cityRoutes,
   ...(await dynamicRoutes()).map((item) => ({
     path: item.path,
     changefreq: 'weekly' as const,

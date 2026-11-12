@@ -2957,3 +2957,126 @@ html[data-astro-transition='back'] {
   font-size: 11px;
   font-weight: 800;
 }
+
+/* ---------------------------------------------------------------------------
+   Páginas locales por ciudad
+   --------------------------------------------------------------------------- */
+
+.city-hero {
+  padding: clamp(34px, 5vw, 64px) 0 clamp(30px, 4vw, 54px);
+  background: linear-gradient(180deg, #fff, var(--bg));
+}
+
+.city-hero h1 {
+  margin: 10px 0 16px;
+  max-width: 18ch;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.city-hero p {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.city-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.city-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.city-fact h2 {
+  margin: 6px 0 12px;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 21px;
+}
+
+.city-fact p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+.city-zones {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.city-zones li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.city-zones svg {
+  color: var(--teal);
+}
+
+.city-contact a {
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+
+.city-more {
+  margin: 24px 0 0;
+  text-align: center;
+}
+
+.city-others {
+  display: grid;
+  gap: 16px;
+}
+
+.city-others h2 {
+  margin: 0;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.city-others-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.city-others-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.city-others-list a:hover {
+  border-color: var(--teal);
+  background: var(--bg-soft);
+}

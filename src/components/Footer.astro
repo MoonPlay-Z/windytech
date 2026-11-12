@@ -1,6 +1,7 @@
 ---
 import { content, site } from '../data/site';
 import { servicePath, services } from '../data/services';
+import { CITIES } from '../data/ciudades';
 
 interface Props {
 }
@@ -46,6 +47,15 @@ const wordmarkAlt =
       <a href={servicesHub}>{servicesHubLabel}</a>
       {services.map((service) => (
         <a href={servicePath(service)}>{service.content.title}</a>
+      ))}
+    </nav>
+  </div>
+
+  <div class="container footer-services">
+    <span class="footer-services-title">Ciudades donde trabajamos</span>
+    <nav class="footer-services-links" aria-label="Ciudades donde trabajamos">
+      {CITIES.map((city) => (
+        <a href={`/${city.slug}/`}>{city.name}</a>
       ))}
     </nav>
   </div>
