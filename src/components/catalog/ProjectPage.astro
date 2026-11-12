@@ -17,6 +17,17 @@ const listHref = projectsPath();
 const href = `${listHref}${project.slug}/`;
 const cover = project.coverPublicId ? projectImage(project.coverPublicId, 1600) : null;
 
+/*
+ * El título se recorta para no pasar de 60 caracteres: si no, Google lo
+ * corta con puntos suspensivos en el resultado y se pierde la marca.
+ */
+const titulo = (() => {
+  const completo = `${project.title} | ${site.name}`;
+  if (completo.length <= 60) return completo;
+  const base = project.title.slice(0, 60 - site.name.length - 3).trim();
+  return `${base}… | ${site.name}`;
+})();
+
 const schema = {
   '@type': 'CreativeWork',
   '@id': `${new URL(href, site.url)}#project`,
@@ -31,7 +42,7 @@ const schema = {
 ---
 
 <BaseLayout
-  title={`${project.title} | ${site.name}`}
+  title={titulo}
   description={project.summary}
   path={href}
   ogImage={cover ?? '/assets/og.webp'}
