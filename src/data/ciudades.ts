@@ -150,6 +150,29 @@ export const CITIES: City[] = [
     delivery: 'Entrega en 4 a 8 días',
     note: 'Proyectos de software y automatización con alcance cerrado por etapas.',
   },
+  {
+    slug: 'barinas',
+    name: 'Barinas',
+    state: 'Barinas',
+    claim: 'Automatización y páginas web para negocios de los llanos',
+    zones: [
+      'Barinas centro',
+      'Orizalco',
+      'Cruz de Pacairí',
+      'El Chiringuito',
+    ],
+    delivery: 'Atención remota inmediata; visita en 2 a 5 días',
+    note: 'El soporte remoto cubre todo el estado; las visitas se coordinan con cita previa.',
+  },
+  {
+    slug: 'portuguesa',
+    name: 'Portuguesa',
+    state: 'Barinas',
+    claim: 'Equipos y redes para el oriente del estado Barinas',
+    zones: ['Portuguesa centro', 'La Curva', 'Alto Barinas', 'Agua Blanca'],
+    delivery: 'Entrega en 3 a 7 días según disponibilidad',
+    note: 'Instalación de redes y entrega de equipos coordinada con proveedores locales.',
+  },
 ];
 
 /**

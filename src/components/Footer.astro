@@ -93,7 +93,12 @@ const estados = STATES.map((state) => ({
           <div class="footer-state">
             <span class="footer-state-name">{state.name}</span>
             <span class="footer-state-cities">
-              {state.cities.map((city) => city.name).join(', ')}
+              {state.cities.map((city, index) => (
+                <>
+                  {index > 0 && ', '}
+                  <a href={`/${city.slug}/`}>{city.name}</a>
+                </>
+              ))}
             </span>
           </div>
         ))

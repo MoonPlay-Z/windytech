@@ -3811,3 +3811,15 @@ html[data-astro-transition='back'] {
     padding: 14px 16px;
   }
 }
+
+/* Las ciudades dentro de cada estado son enlaces a su página local. */
+.footer-state-cities a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+
+.footer-state-cities a:hover {
+  color: var(--mint);
+  text-decoration: underline;
+}

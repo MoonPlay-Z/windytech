@@ -11,6 +11,7 @@
  * adaptador Node sirve como archivos estáticos.
  */
 import { writeFile, mkdir } from 'node:fs/promises';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -21,6 +22,25 @@ import { CITIES } from '../src/data/ciudades';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const outDir = join(root, 'dist', 'client');
 const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://windytech.studio').replace(/\/$/, '');
+
+/*
+ * En local el build no hereda el .env (solo lo lee `node --env-file`).
+ * Sin DATABASE_URL el sitemap se quedaría sin productos, publicaciones y
+ * proyectos, así que se cargan aquí las variables que falten.
+ */
+if (!process.env.DATABASE_URL) {
+  const envPath = join(root, '.env');
+  if (existsSync(envPath)) {
+    for (const line of readFileSync(envPath, 'utf8').split('\n')) {
+      const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (!match) continue;
+      const [, key, rawValue] = match;
+      if (process.env[key] !== undefined) continue;
+      const value = rawValue.replace(/^['"]|['"]$/g, '');
+      process.env[key] = value;
+    }
+  }
+}
 
 type Entry = {
   /** Ruta en español (único idioma del sitio). */

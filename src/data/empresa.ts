@@ -10,6 +10,8 @@
  * virtuales o ficticias en el `PostalAddress`.
  */
 
+import { STATES } from './ciudades';
+
 export type SocialProfile = {
   /** Nombre de la red, tal como se muestra en el schema. */
   name: string;
@@ -114,8 +116,7 @@ export type CompanyProfile = {
  * IMPORTANTE: la URL debe ser la real y pública. Si la red todavía no existe,
  * deja el `url` vacío: es preferible publicar un solo perfil vrai que cinco
  * enlaces rotos o de terceros.
- */
-const PROFILES: SocialProfile[] = [
+ */const PROFILES: SocialProfile[] = [
   { name: 'Facebook', url: '' },
   { name: 'Instagram', url: '' },
   { name: 'LinkedIn', url: '' },
@@ -185,12 +186,8 @@ export const company: CompanyProfile = {
   timeZone: 'America/Caracas',
   areaServed: [
     { name: 'Venezuela', type: 'Country' },
-    { name: 'Distrito Capital', type: 'State' },
-    { name: 'Carabobo', type: 'State' },
-    { name: 'Aragua', type: 'State' },
-    { name: 'Lara', type: 'State' },
-    { name: 'Zulia', type: 'State' },
-    { name: 'Mérida', type: 'State' },
+    // Los estados salen de la lista de ciudades: una sola fuente de verdad.
+    ...STATES.map((state) => ({ name: state.name, type: 'State' as const })),
     { name: 'Latinoamérica', type: 'Place' },
     { name: 'Worldwide', type: 'Place' },
   ],
