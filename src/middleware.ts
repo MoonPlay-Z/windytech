@@ -59,10 +59,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { url, request } = context;
 
   // Todo el sitio es en español: /en/... va a su equivalente en español.
+  // La redirección es relativa para que conserve el dominio público real
+  // detrás del proxy (si se usara url.origin saldría "localhost").
   const spanish = spanishPath(url.pathname);
   if (spanish && spanish !== url.pathname) {
-    const target = new URL(spanish + url.search, url.origin);
-    return new Response(null, { status: 301, headers: { Location: target.toString() } });
+    return new Response(null, {
+      status: 301,
+      headers: { Location: `${spanish}${url.search}` },
+    });
   }
 
   // Protección CSRF propia: compara hosts (no esquema) y tolera proxies.
