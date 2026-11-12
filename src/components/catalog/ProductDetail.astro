@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../Icon.astro';
 import ShareBar from '../ShareBar.astro';
+import ShareMenu from '../ShareMenu.astro';
 import { site, whatsappLink } from '../../data/site';
 import {
   attributeLabels,
@@ -303,6 +304,14 @@ const productSchema: Record<string, unknown> = {
           )}
 
           <div class="product-actions">
+            <ShareMenu
+              path={href}
+              title={product.name}
+              text={product.shortDescription}
+              label="Compartir este equipo"
+              variant="detail"
+              campaign="product"
+            />
             {product.availability === 'OUT_OF_STOCK' ? (
               <a
                 class="btn btn-primary"

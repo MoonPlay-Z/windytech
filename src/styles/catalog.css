@@ -477,3 +477,10 @@
   }
 }
 }
+
+/* Botón de compartir en la tarjeta de producto */
+.product-card-share {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}

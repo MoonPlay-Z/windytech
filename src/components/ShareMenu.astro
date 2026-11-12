@@ -1,0 +1,77 @@
+---
+import Icon from './Icon.astro';
+import { shareLinks, shareCopy } from '../lib/social';
+
+interface Props {
+  /** Ruta o URL absoluta de lo que se comparte. */
+  path: string;
+  /** Título del recurso. */
+  title: string;
+  /** Texto que acompaña al enlace. */
+  text?: string;
+  /** Etiqueta del botón. */
+  label?: string;
+  /** Apariencia: discreta (dentro de una tarjeta) o destacada. */
+  variant?: 'card' | 'detail';
+  /** Campaña UTM para medir el canal. */
+  campaign?: string;
+}
+
+const {
+  path,
+  title,
+  text,
+  label,
+  variant = 'card',
+  campaign = 'share',
+} = Astro.props;
+
+const t = shareCopy;
+const url = new URL(path, Astro.site ?? 'https://windytech.studio').toString();
+const links = shareLinks({ url, title, text, campaign });
+const id = `share-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class:list={['share-menu', `share-menu--${variant}`]} data-share-menu>
+  <button
+    type="button"
+    class="share-menu-trigger"
+    aria-expanded="false"
+    aria-controls={`${id}-panel`}
+    data-share-trigger
+  >
+    <Icon name="share" size={16} />
+    <span>{label ?? t.share}</span>
+  </button>
+
+  <div class="share-menu-panel" id={`${id}-panel`} data-share-panel hidden>
+    <p class="share-menu-title">{t.shareTitle}</p>
+    <ul class="share-menu-list">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-share-channel={link.id}
+            >
+              <Icon name={link.icon} size={16} />
+              <span>{link.label}</span>
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <button type="button" data-copy-share data-copy-url={url} data-copy-label={t.copy} data-copied-label={t.copied} data-error-label={t.copyError}>
+          <Icon name="copy" size={16} />
+          <span>{t.copy}</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  import '../scripts/share-menu';
+</script>

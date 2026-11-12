@@ -38,6 +38,7 @@ export const ICON_GROUPS = {
     close: 'lucide:x',
     plus: 'lucide:plus',
     bell: 'lucide:bell',
+    share: 'lucide:share-2',
     minus: 'lucide:minus',
   },
 

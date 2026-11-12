@@ -3080,3 +3080,102 @@ html[data-astro-transition='back'] {
   border-color: var(--teal);
   background: var(--bg-soft);
 }
+
+/* ---------------------------------------------------------------------------
+   Menú de compartir (productos y paquetes)
+   --------------------------------------------------------------------------- */
+
+.share-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.share-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--navy);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.share-menu-trigger:hover,
+.share-menu.is-open .share-menu-trigger {
+  border-color: var(--teal);
+  background: var(--bg-soft);
+}
+
+.share-menu--detail .share-menu-trigger {
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 13.5px;
+}
+
+.share-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  min-width: 210px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(14, 34, 52, 0.16);
+}
+
+.share-menu-title {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.share-menu-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.share-menu-list a,
+.share-menu-list button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--navy);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.share-menu-list a:hover,
+.share-menu-list button:hover {
+  background: var(--bg-soft);
+  color: var(--teal-dark);
+}
+
+.share-menu-list svg {
+  flex: none;
+  color: var(--teal);
+}

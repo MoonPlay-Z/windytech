@@ -1,5 +1,6 @@
 ---
 import Icon from '../Icon.astro';
+import ShareMenu from '../ShareMenu.astro';
 import { site, whatsappLink } from '../../data/site';
 import {
   availabilityLabels,
@@ -112,6 +113,16 @@ const addedLabel = 'Añadido';
         {t.view}
         <Icon name="arrow-right" size={15} />
       </a>
+    </div>
+
+    <div class="product-card-share">
+      <ShareMenu
+        path={href}
+        title={product.name}
+        text={product.shortDescription}
+        label="Compartir"
+        campaign="product"
+      />
     </div>
   </div>
 </article>

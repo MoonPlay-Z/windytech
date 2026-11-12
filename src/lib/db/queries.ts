@@ -1314,6 +1314,14 @@ export async function servicePlanSlugInUse(
   return Boolean(row?.exists);
 }
 
+/** Paquete por su slug en español (para crear o actualizar sin duplicar). */
+export async function findServicePlanBySlug(slug: string): Promise<number | null> {
+  const row = await one<{ id: number }>(
+    sql`SELECT plan_id AS id FROM service_plan_translations WHERE locale = 'es' AND slug = ${slug} LIMIT 1`,
+  );
+  return row ? Number(row.id) : null;
+}
+
 export async function saveServicePlan(input: {
   id?: number;
   serviceKey: string;

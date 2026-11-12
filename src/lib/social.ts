@@ -27,6 +27,9 @@ export type ShareCopy = {
   copy: string;
   copied: string;
   copyError: string;
+  /** Etiqueta del botón que abre el menú de compartir. */
+  share: string;
+  shareTitle: string;
 };
 
 export const shareCopy: ShareCopy = {
@@ -41,6 +44,8 @@ export const shareCopy: ShareCopy = {
     copy: 'Copiar enlace',
     copied: 'Enlace copiado',
     copyError: 'No se pudo copiar. Copia la dirección desde el navegador.',
+    share: 'Compartir',
+    shareTitle: 'Compartir en',
 };
 
 /**

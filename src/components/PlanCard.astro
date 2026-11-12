@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import ShareMenu from './ShareMenu.astro';
 import { whatsappLink } from '../data/site';
 import { formatUsd, formatVes } from '../lib/money';
 import { shareCopy } from '../lib/social';
@@ -79,17 +80,12 @@ const message = `Hola Windytech, quiero el paquete ${plan.name}.`;
         <Icon name="arrow-right" size={16} />
       </a>
     )}
-    <button
-      type="button"
-      class="plan-link plan-link--share"
-      data-copy-share
-      data-copy-url={shareUrl}
-      data-copy-label={copy.copy}
-      data-copied-label={copy.copied}
-      data-error-label={copy.copyError}
-    >
-      <Icon name="copy" size={15} />
-      <span>{copy.copy}</span>
-    </button>
+    <ShareMenu
+      path={shareUrl}
+      title={plan.name}
+      text={plan.tagline}
+      label="Compartir"
+      campaign="plan"
+    />
   </div>
 </article>
