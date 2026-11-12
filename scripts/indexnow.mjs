@@ -13,7 +13,20 @@ const KEY = '3912b45e618c49a3694bc4c10ff020f4';
 const ENDPOINT = 'https://api.indexnow.org/indexnow';
 const dryRun = process.argv.includes('--dry-run');
 
-const sitemap = await readFile(new URL('../dist/sitemap.xml', import.meta.url), 'utf8');
+// El sitemap se genera en dist/client/ (carpeta de estáticos del adaptador).
+const sitemapCandidates = [
+  new URL('../dist/client/sitemap.xml', import.meta.url),
+  new URL('../dist/sitemap.xml', import.meta.url),
+];
+let sitemap = '';
+for (const candidate of sitemapCandidates) {
+  try {
+    sitemap = await readFile(candidate, 'utf8');
+    break;
+  } catch {
+    // probamos el siguiente
+  }
+}
 const urlList = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
   .map((match) => match[1].trim())
   .filter((url) => url.startsWith(`https://${HOST}/`));

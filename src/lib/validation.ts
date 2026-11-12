@@ -286,3 +286,16 @@ export const trackingSchema = z.object({
   eta: z.string().trim().max(40).nullable().optional(),
   note: z.string().trim().max(500).default(''),
 });
+
+export const leadSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  business: z.string().trim().max(120).default(''),
+  phone: z.string().trim().max(40).default(''),
+  email: z.union([z.string().trim().email().max(200), z.literal('')]).default(''),
+  service: z.string().trim().max(120).default(''),
+  message: z.string().trim().max(1500).default(''),
+  channel: z.string().trim().max(40).default('web'),
+  source: z.string().trim().max(60).default(''),
+  campaign: z.string().trim().max(120).default(''),
+  website: z.string().max(0).optional(), // honeypot
+});

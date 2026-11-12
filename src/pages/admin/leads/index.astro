@@ -1,0 +1,125 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listLeads } from '../../../lib/db/queries';
+import { LEAD_STATUS_LIST } from '../../../lib/leads';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const leads = await listLeads();
+const porEstado = new Map(LEAD_STATUS_LIST.map((item) => [item.id, item]));
+
+const fecha = (value: string) =>
+  new Intl.DateTimeFormat('es-VE', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value));
+
+const wa = (lead: (typeof leads)[number]) => {
+  const texto = `Hola ${lead.name}${lead.business ? ` de ${lead.business}` : ''}, gracias por escribirnos${
+    lead.service ? ` sobre ${lead.service}` : ''
+  }.`;
+  return `https://wa.me/584127723148?text=${encodeURIComponent(texto)}`;
+};
+---
+
+<AdminLayout title="Leads" admin={admin} active="leads">
+  <section class="admin-card">
+    <header class="admin-actions">
+      <span class="admin-text-muted">{leads.length} consultas recibidas</span>
+    </header>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Contacto</th>
+          <th>Interés</th>
+          <th>Canal</th>
+          <th>Estado</th>
+          <th>Recibida</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          leads.map((lead) => {
+            const estado = porEstado.get(lead.status);
+            return (
+              <tr data-lead-row={lead.id}>
+                <td>{lead.id}</td>
+                <td>
+                  <strong>{lead.name}</strong>
+                  {lead.business && <small class="admin-text-muted">{lead.business}</small>}
+                  {lead.phone && <small class="admin-text-muted">{lead.phone}</small>}
+                  {lead.email && <small class="admin-text-muted">{lead.email}</small>}
+                </td>
+                <td>
+                  {lead.service && <strong>{lead.service}</strong>}
+                  {lead.message && <small class="admin-text-muted">{lead.message}</small>}
+                </td>
+                <td>
+                  {lead.channel}
+                  {lead.source && <small class="admin-text-muted">{lead.source}</small>}
+                  {lead.campaign && <small class="admin-text-muted">{lead.campaign}</small>}
+                </td>
+                <td>
+                  <select
+                    class="admin-select"
+                    data-lead-status={lead.id}
+                    aria-label="Estado del lead"
+                  >
+                    {LEAD_STATUS_LIST.map((item) => (
+                      <option value={item.id} selected={item.id === lead.status}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td class="nowrap">{fecha(lead.createdAt)}</td>
+                <td>
+                  <div class="admin-actions-cell">
+                    <a
+                      class="admin-btn admin-btn--ghost admin-btn--sm"
+                      href={wa(lead)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
+                    <button
+                      class="admin-btn admin-btn--danger admin-btn--sm"
+                      data-delete={`/api/admin/leads?id=${lead.id}`}
+                      data-confirm="¿Eliminar este lead?"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })
+        }
+        {
+          leads.length === 0 && (
+            <tr>
+              <td colspan="7">
+                Sin consultas todavía. Aparecen aquí las que llegan por el formulario de contacto.
+              </td>
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    import '../../../scripts/leads';
+  </script>
+</AdminLayout>

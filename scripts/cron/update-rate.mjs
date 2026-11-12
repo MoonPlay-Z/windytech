@@ -6,8 +6,8 @@
  * Variables requeridas: DATABASE_URL
  * Opcionales: PUBLIC_CLOUDINARY_* (no usadas aquí)
  */
-import { currentRate, saveRate } from '../src/lib/db/queries';
-import { fetchBcvRate } from '../src/lib/rate';
+import { saveRate } from '../../src/lib/db/queries';
+import { currentRate, fetchBcvRate } from '../../src/lib/rate';
 
 (async () => {
   console.log('[cron:rate] Iniciando actualización de tasa BCV...');

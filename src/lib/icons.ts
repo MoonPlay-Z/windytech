@@ -37,6 +37,7 @@ export const ICON_GROUPS = {
     menu: 'lucide:menu',
     close: 'lucide:x',
     plus: 'lucide:plus',
+    bell: 'lucide:bell',
     minus: 'lucide:minus',
   },
 

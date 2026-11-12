@@ -34,3 +34,17 @@ services:
         sync: false
       - key: ADMIN_NOTIFICACION_EMAIL
         sync: false
+
+  # Actualiza la tasa BCV cada día (12:00 UTC). Sin esto, el catálogo y el
+  # carrito muestran una tasa vieja.
+  - type: cron
+    name: windytech-tasa-bcv
+    runtime: node
+    plan: starter
+    region: ohio
+    buildCommand: npm ci
+    schedule: "0 12 * * *"
+    startCommand: "tsx scripts/cron/update-rate.mjs"
+    envVars:
+      - key: DATABASE_URL
+        sync: false

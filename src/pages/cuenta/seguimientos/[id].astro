@@ -108,6 +108,10 @@ const fecha = (value: string | null) =>
         </section>
 
         <div class="tracking-actions">
+          <button class="btn btn-light" type="button" data-copy-public={tracking.publicToken}>
+            <Icon name="copy" size={18} />
+            Copiar enlace público
+          </button>
           <a
             class="btn btn-primary"
             href={`https://wa.me/584127723148?text=${encodeURIComponent(
@@ -125,4 +129,28 @@ const fecha = (value: string | null) =>
       </div>
     </div>
   </section>
+
+  <script>
+    import '../../../scripts/customer-auth';
+    import '../../../scripts/customer-notifications';
+
+    // Copiar el enlace público del seguimiento para compartirlo.
+    const boton = document.querySelector('[data-copy-public]');
+    if (boton) {
+      boton.addEventListener('click', async () => {
+        const token = boton.getAttribute('data-copy-public');
+        const url = `${window.location.origin}/seguimiento/${token}/`;
+        const original = boton.innerHTML;
+        try {
+          await navigator.clipboard.writeText(url);
+          boton.textContent = 'Enlace copiado';
+        } catch {
+          boton.textContent = 'No se pudo copiar';
+        }
+        window.setTimeout(() => {
+          boton.innerHTML = original;
+        }, 2500);
+      });
+    }
+  </script>
 </BaseLayout>

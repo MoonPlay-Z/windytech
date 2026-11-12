@@ -139,6 +139,14 @@ const isLoggedIn = Boolean(customer);
         </>
       )}
       <a
+        class="cart-link notifications-link"
+        href="/cuenta/seguimientos/"
+        aria-label="Mis novedades y seguimientos"
+      >
+        <Icon name="bell" size={20} />
+        <span class="nav-badge" data-notifications-badge hidden>0</span>
+      </a>
+      <a
         class="cart-link"
         href={'/carrito/'}
         aria-label={'Ver carrito'}

@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import '../../styles/account.css';
+import { getTrackingByToken, listTrackingEvents } from '../../lib/db/queries';
+import { trackingMeta, trackingStatus } from '../../lib/trackings';
+
+export const prerender = false;
+
+const token = Astro.params.token ?? '';
+const tracking = await getTrackingByToken(token);
+
+if (!tracking) {
+  return Astro.redirect('/404/', 302);
+}
+
+const events = await listTrackingEvents(tracking.id);
+const meta = trackingMeta(tracking.kind);
+const estado = trackingStatus(tracking.kind, tracking.status);
+
+const fecha = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat('es-VE', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(value))
+    : null;
+---
+
+<BaseLayout
+  title={`${tracking.title} | Seguimiento | Windytech`}
+  description="Estado y avances del seguimiento en Windytech."
+  path={`/seguimiento/${tracking.publicToken}/`}
+  noindex={true}
+  hideWhatsappFloat={true}
+>
+  <section class="section section--soft tracking-public">
+    <div class="container tracking-public-inner">
+      <header class="tracking-public-head">
+        <img
+          class="account-logo"
+          src="/assets/logo-mark-large-112.webp?v=2"
+          alt=""
+          width="56"
+          height="57"
+        />
+        <p class="eyebrow">{meta.label}</p>
+        <h1>{tracking.title}</h1>
+        {tracking.reference && <p class="tracking-ref">Referencia: {tracking.reference}</p>}
+        <p>
+          <span class={`tracking-badge is-${estado?.tone ?? 'neutral'}`}>
+            {estado?.label ?? tracking.status}
+          </span>
+        </p>
+      </header>
+
+      <div class="tracking-public-body">
+        <div class="tracking-progress tracking-progress--lg" role="img" aria-label={`Avance ${tracking.progress}%`}>
+          <span style={`width:${tracking.progress}%`} />
+        </div>
+        <p class="tracking-meta">
+          <span>Avance {tracking.progress}%</span>
+          {tracking.eta && <span>Entrega estimada: {fecha(tracking.eta)}</span>}
+          <span>Última actualización: {fecha(tracking.updatedAt)}</span>
+        </p>
+
+        {tracking.summary && <p class="tracking-summary">{tracking.summary}</p>}
+
+        <section class="tracking-timeline" aria-labelledby="historial">
+          <h3 id="historial">Historial</h3>
+          <ol>
+            {
+              events.map((event) => {
+                const estadoEvento = trackingStatus(tracking.kind, event.status);
+                return (
+                  <li>
+                    <span class={`tracking-dot is-${estadoEvento?.tone ?? 'neutral'}`} />
+                    <div>
+                      <strong>{estadoEvento?.label ?? event.status}</strong>
+                      {event.note && <p>{event.note}</p>}
+                      <small>
+                        {fecha(event.createdAt)} · {event.author}
+                      </small>
+                    </div>
+                  </li>
+                );
+              })
+            }
+          </ol>
+        </section>
+
+        <div class="tracking-actions">
+          <a
+            class="btn btn-primary"
+            href={`https://wa.me/584127723148?text=${encodeURIComponent(
+              `Hola Windytech, quiero consultar el seguimiento «${tracking.title}»${tracking.reference ? ` (${tracking.reference})` : ''}.`,
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+          >
+            <Icon name="whatsapp" size={18} />
+            Consultar por WhatsApp
+          </a>
+          <a class="btn btn-light" href="/">Ir al sitio</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

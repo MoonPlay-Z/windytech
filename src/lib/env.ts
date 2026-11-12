@@ -32,6 +32,10 @@ export const serverEnv = {
   get resendKey() {
     return read('RESEND_API_KEY');
   },
+  /** Remitente de los correos (opcional: sin él, el aviso solo va al panel). */
+  get mailFrom() {
+    return read('MAIL_FROM');
+  },
   get adminNotifyEmail() {
     return read('ADMIN_NOTIFICACION_EMAIL');
   },

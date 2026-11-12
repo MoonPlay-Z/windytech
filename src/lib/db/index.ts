@@ -14,7 +14,9 @@ const globalForDb = globalThis as GlobalWithDb;
 export type Database = NodePgDatabase<typeof schema>;
 
 export function databaseUrl(): string {
-  return process.env.DATABASE_URL ?? import.meta.env.DATABASE_URL ?? '';
+  // Fuera de Astro (por ejemplo el cron con tsx) no existe import.meta.env.
+  const fromAstro = (import.meta as unknown as { env?: Record<string, string> }).env;
+  return process.env.DATABASE_URL ?? fromAstro?.DATABASE_URL ?? '';
 }
 
 export function hasDatabase(): boolean {

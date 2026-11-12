@@ -2,7 +2,9 @@
 import AdminLayout from '../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../lib/auth';
 import {
+  countLeadsByStatus,
   countQuotesByStatus,
+  countTrackingsByStatus,
   listPostsAdmin,
   listProductsAdmin,
   listProjectsAdmin,
@@ -17,13 +19,34 @@ if (!admin) {
   return Astro.redirect('/admin/login/', 302);
 }
 
-const [products, projects, posts, quotes, plans] = await Promise.all([
+const [products, projects, posts, quotes, plans, leads, trackings] = await Promise.all([
   listProductsAdmin(),
   listProjectsAdmin(),
   listPostsAdmin(),
   countQuotesByStatus(),
   listServicePlansAdmin(),
+  countLeadsByStatus(),
+  countTrackingsByStatus(),
 ]);
+
+const embudo = [
+  { label: 'Consultas recibidas', value: leads.new ?? 0, href: '/admin/leads/' },
+  {
+    label: 'Cotizaciones',
+    value: Object.values(quotes).reduce((a, b) => a + b, 0),
+    href: '/admin/cotizaciones/',
+  },
+  { label: 'Cotizaciones nuevas', value: quotes.NEW ?? 0, href: '/admin/cotizaciones/' },
+  { label: 'Cerradas (aceptadas)', value: quotes.CLOSED ?? 0, href: '/admin/cotizaciones/' },
+  {
+    label: 'Seguimientos activos',
+    value: Object.entries(trackings)
+      .filter(([status]) => status !== 'entregado' && status !== 'cancelado')
+      .reduce((a, [, b]) => a + b, 0),
+    href: '/admin/seguimientos/',
+  },
+  { label: 'Equipos entregados', value: trackings.entregado ?? 0, href: '/admin/seguimientos/' },
+];
 ---
 
 <AdminLayout title="Resumen" admin={admin} active="dashboard">
@@ -65,6 +88,13 @@ const [products, projects, posts, quotes, plans] = await Promise.all([
       <span class="admin-stat-caption">Publicaciones</span>
       <span class="admin-stat-link">Gestionar contenido <span aria-hidden="true">→</span></span>
     </a>
+    <a class="admin-stat admin-stat--leads" href="/admin/leads/">
+      <span class="admin-stat-icon" aria-hidden="true">◎</span>
+      <span class="admin-stat-label">CONSULTAS</span>
+      <strong>{leads.new ?? 0}</strong>
+      <span class="admin-stat-caption">Consultas nuevas</span>
+      <span class="admin-stat-link">Ver consultas <span aria-hidden="true">→</span></span>
+    </a>
     <a class="admin-stat admin-stat--services" href="/admin/servicios/">
       <span class="admin-stat-icon" aria-hidden="true">◈</span>
       <span class="admin-stat-label">PAQUETES</span>
@@ -85,6 +115,23 @@ const [products, projects, posts, quotes, plans] = await Promise.all([
       <a href="/admin/productos/nuevo/"><span>＋</span><strong>Añadir producto</strong><small>Incorpora un artículo al catálogo</small></a>
       <a href="/admin/cotizaciones/"><span>↗</span><strong>Ver cotizaciones</strong><small>Responde solicitudes de clientes</small></a>
       <a href="/admin/publicaciones/"><span>✎</span><strong>Crear publicación</strong><small>Actualiza el contenido del sitio</small></a>
+    </div>
+  </section>
+
+  <section class="admin-card">
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">EMBUDO</p>
+        <h2>De la consulta a la entrega</h2>
+      </div>
+    </div>
+    <div class="admin-funnel">
+      {embudo.map((paso) => (
+        <a class="admin-funnel-step" href={paso.href}>
+          <strong>{paso.value}</strong>
+          <span>{paso.label}</span>
+        </a>
+      ))}
     </div>
   </section>
 

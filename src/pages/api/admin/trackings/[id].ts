@@ -1,8 +1,10 @@
 import type { APIRoute } from 'astro';
 import { trackingSchema, fieldErrors } from '../../../../lib/validation';
 import { getTracking, updateTracking } from '../../../../lib/db/queries';
-import { isValidTrackingStatus } from '../../../../lib/trackings';
+import { isValidTrackingStatus, trackingStatus } from '../../../../lib/trackings';
+import { notifyCustomer, whatsappMessage } from '../../../../lib/notifier';
 import { json, readJson, requireAdmin } from '../../../../lib/api';
+import { serverEnv } from '../../../../lib/env';
 import { sameOrigin } from '../../../../lib/security';
 
 export const prerender = false;
@@ -42,5 +44,27 @@ export const PATCH: APIRoute = async ({ request, params }) => {
   });
 
   if (!updated) return json({ error: 'No se pudo actualizar el seguimiento.' }, 503);
-  return json({ ok: true });
+
+  // Aviso al cliente: entra en su panel y queda listo para WhatsApp.
+  const meta = trackingStatus(kind, status);
+  const label = meta?.label ?? status;
+  const url = `${serverEnv.siteUrl}/cuenta/seguimientos/${current.id}/`;
+  const message = whatsappMessage({
+    title: current.title,
+    status: label,
+    reference: current.reference,
+    url,
+  });
+
+  await notifyCustomer({
+    customerId: current.customerId,
+    trackingId: current.id,
+    title: `Tu «${current.title}» está en ${label.toLowerCase()}`,
+    body: message,
+    url,
+    status: label,
+    reference: current.reference,
+  });
+
+  return json({ ok: true, whatsapp: message });
 };

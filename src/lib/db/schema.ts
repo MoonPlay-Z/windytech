@@ -427,6 +427,57 @@ export const serviceTrackings = pgTable(
   ],
 );
 
+/* Leads: consultas recibidas por el formulario de contacto. */
+export const leads = pgTable(
+  'leads',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    business: text('business').notNull().default(''),
+    phone: text('phone').notNull().default(''),
+    email: text('email').notNull().default(''),
+    service: text('service').notNull().default(''),
+    message: text('message').notNull().default(''),
+    channel: text('channel').notNull().default('web'),
+    source: text('source').notNull().default(''),
+    campaign: text('campaign').notNull().default(''),
+    status: text('status').notNull().default('new'),
+    customerId: integer('customer_id').references(() => customerAccounts.id, {
+      onDelete: 'set null',
+    }),
+    trackingId: integer('tracking_id').references(() => serviceTrackings.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('leads_status_idx').on(table.status),
+    index('leads_created_idx').on(table.createdAt),
+  ],
+);
+
+/* Novedades del cliente: lo que ve como pendiente en su panel. */
+export const customerNotifications = pgTable(
+  'customer_notifications',
+  {
+    id: serial('id').primaryKey(),
+    customerId: integer('customer_id')
+      .notNull()
+      .references(() => customerAccounts.id, { onDelete: 'cascade' }),
+    trackingId: integer('tracking_id').references(() => serviceTrackings.id, {
+      onDelete: 'cascade',
+    }),
+    title: text('title').notNull(),
+    body: text('body').notNull().default(''),
+    url: text('url').notNull().default(''),
+    channel: text('channel').notNull().default('panel'),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('customer_notifications_customer_idx').on(table.customerId, table.createdAt)],
+);
+
 export const trackingEvents = pgTable(
   'tracking_events',
   {

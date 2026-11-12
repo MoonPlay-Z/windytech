@@ -1,5 +1,14 @@
 import type { APIRoute } from 'astro';
-import { listQuotes, updateQuoteStatus, writeAudit } from '../../../lib/db/queries';
+import {
+  createTracking,
+  getQuoteById,
+  listQuotes,
+  updateQuoteStatus,
+  writeAudit,
+} from '../../../lib/db/queries';
+import { notifyCustomer } from '../../../lib/notifier';
+import { randomToken } from '../../../lib/security';
+import { serverEnv } from '../../../lib/env';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
 import type { QuoteStatus } from '../../../lib/catalog';
@@ -28,5 +37,36 @@ export const PATCH: APIRoute = async ({ request }) => {
 
   await updateQuoteStatus(id, status);
   await writeAudit(admin.id, 'UPDATE', 'quotes', String(id), { status });
+
+  // Al cerrar la cotización como aceptada, arranca el seguimiento del proyecto
+  // y se avisa al cliente (si tiene cuenta en la web).
+  if (status === 'CLOSED') {
+    const quote = await getQuoteById(id);
+    if (quote?.customerId) {
+      const trackingId = await createTracking({
+        customerId: quote.customerId,
+        kind: 'project',
+        title: `Proyecto de la cotización ${quote.number ?? id}`,
+        reference: quote.number ?? '',
+        status: 'planificacion',
+        progress: 15,
+        summary: `Proyecto en marcha. Presupuesto de ${(quote.totalCents / 100).toFixed(2)} USD.`,
+        publicToken: randomToken(12),
+        note: 'Proyecto creado al aceptar la cotización.',
+      });
+
+      const url = `${serverEnv.siteUrl}/cuenta/seguimientos/`;
+      await notifyCustomer({
+        customerId: quote.customerId,
+        trackingId,
+        title: `Aceptamos tu cotización ${quote.number ?? ''}`.trim(),
+        body: `Tu proyecto ya está en marcha. Seguimiento: ${url}`,
+        url,
+        status: 'En planificación',
+        reference: quote.number ?? '',
+      });
+    }
+  }
+
   return json({ ok: true });
 };

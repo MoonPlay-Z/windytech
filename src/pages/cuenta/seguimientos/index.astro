@@ -3,7 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Icon from '../../../components/Icon.astro';
 import '../../../styles/account.css';
 import { customerSessionFromRequest } from '../../../lib/customer-auth';
-import { listTrackingsForCustomer } from '../../../lib/db/queries';
+import { listCustomerNotifications, listTrackingsForCustomer } from '../../../lib/db/queries';
 import { TRACKING_KIND_LIST, trackingMeta, trackingStatus } from '../../../lib/trackings';
 
 export const prerender = false;
@@ -12,6 +12,7 @@ const customer = await customerSessionFromRequest(Astro.request);
 if (!customer) return Astro.redirect('/cuenta/login/', 302);
 
 const trackings = await listTrackingsForCustomer(customer.id);
+const novedades = await listCustomerNotifications(customer.id, true);
 const porTipo = TRACKING_KIND_LIST.map((kind) => ({
   kind,
   items: trackings.filter((item: (typeof trackings)[number]) => item.kind === kind.id),
@@ -63,6 +64,30 @@ const fecha = (value: string | null) =>
             WhatsApp con el número de referencia.
           </p>
         </header>
+
+        <section class="tracking-notices" aria-labelledby="novedades">
+          <div class="tracking-notices-head">
+            <h3 id="novedades">Novedades</h3>
+            <button class="admin-btn admin-btn--ghost admin-btn--sm" type="button" data-notifications-enable>
+              Activar avisos en este navegador
+            </button>
+          </div>
+          {novedades.length > 0 ? (
+            <ul class="tracking-notice-list">
+              {novedades.map((item) => (
+                <li>
+                  <strong>{item.title}</strong>
+                  {item.body && <p>{item.body}</p>}
+                  <small>{fecha(item.createdAt)}</small>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="tracking-empty-note">
+              No hay novedades. Cuando avanza un servicio o un equipo, te avisamos aquí.
+            </p>
+          )}
+        </section>
 
         {
           trackings.length === 0 ? (
@@ -123,5 +148,6 @@ const fecha = (value: string | null) =>
 
   <script>
     import '../../../scripts/customer-auth';
+    import '../../../scripts/customer-notifications';
   </script>
 </BaseLayout>

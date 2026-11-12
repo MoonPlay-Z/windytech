@@ -513,3 +513,113 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* Novedades del cliente */
+.tracking-notices {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.tracking-notices-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tracking-notices-head h3 {
+  margin: 0;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 17px;
+}
+
+.tracking-notice-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tracking-notice-list li {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--mint);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bg);
+}
+
+.tracking-notice-list strong {
+  color: var(--navy);
+  font-size: 15px;
+}
+
+.tracking-notice-list p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.tracking-notice-list small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tracking-empty-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Vista pública del seguimiento (por token) */
+.tracking-public-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+  max-width: 1080px;
+}
+
+.tracking-public-head h1 {
+  margin: 10px 0 12px;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.2vw, 38px);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  overflow-wrap: break-word;
+}
+
+.tracking-public-head .tracking-ref {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tracking-public-body {
+  display: grid;
+  gap: 18px;
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 860px) {
+  .tracking-public-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

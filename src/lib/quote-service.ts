@@ -1,4 +1,5 @@
 import { randomToken } from './security';
+import { notifyCustomer, whatsappMessage } from './notifier';
 import { computeTotals, resolvePrice } from './pricing';
 import { createQuote, createTracking, findCustomerByEmail, getProductsByIds } from './db/queries';
 import { currentRate } from './rate';
@@ -131,7 +132,7 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
   });
 
   if (customer && created?.number) {
-    await createTracking({
+    const trackingId = await createTracking({
       customerId: customer.id,
       kind: 'quote',
       title: `Cotización ${created.number}`,
@@ -143,6 +144,22 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
       } producto(s). Te avisamos cuando lo revises.`,
       publicToken: randomToken(12),
       note: 'Cotización creada desde el sitio.',
+    });
+
+    const panelUrl = `${siteUrl}/cuenta/seguimientos/`;
+    await notifyCustomer({
+      customerId: customer.id,
+      trackingId,
+      title: `Recibimos tu cotización ${created.number}`,
+      body: whatsappMessage({
+        title: `Cotización ${created.number}`,
+        status: 'Recibida',
+        reference: created.number,
+        url: panelUrl,
+      }),
+      url: panelUrl,
+      status: 'Recibida',
+      reference: created.number,
     });
   }
 

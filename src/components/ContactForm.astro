@@ -45,6 +45,31 @@ const f = t.contact.form;
     </select>
   </div>
 
+  <div class="form-row">
+    <div class="field">
+      <label for="telefono">{f.phone}</label>
+      <input
+        id="telefono"
+        name="phone"
+        type="tel"
+        placeholder={f.phonePlaceholder}
+        autocomplete="tel"
+        maxlength="40"
+      />
+    </div>
+    <div class="field">
+      <label for="correo">{f.email}</label>
+      <input
+        id="correo"
+        name="email"
+        type="email"
+        placeholder={f.emailPlaceholder}
+        autocomplete="email"
+        maxlength="200"
+      />
+    </div>
+  </div>
+
   <div class="field">
     <label for="mensaje">{f.message}</label>
     <textarea
@@ -56,10 +81,24 @@ const f = t.contact.form;
     ></textarea>
   </div>
 
-  <button class="btn btn-primary" type="submit" data-track="whatsapp-form">
+  <button class="btn btn-primary" type="submit" data-track="lead-form">
     {f.submit}
     <Icon name="whatsapp" size={18} />
   </button>
+
+  <p class="form-status" data-contact-status role="status" hidden></p>
+
+  <a
+    class="btn btn-light contact-whatsapp"
+    href={whatsappLink(t.whatsapp.general)}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-contact-whatsapp
+    hidden
+  >
+    <Icon name="whatsapp" size={18} />
+    Continuar por WhatsApp
+  </a>
 
   <p class="form-note">
     {f.note}
@@ -82,7 +121,7 @@ const f = t.contact.form;
       if (form.dataset.wtBound === 'true') return;
       form.dataset.wtBound = 'true';
 
-      form.addEventListener('submit', (event) => {
+      form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const data = new FormData(form);
@@ -90,14 +129,68 @@ const f = t.contact.form;
         const business = String(data.get('business') ?? '').trim();
         const service = String(data.get('service') ?? '').trim();
         const message = String(data.get('message') ?? '').trim();
+        const phone = String(data.get('phone') ?? '').trim();
+        const email = String(data.get('email') ?? '').trim();
         const number = form.dataset.waNumber ?? '584127723148';
 
+        const status = form.querySelector<HTMLElement>('[data-contact-status]');
+        const submit = form.querySelector<HTMLButtonElement>('[type="submit"]');
         const intro = `Hola Windytech, soy ${name}${business ? ` de ${business}` : ''}. Me interesa ${service}.`;
-
         const text = `${intro}${message ? `\n\n${message}` : ''}`;
-        const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+        const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 
-        window.open(url, '_blank', 'noopener,noreferrer');
+        // 1) Guardamos la consulta (no se pierde aunque el cliente no use WhatsApp).
+        if (submit) submit.disabled = true;
+        if (status) status.textContent = 'Enviando tu consulta…';
+
+        try {
+          const response = await fetch('/api/leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+              name,
+              business,
+              phone,
+              email,
+              service,
+              message,
+              channel: 'web',
+              source: window.windych?.source ?? '',
+              campaign: window.windych?.campaign ?? '',
+            }),
+          });
+
+          const result = (await response.json().catch(() => ({}))) as { error?: string };
+          if (!response.ok) throw new Error(result.error ?? 'No se pudo enviar la consulta.');
+
+          // 2) Confirmación y atajo a WhatsApp con el mensaje ya escrito.
+          if (status) {
+            status.textContent = '¡Recibimos tu consulta! Te respondemos muy pronto.';
+            status.dataset.kind = 'ok';
+          }
+          form.dataset.sent = 'true';
+          const waLink = form.querySelector<HTMLAnchorElement>('[data-contact-whatsapp]');
+          if (waLink) {
+            waLink.href = whatsappUrl;
+            waLink.hidden = false;
+          }
+        } catch (error) {
+          if (status) {
+            status.textContent =
+              error instanceof Error
+                ? error.message
+                : 'No se pudo enviar. Escríbenos por WhatsApp.';
+            status.dataset.kind = 'error';
+          }
+          const waLink = form.querySelector<HTMLAnchorElement>('[data-contact-whatsapp]');
+          if (waLink) {
+            waLink.href = whatsappUrl;
+            waLink.hidden = false;
+          }
+        } finally {
+          if (submit) submit.disabled = false;
+        }
       });
     });
   }

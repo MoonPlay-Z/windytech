@@ -348,6 +348,29 @@ export async function countProducts(): Promise<number> {
 /* Cotizaciones                                                        */
 /* ------------------------------------------------------------------ */
 
+export type QuoteRow = {
+  id: number;
+  number: string | null;
+  publicToken: string;
+  customerName: string;
+  phone: string;
+  email: string;
+  customerId: number | null;
+  status: string;
+  totalCents: number;
+  createdAt: string;
+};
+
+/** Cotización con el cliente asociado (para el panel y el cierre). */
+export async function getQuoteById(id: number): Promise<QuoteRow | null> {
+  return one<QuoteRow>(
+    sql`SELECT id, number, public_token AS "publicToken", customer_name AS "customerName",
+               phone, email, customer_id AS "customerId", status,
+               total_cents AS "totalCents", created_at::text AS "createdAt"
+        FROM quotes WHERE id = ${id} LIMIT 1`,
+  );
+}
+
 export async function createQuote(data: {
   number: string | null;
   publicToken: string;
@@ -1466,6 +1489,13 @@ export async function getTrackingForCustomer(
   );
 }
 
+/** Seguimiento por token público (para compartir sin cuenta). */
+export async function getTrackingByToken(token: string): Promise<TrackingRow | null> {
+  return one<TrackingRow>(
+    sql`${sql.raw(TRACKING_SELECT)} WHERE t.public_token = ${token} LIMIT 1`,
+  );
+}
+
 export async function listTrackingEvents(trackingId: number): Promise<TrackingEventRow[]> {
   return safeRows<TrackingEventRow>(
     sql`SELECT id, tracking_id AS "trackingId", status, progress, note, author,
@@ -1559,4 +1589,164 @@ export async function findCustomerByEmail(email: string): Promise<{ id: number; 
   return one<{ id: number; name: string }>(
     sql`SELECT id, name FROM customer_accounts WHERE lower(email) = lower(${email}) LIMIT 1`,
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Leads y novedades del cliente                                      */
+/* ------------------------------------------------------------------ */
+
+export type LeadRow = {
+  id: number;
+  name: string;
+  business: string;
+  phone: string;
+  email: string;
+  service: string;
+  message: string;
+  channel: string;
+  source: string;
+  campaign: string;
+  status: string;
+  customerId: number | null;
+  trackingId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export async function createLead(data: {
+  name: string;
+  business: string;
+  phone: string;
+  email: string;
+  service: string;
+  message: string;
+  channel: string;
+  source: string;
+  campaign: string;
+  customerId: number | null;
+}): Promise<number | null> {
+  const client = db();
+  if (!client) return null;
+  const result = await client.execute(
+    sql`INSERT INTO leads (name, business, phone, email, service, message, channel, source,
+                campaign, customer_id)
+          VALUES (${data.name}, ${data.business}, ${data.phone}, ${data.email}, ${data.service},
+                ${data.message}, ${data.channel}, ${data.source}, ${data.campaign}, ${data.customerId})
+          RETURNING id`,
+  );
+  return result.rows.length > 0 ? Number((result.rows[0] as { id: number }).id) : null;
+}
+
+export async function listLeads(): Promise<LeadRow[]> {
+  return safeRows<LeadRow>(
+    sql`SELECT id, name, business, phone, email, service, message, channel, source, campaign,
+               status, customer_id AS "customerId", tracking_id AS "trackingId",
+               created_at::text AS "createdAt", updated_at::text AS "updatedAt"
+        FROM leads ORDER BY created_at DESC, id DESC`,
+  );
+}
+
+export async function getLead(id: number): Promise<LeadRow | null> {
+  return one<LeadRow>(
+    sql`SELECT id, name, business, phone, email, service, message, channel, source, campaign,
+               status, customer_id AS "customerId", tracking_id AS "trackingId",
+               created_at::text AS "createdAt", updated_at::text AS "updatedAt"
+        FROM leads WHERE id = ${id} LIMIT 1`,
+  );
+}
+
+export async function updateLeadStatus(
+  id: number,
+  status: string,
+  trackingId?: number | null,
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  const result = await client.execute(
+    sql`UPDATE leads
+            SET status = ${status},
+                tracking_id = COALESCE(${trackingId ?? null}, tracking_id),
+                updated_at = now()
+          WHERE id = ${id} RETURNING id`,
+  );
+  return result.rows.length > 0;
+}
+
+export async function deleteLead(id: number): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  const result = await client.execute(sql`DELETE FROM leads WHERE id = ${id} RETURNING id`);
+  return result.rows.length > 0;
+}
+
+/** Recuento del embudo: leads por estado. */
+export async function countLeadsByStatus(): Promise<Record<string, number>> {
+  const rows = await safeRows<{ status: string; n: number }>(
+    sql`SELECT status, COUNT(*)::int AS n FROM leads GROUP BY status`,
+  );
+  return Object.fromEntries(rows.map((row) => [row.status, Number(row.n)]));
+}
+
+export type CustomerNotification = {
+  id: number;
+  customerId: number;
+  trackingId: number | null;
+  title: string;
+  body: string;
+  url: string;
+  channel: string;
+  readAt: string | null;
+  createdAt: string;
+};
+
+/** Recuento de seguimientos por estado (embudo). */
+export async function countTrackingsByStatus(): Promise<Record<string, number>> {
+  const rows = await safeRows<{ status: string; n: number }>(
+    sql`SELECT status, COUNT(*)::int AS n FROM service_trackings GROUP BY status`,
+  );
+  return Object.fromEntries(rows.map((row) => [row.status, Number(row.n)]));
+}
+
+/** Novedades pendientes del cliente (insignia del panel). */
+export async function listCustomerNotifications(
+  customerId: number,
+  onlyUnread = false,
+): Promise<CustomerNotification[]> {
+  return safeRows<CustomerNotification>(
+    sql`SELECT id, customer_id AS "customerId", tracking_id AS "trackingId", title, body, url,
+               channel, read_at::text AS "readAt", created_at::text AS "createdAt"
+        FROM customer_notifications
+        WHERE customer_id = ${customerId}
+          ${onlyUnread ? sql`AND read_at IS NULL` : sql``}
+        ORDER BY created_at DESC, id DESC
+        LIMIT 30`,
+  );
+}
+
+export async function createCustomerNotification(data: {
+  customerId: number;
+  trackingId: number | null;
+  title: string;
+  body: string;
+  url: string;
+  channel: string;
+}): Promise<number | null> {
+  const client = db();
+  if (!client) return null;
+  const result = await client.execute(
+    sql`INSERT INTO customer_notifications (customer_id, tracking_id, title, body, url, channel)
+          VALUES (${data.customerId}, ${data.trackingId}, ${data.title}, ${data.body}, ${data.url},
+                ${data.channel})
+          RETURNING id`,
+  );
+  return result.rows.length > 0 ? Number((result.rows[0] as { id: number }).id) : null;
+}
+
+export async function markNotificationsRead(customerId: number): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  await client.execute(
+    sql`UPDATE customer_notifications SET read_at = now() WHERE customer_id = ${customerId} AND read_at IS NULL`,
+  );
+  return true;
 }

@@ -78,13 +78,28 @@ const fecha = (value: string | null) =>
                 </td>
                 <td>{fecha(item.eta) ?? '—'}</td>
                 <td>
-                  <button
-                    class="admin-btn admin-btn--danger admin-btn--sm"
-                    data-delete={`/api/admin/trackings?id=${item.id}`}
-                    data-confirm="¿Eliminar este seguimiento?"
-                  >
-                    Eliminar
-                  </button>
+                  <div class="admin-actions-cell">
+                    <a
+                      class="admin-btn admin-btn--ghost admin-btn--sm"
+                      href={`https://wa.me/584127723148?text=${encodeURIComponent(
+                        `Hola ${item.customerName}, te avisamos del estado de «${item.title}»: ${estado?.label ?? item.status}${
+                          item.reference ? ` (${item.reference})` : ''
+                        }.`,
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Avisar al cliente por WhatsApp"
+                    >
+                      Avisar
+                    </a>
+                    <button
+                      class="admin-btn admin-btn--danger admin-btn--sm"
+                      data-delete={`/api/admin/trackings?id=${item.id}`}
+                      data-confirm="¿Eliminar este seguimiento?"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             );

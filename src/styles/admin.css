@@ -1051,3 +1051,46 @@ html.admin-page {
 .admin-table td.nowrap {
   white-space: nowrap;
 }
+
+/* Embudo comercial en el resumen */
+.admin-funnel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.admin-funnel-step {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fbfdfe;
+  color: var(--navy);
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.admin-funnel-step:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.admin-funnel-step strong {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--navy);
+}
+
+.admin-funnel-step span {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.admin-stat--leads .admin-stat-icon {
+  background: #fdeef8;
+  color: #a4407a;
+}

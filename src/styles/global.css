@@ -2908,3 +2908,52 @@ html[data-astro-transition='back'] {
   }
 }
 }
+
+/* ---------------------------------------------------------------------------
+   Formulario de contacto: estado del envío y atajo a WhatsApp
+   --------------------------------------------------------------------------- */
+
+.form-status {
+  margin: 0;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-status[data-kind='ok'] {
+  background: var(--mint-soft);
+  color: var(--teal-dark);
+}
+
+.form-status[data-kind='error'] {
+  background: #fdecea;
+  color: #9c2929;
+}
+
+.contact-whatsapp {
+  justify-content: center;
+}
+
+/* Insignia de novedades en la cabecera */
+.notifications-link {
+  position: relative;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: #06302b;
+  font-size: 11px;
+  font-weight: 800;
+}
