@@ -174,9 +174,9 @@ function initTabla(tabla: HTMLElement) {
   pintar();
 }
 
-function init() {
+function initTablas() {
   document.querySelectorAll<HTMLElement>('[data-win-table]').forEach(initTabla);
 }
 
-init();
-document.addEventListener('astro:page-load', init);
+initTablas();
+document.addEventListener('astro:page-load', initTablas);

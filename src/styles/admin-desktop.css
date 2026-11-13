@@ -1620,3 +1620,159 @@ html.admin-page {
     grid-column: 1 / -1;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   13. Pantalla de acceso
+   --------------------------------------------------------------------------- */
+
+.admin-body--login {
+  overflow: auto;
+}
+
+.admin-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    radial-gradient(40% 40% at 15% 15%, rgba(0, 120, 215, 0.16), transparent 70%),
+    radial-gradient(45% 45% at 85% 85%, rgba(61, 220, 181, 0.14), transparent 70%),
+    linear-gradient(160deg, #0d1f30 0%, #16324a 100%);
+}
+
+/* Ventana de acceso. */
+.admin-login-window {
+  width: min(420px, 100%);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: var(--win-chrome);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.admin-login-titlebar {
+  min-height: 32px;
+}
+
+.admin-login-window-buttons {
+  display: flex;
+  align-self: stretch;
+}
+
+.admin-login-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  color: var(--win-title-text);
+  font-size: 12px;
+}
+
+.admin-login-card {
+  display: grid;
+  gap: 14px;
+  padding: 28px;
+  border: 0;
+  border-radius: 0;
+  background: var(--win-field);
+  box-shadow: none;
+}
+
+.admin-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--win-border-soft);
+}
+
+.admin-login-brand img {
+  width: 48px;
+  height: 48px;
+}
+
+.admin-login-brand strong {
+  display: block;
+  color: var(--win-text);
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.admin-login-brand span {
+  color: var(--win-muted);
+  font-size: 12.5px;
+}
+
+.admin-login-card .admin-btn {
+  min-height: 38px;
+  border-color: #0067c0;
+  background: linear-gradient(180deg, #4aa6ec 0%, #0078d7 100%);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.admin-login-card .admin-btn:hover {
+  background: linear-gradient(180deg, #63b4f0 0%, #1a86e0 100%);
+}
+
+.admin-login-card .admin-hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+   14. Menú contextual de las filas
+   --------------------------------------------------------------------------- */
+
+.win-context-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 26px;
+  border: 1px solid transparent;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: var(--win-muted);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.win-context-button:hover {
+  border-color: var(--win-border-strong);
+  background: var(--win-chrome);
+  color: var(--win-text);
+}
+
+.win-context-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.win-context-menu {
+  position: fixed;
+  min-width: 190px;
+}
+
+.win-context-menu [data-peligro='true'] {
+  color: var(--win-error);
+}
+
+.win-context-menu [data-peligro='true']:hover {
+  background: var(--win-error-bg);
+}
+
+.win-context-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.win-context-icon svg {
+  width: 15px;
+  height: 15px;
+}

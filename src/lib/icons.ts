@@ -106,6 +106,8 @@ export const ICON_GROUPS = {
     panel: 'lucide:panel-left',
     teclado: 'lucide:keyboard',
     ayuda: 'lucide:circle-help',
+    mas: 'lucide:ellipsis-vertical',
+    papelera: 'lucide:trash-2',
   },
 } as const;
 

@@ -2,6 +2,7 @@
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import Icon from '../../../components/Icon.astro';
 import AdminTable from '../../../components/admin/AdminTable.astro';
+import AdminContextMenu from '../../../components/admin/AdminContextMenu.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listProductsAdmin } from '../../../lib/db/queries';
 
@@ -91,6 +92,31 @@ const disponibilidad: Record<string, { label: string; tone: string }> = {
                     >
                       Eliminar
                     </button>
+                    <button
+                      type="button"
+                      class="win-context-button"
+                      aria-label={`Acciones de ${product.name}`}
+                      aria-expanded="false"
+                      data-context-menu={`menu-producto-${product.id}`}
+                    >
+                      <Icon name="mas" size={15} />
+                    </button>
+                    <AdminContextMenu
+                      id={`menu-producto-${product.id}`}
+                      label={`Acciones de ${product.name}`}
+                      actions={[
+                        { label: 'Editar', href: `/admin/productos/${product.id}/`, icon: 'edit' },
+                        { label: 'Ver en la tienda', href: `/catalogo/${product.slug}/`, icon: 'arrow-up-right' },
+                        {
+                          label: 'Eliminar',
+                          href: `#`,
+                          icon: 'papelera',
+                          danger: true,
+                          deleteEndpoint: `/api/admin/products?id=${product.id}`,
+                          confirm: '¿Eliminar este producto y sus imágenes?',
+                        },
+                      ]}
+                    />
                   </div>
                 </td>
               </tr>
@@ -103,5 +129,6 @@ const disponibilidad: Record<string, { label: string; tone: string }> = {
 
   <script>
     import '../../../scripts/admin-table';
+    import '../../../scripts/admin-context';
   </script>
 </AdminLayout>
