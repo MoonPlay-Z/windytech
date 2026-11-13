@@ -1,6 +1,7 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../../lib/auth';
+import { promotionTypeLabel, promotionValueLabel } from '../../../lib/admin-labels';
 import { listPromotionsAdmin } from '../../../lib/db/queries';
 
 export const prerender = false;
@@ -9,6 +10,11 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const promotions = await listPromotionsAdmin();
+
+const fechaPromocion = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat('es-VE', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value))
+    : '—';
 ---
 
 <AdminLayout title="Promociones" admin={admin} active="promotions">
@@ -19,13 +25,14 @@ const promotions = await listPromotionsAdmin();
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Valor</th>
-          <th>Prioridad</th>
-          <th>Activa</th>
-          <th>Acciones</th>
+          <th style="width:40px" scope="col">#</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Valor</th>
+          <th scope="col">Prioridad</th>
+          <th scope="col">Vigencia</th>
+          <th scope="col">Activa</th>
+          <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -33,11 +40,16 @@ const promotions = await listPromotionsAdmin();
           <tr>
             <td>{promotion.id}</td>
             <td>{promotion.name}</td>
-            <td>{promotion.type}</td>
-            <td>{promotion.type === 'PERCENT' ? `${promotion.value}%` : promotion.value}</td>
+            <td>{promotionTypeLabel(promotion.type)}</td>
+            <td>{promotionValueLabel(promotion.type, promotion.value)}</td>
             <td>{promotion.priority}</td>
+            <td>
+              {fechaPromocion(promotion.startsAt)}
+              {promotion.endsAt ? ` → ${fechaPromocion(promotion.endsAt)}` : ''}
+            </td>
             <td>{promotion.isActive ? 'Sí' : 'No'}</td>
             <td>
+              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/promociones/${promotion.id}/`}>Editar</a>
               <button
                 class="admin-btn admin-btn--danger admin-btn--sm"
                 data-delete={`/api/admin/promotions?id=${promotion.id}`}
@@ -48,7 +60,7 @@ const promotions = await listPromotionsAdmin();
             </td>
           </tr>
         ))}
-        {promotions.length === 0 && <tr><td colspan="7">Sin promociones.</td></tr>}
+        {promotions.length === 0 && <tr><td colspan="8">Sin promociones.</td></tr>}
       </tbody>
     </table>
   </section>

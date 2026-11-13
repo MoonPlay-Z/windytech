@@ -1,6 +1,7 @@
 ---
 import AdminLayout from '../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../lib/auth';
+import { availabilityLabel } from '../../lib/admin-labels';
 import {
   countLeadsByStatus,
   countQuotesByStatus,
@@ -146,14 +147,14 @@ const embudo = [
     <div class="admin-table-wrap">
       <table class="admin-table">
         <thead>
-          <tr><th>Producto</th><th>Precio</th><th>Disponibilidad</th><th>Estado</th></tr>
+          <tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Disponibilidad</th><th scope="col">Estado</th></tr>
         </thead>
         <tbody>
           {products.slice(0, 8).map((product) => (
             <tr>
               <td><a href={`/admin/productos/${product.id}/`}>{product.name}</a></td>
-              <td>${(product.priceCents / 100).toFixed(2)}</td>
-              <td><span class="admin-badge">{product.availability.replaceAll('_', ' ')}</span></td>
+              <td>${(product.priceCents / 100).toFixed(2)} USD</td>
+              <td><span class="admin-badge">{availabilityLabel(product.availability)}</span></td>
               <td>
                 <span class:list={['admin-active-state', { 'is-inactive': !product.isActive }]}>
                   <span></span>{product.isActive ? 'Activo' : 'Inactivo'}

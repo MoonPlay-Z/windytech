@@ -6,6 +6,7 @@ import { ClientRouter } from 'astro:transitions';
 import type { AdminSession } from '../../lib/auth';
 import AdminNav from './AdminNav.astro';
 import { site } from '../../data/site';
+import { roleLabel } from '../../lib/admin-labels';
 
 interface Props {
   title: string;
@@ -38,9 +39,10 @@ const { title, admin, active } = Astro.props;
         <AdminNav active={active} role={admin.role} />
         <div class="admin-sidebar-footer">
           <span>{admin.email}</span>
-          <span class="admin-role">{admin.role}</span>
+          <span class="admin-role">{roleLabel(admin.role)}</span>
           <a href="/admin/perfil/" class="admin-btn admin-btn--ghost" style="font-size:12px">Mi perfil</a>
           <button type="button" class="admin-btn admin-btn--ghost" data-logout>Cerrar sesión</button>
+          <span class="admin-message" data-session-message hidden></span>
         </div>
       </aside>
 

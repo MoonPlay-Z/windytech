@@ -18,7 +18,7 @@ const categories = await listCategoriesAdmin();
     </header>
     <table class="admin-table">
       <thead>
-        <tr><th style="width:40px">#</th><th>Nombre (ES)</th><th>Slug ES</th><th>Productos</th><th>Acciones</th></tr>
+        <tr><th style="width:40px" scope="col">#</th><th scope="col">Nombre (ES)</th><th scope="col">Slug ES</th><th scope="col">Productos</th><th scope="col">Acciones</th></tr>
       </thead>
       <tbody>
         {categories.map((category) => (
@@ -28,13 +28,16 @@ const categories = await listCategoriesAdmin();
             <td>{category.slug}</td>
             <td>{category.products}</td>
             <td>
-              <button
+              <div class="admin-actions-cell">
+                <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/categorias/${category.id}/`}>Editar</a>
+                <button
                 class="admin-btn admin-btn--danger admin-btn--sm"
                 data-delete={`/api/admin/categories?id=${category.id}`}
                 data-confirm="¿Eliminar esta categoría?"
               >
                 Eliminar
               </button>
+              </div>
             </td>
           </tr>
         ))}

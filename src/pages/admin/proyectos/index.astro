@@ -18,7 +18,7 @@ const projects = await listProjectsAdmin();
     </header>
     <table class="admin-table">
       <thead>
-        <tr><th style="width:40px">#</th><th>Título</th><th>Año</th><th>Cliente</th><th>Publicado</th><th>Aprobado</th></tr>
+        <tr><th style="width:40px" scope="col">#</th><th scope="col">Título</th><th scope="col">Año</th><th scope="col">Cliente</th><th scope="col">Publicado</th><th scope="col">Aprobado</th><th scope="col">Acciones</th></tr>
       </thead>
       <tbody>
         {projects.map((project) => (
@@ -29,9 +29,21 @@ const projects = await listProjectsAdmin();
             <td>{project.clientName}</td>
             <td>{project.isPublished ? 'Sí' : 'No'}</td>
             <td>{project.clientApproved ? 'Sí' : 'No'}</td>
+            <td>
+              <div class="admin-actions-cell">
+                <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/proyectos/${project.id}/`}>Editar</a>
+                <button
+                  class="admin-btn admin-btn--danger admin-btn--sm"
+                  data-delete={`/api/admin/projects?id=${project.id}`}
+                  data-confirm="¿Eliminar este proyecto?"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </td>
           </tr>
         ))}
-        {projects.length === 0 && <tr><td colspan="6">Sin proyectos.</td></tr>}
+        {projects.length === 0 && <tr><td colspan="7">Sin proyectos.</td></tr>}
       </tbody>
     </table>
   </section>

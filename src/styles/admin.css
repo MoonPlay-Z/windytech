@@ -299,6 +299,41 @@
   color: #a61b12;
 }
 
+.admin-dialog {
+  border: none;
+  border-radius: var(--radius);
+  padding: 0;
+  width: min(440px, calc(100vw - 32px));
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-dialog::backdrop {
+  background: rgba(15, 32, 40, 0.55);
+}
+
+.admin-dialog-card {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.admin-dialog-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.admin-dialog-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.admin-dialog-error {
+  font-size: 13px;
+  color: #a61b12;
+}
+
 .uploader {
   display: grid;
   gap: 10px;

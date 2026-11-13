@@ -1,0 +1,57 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getCategoryAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const categoryId = Number(Astro.params.id);
+const category = await getCategoryAdmin(categoryId);
+if (!category) return Astro.redirect('/admin/categorias/', 302);
+
+const esTranslation = category.translations?.find((item: { locale?: string }) => item.locale === 'es') ?? category.translations?.[0] ?? {};
+---
+
+<AdminLayout title="Editar categoría" admin={admin} active="categories">
+  <section class="admin-card">
+    <h2>Editar categoría</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/categories" data-success="Categoría guardada." data-redirect="/admin/categorias/">
+      <input type="hidden" name="id" data-field="id" data-type="number" value={String(category.id)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Orden</span>
+          <input type="number" name="sortOrder" data-field="sortOrder" data-type="number" min="0" value={String(category.sortOrder ?? 0)} />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Slug</span>
+          <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Nombre</span>
+          <input name="tr.es.name" data-field="tr.es.name" type="text" value={esTranslation.name ?? ''} required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Descripción</span>
+          <input name="tr.es.description" data-field="tr.es.description" type="text" value={esTranslation.description ?? ''} />
+        </label>
+      </div>
+      <ImageUploader mode="single" folder="windytech/categorias" field="imagePublicId" label="Imagen de categoría" publicId={category.imagePublicId} />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/categorias/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

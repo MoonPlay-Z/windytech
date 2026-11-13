@@ -3,6 +3,7 @@ import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { requireOwner } from '../../../lib/api';
 import { listAdmins } from '../../../lib/db/queries';
+import { roleLabel } from '../../../lib/admin-labels';
 
 export const prerender = false;
 
@@ -15,14 +16,18 @@ const users = await listAdmins();
 
 <AdminLayout title="Usuarios" admin={admin} active="users">
   <section class="admin-card">
+    <p class="admin-message" data-reset-message hidden></p>
+    <header class="admin-actions">
+      <a class="admin-btn" href="nuevo/">Nuevo usuario</a>
+    </header>
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Correo</th>
-          <th>Rol</th>
-          <th>Activo</th>
-          <th style="width:170px">Acciones</th>
+          <th style="width:40px" scope="col">#</th>
+          <th scope="col">Correo</th>
+          <th scope="col">Rol</th>
+          <th scope="col">Activo</th>
+          <th style="width:170px" scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -30,10 +35,11 @@ const users = await listAdmins();
           <tr>
             <td>{user.id}</td>
             <td>{user.email}</td>
-            <td>{user.role}</td>
+            <td>{roleLabel(user.role)}</td>
             <td>{user.isActive ? 'Sí' : 'No'}</td>
             <td>
               <div class="admin-actions-cell">
+                <a class="admin-btn admin-btn--ghost admin-btn--small" href={`/admin/usuarios/${user.id}/`}>Editar</a>
                 {user.id !== admin.id ? (
                   <button
                     type="button"
@@ -86,11 +92,19 @@ const users = await listAdmins();
             throw new Error(data.error || 'No se pudo restablecer la clave.');
           }
 
-          alert(
-            `Nueva contraseña temporal para ${userEmail}:\n${data.temporaryPassword}\n\nCompártesela al usuario.`,
-          );
+          const message = document.querySelector<HTMLElement>('[data-reset-message]');
+          if (message) {
+            message.hidden = false;
+            message.dataset.kind = 'ok';
+            message.textContent = `Nueva contraseña temporal para ${userEmail}:\n${data.temporaryPassword}\n\nCompártesela al usuario.`;
+          }
         } catch (error) {
-          alert(error instanceof Error ? error.message : 'Error inesperado.');
+          const message = document.querySelector<HTMLElement>('[data-reset-message]');
+          if (message) {
+            message.hidden = false;
+            message.dataset.kind = 'error';
+            message.textContent = error instanceof Error ? error.message : 'Error inesperado.';
+          }
         } finally {
           button.disabled = false;
           button.textContent = original;

@@ -1,0 +1,44 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { requireOwner } from '../../../lib/api';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+if (!requireOwner(admin)) return Astro.redirect('/admin/', 302);
+---
+
+<AdminLayout title="Nuevo usuario" admin={admin} active="users">
+  <section class="admin-card">
+    <h2>Nuevo usuario</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/users" data-success="Usuario creado." data-redirect="/admin/usuarios/">
+      <div class="admin-form-row">
+        <label>
+          <span>Correo</span>
+          <input name="email" data-field="email" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          <span>Rol</span>
+          <select name="role" data-field="role">
+            <option value="OWNER">Propietario</option>
+            <option value="EDITOR">Editor</option>
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Contraseña</span>
+          <input name="password" data-field="password" type="password" autocomplete="new-password" minlength="8" required />
+        </label>
+      </div>
+      <p class="admin-hint">Los propietarios administran usuarios. Los editores solo gestionan el contenido.</p>
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear usuario</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/usuarios/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

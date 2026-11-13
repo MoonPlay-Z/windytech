@@ -18,7 +18,7 @@ const posts = await listPostsAdmin();
     </header>
     <table class="admin-table">
       <thead>
-        <tr><th style="width:40px">#</th><th>Título (ES)</th><th>Autor</th><th>Publicada</th><th>Acciones</th></tr>
+        <tr><th style="width:40px" scope="col">#</th><th scope="col">Título (ES)</th><th scope="col">Autor</th><th scope="col">Publicada</th><th scope="col">Acciones</th></tr>
       </thead>
       <tbody>
         {posts.map((post) => (

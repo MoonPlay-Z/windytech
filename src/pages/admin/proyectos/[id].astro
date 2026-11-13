@@ -1,0 +1,103 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import ImageUploader from '../../../components/admin/ImageUploader.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getProjectAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const projectId = Number(Astro.params.id);
+const project = await getProjectAdmin(projectId);
+if (!project) return Astro.redirect('/admin/proyectos/', 302);
+
+const aFecha = (value?: string | null) => {
+  if (!value) return '';
+  const date = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+const esTranslation = project.translations?.find((item: { locale?: string }) => item.locale === 'es') ?? project.translations?.[0] ?? {};
+---
+
+<AdminLayout title="Editar proyecto" admin={admin} active="projects">
+  <section class="admin-card">
+    <h2>Editar proyecto</h2>
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/projects"
+      data-success="Proyecto guardado."
+      data-redirect="/admin/proyectos/"
+    >
+      <input type="hidden" name="id" data-field="id" data-type="number" value={String(project.id)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Año</span>
+          <input type="number" name="year" data-field="year" data-type="number" min="2000" max="2100" value={project.year ? String(project.year) : ''} />
+        </label>
+        <label>
+          <span>Cliente</span>
+          <input name="clientName" data-field="clientName" type="text" maxlength="160" value={project.clientName ?? ''} />
+        </label>
+        <label>
+          <span>Orden</span>
+          <input type="number" name="sortOrder" data-field="sortOrder" data-type="number" min="0" value={String(project.sortOrder ?? 0)} />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label class="admin-check">
+          <input type="checkbox" name="clientApproved" data-field="clientApproved" data-type="checkbox" checked={project.clientApproved ? 'checked' : ''} />
+          Cliente aprobó publicar
+        </label>
+        <label class="admin-check">
+          <input type="checkbox" name="isPublished" data-field="isPublished" data-type="checkbox" checked={project.isPublished ? 'checked' : ''} />
+          Publicado
+        </label>
+      </div>
+      <label>
+        <span>Servicios (separados por coma)</span>
+        <input name="services" data-field="services" data-type="array" type="text" value={(project.services ?? []).join(', ')} />
+      </label>
+
+      <fieldset class="admin-fieldset">
+        <legend>Contenido</legend>
+        <div class="admin-form-row">
+          <label>
+            <span>Slug</span>
+            <input name="tr.es.slug" data-field="tr.es.slug" type="text" value={esTranslation.slug ?? ''} required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Título</span>
+            <input name="tr.es.title" data-field="tr.es.title" type="text" value={esTranslation.title ?? ''} required />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Resumen</span>
+            <input name="tr.es.summary" data-field="tr.es.summary" type="text" maxlength="600" value={esTranslation.summary ?? ''} />
+          </label>
+        </div>
+        <div class="admin-form-row">
+          <label>
+            <span>Descripción (Markdown)</span>
+            <textarea name="tr.es.descriptionMd" data-field="tr.es.descriptionMd" rows="4">{esTranslation.descriptionMd ?? ''}</textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <ImageUploader mode="single" folder="windytech/proyectos/editar" field="coverPublicId" label="Imagen de portada" publicId={project.coverPublicId} />
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/proyectos/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

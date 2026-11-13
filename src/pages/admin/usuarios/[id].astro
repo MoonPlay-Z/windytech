@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { requireOwner } from '../../../lib/api';
+import { listAdmins } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+if (!requireOwner(admin)) return Astro.redirect('/admin/', 302);
+
+const userId = Number(Astro.params.id);
+const users = await listAdmins();
+const user = users.find((item) => item.id === userId) ?? null;
+if (!user) return Astro.redirect('/admin/usuarios/', 302);
+
+const roleOptions = [
+  { value: 'OWNER', label: 'Propietario' },
+  { value: 'EDITOR', label: 'Editor' },
+];
+---
+
+<AdminLayout title="Editar usuario" admin={admin} active="users">
+  <section class="admin-card">
+    <h2>Editar usuario</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/users" data-success="Usuario actualizado." data-redirect="/admin/usuarios/">
+      <input type="hidden" name="id" data-field="id" data-type="number" value={String(user.id)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Correo</span>
+          <input type="text" value={user.email} disabled />
+        </label>
+        <label>
+          <span>Rol</span>
+          <select name="role" data-field="role">
+            {roleOptions.map((option) => (
+              <option value={option.value} selected={user.role === option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label class="admin-check">
+          <input type="checkbox" name="isActive" data-field="isActive" data-type="checkbox" checked={user.isActive ? 'checked' : ''} />
+          Cuenta activa
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Nueva contraseña (opcional)</span>
+          <input name="password" data-field="password" type="password" autocomplete="new-password" minlength="8" />
+        </label>
+      </div>
+      <p class="admin-hint">El correo no se puede cambiar desde el panel de usuarios.</p>
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/usuarios/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>

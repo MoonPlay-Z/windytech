@@ -1,6 +1,7 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../../lib/auth';
+import { availabilityLabel } from '../../../lib/admin-labels';
 import { listProductsAdmin } from '../../../lib/db/queries';
 
 export const prerender = false;
@@ -19,13 +20,13 @@ const products = await listProductsAdmin();
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Producto</th>
-          <th>SKU</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Activo</th>
-          <th>Acciones</th>
+          <th style="width:40px" scope="col">#</th>
+          <th scope="col">Producto</th>
+          <th scope="col">SKU</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Activo</th>
+          <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -36,8 +37,8 @@ const products = await listProductsAdmin();
               <a href={`/admin/productos/${product.id}/`}>{product.name}</a>
             </td>
             <td>{product.sku}</td>
-            <td>${(product.priceCents / 100).toFixed(2)}</td>
-            <td>{product.availability}</td>
+            <td>${(product.priceCents / 100).toFixed(2)} USD</td>
+            <td>{availabilityLabel(product.availability)}</td>
             <td>{product.isActive ? 'Sí' : 'No'}</td>
             <td>
               <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/productos/${product.id}/`}>Editar</a>

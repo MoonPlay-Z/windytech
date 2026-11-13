@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { projectSchema, fieldErrors } from '../../../lib/validation';
-import { deleteProject, listProjectsAdmin, saveProject, writeAudit } from '../../../lib/db/queries';
+import { deleteProject, listProjectsAdmin, projectSlugInUse, saveProject, writeAudit } from '../../../lib/db/queries';
 import { destroyAsset } from '../../../lib/cloudinary';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
@@ -27,18 +27,34 @@ export const POST: APIRoute = async ({ request }) => {
   // Un caso sin permiso del cliente no puede publicarse.
   const isPublished = data.isPublished && data.clientApproved;
 
-  const id = await saveProject({
-    id: data.id,
-    year: data.year ?? null,
-    clientName: data.clientName,
-    clientApproved: data.clientApproved,
-    services: data.services,
-    coverPublicId: data.coverPublicId ?? null,
-    isPublished,
-    sortOrder: data.sortOrder,
-    translations: data.translations,
-    images: data.images,
-  });
+  // El slug es único por idioma: avisa antes de tocar la base de datos.
+  for (const translation of data.translations) {
+    if (await projectSlugInUse(translation.locale, translation.slug, data.id ?? null)) {
+      return json(
+        { error: `El slug "${translation.slug}" ya lo usa otro proyecto.` },
+        422,
+      );
+    }
+  }
+
+  let id: number | null;
+  try {
+    id = await saveProject({
+      id: data.id,
+      year: data.year ?? null,
+      clientName: data.clientName,
+      clientApproved: data.clientApproved,
+      services: data.services,
+      coverPublicId: data.coverPublicId ?? null,
+      isPublished,
+      sortOrder: data.sortOrder,
+      translations: data.translations,
+      images: data.images,
+    });
+  } catch (error) {
+    console.error('[admin] no se pudo guardar el proyecto:', error);
+    return json({ error: 'No se pudo guardar el proyecto. Revisa los datos e inténtalo de nuevo.' }, 500);
+  }
 
   if (!id) return json({ error: 'No se pudo guardar el proyecto.' }, 503);
   await writeAudit(admin.id, data.id ? 'UPDATE' : 'CREATE', 'projects', String(id), {

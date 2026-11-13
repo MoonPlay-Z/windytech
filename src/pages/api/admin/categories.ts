@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { categorySchema, fieldErrors } from '../../../lib/validation';
-import { deleteCategory, listCategoriesAdmin, saveCategory, writeAudit } from '../../../lib/db/queries';
+import { categorySlugInUse, deleteCategory, listCategoriesAdmin, saveCategory, writeAudit } from '../../../lib/db/queries';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
 
@@ -22,10 +22,28 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Datos inválidos.', fields: fieldErrors(parsed.error) }, 422);
   }
 
-  const id = await saveCategory({
-    ...parsed.data,
-    imagePublicId: parsed.data.imagePublicId ?? null,
-  });
+  const data = parsed.data;
+
+  // El slug es único por idioma: avisa antes de tocar la base de datos.
+  for (const translation of data.translations) {
+    if (await categorySlugInUse(translation.locale, translation.slug, data.id ?? null)) {
+      return json(
+        { error: `El slug "${translation.slug}" ya lo usa otra categoría.` },
+        422,
+      );
+    }
+  }
+
+  let id: number | null;
+  try {
+    id = await saveCategory({
+      ...parsed.data,
+      imagePublicId: parsed.data.imagePublicId ?? null,
+    });
+  } catch (error) {
+    console.error('[admin] no se pudo guardar la categoría:', error);
+    return json({ error: 'No se pudo guardar la categoría. Revisa los datos e inténtalo de nuevo.' }, 500);
+  }
   if (!id) return json({ error: 'No se pudo guardar la categoría.' }, 503);
   await writeAudit(admin.id, parsed.data.id ? 'UPDATE' : 'CREATE', 'categories', String(id), null);
   return json({ ok: true, id });

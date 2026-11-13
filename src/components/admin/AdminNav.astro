@@ -5,8 +5,9 @@ interface Props {
 }
 
 const { active, role } = Astro.props;
+const isOwner = role === 'OWNER';
 
-const links = [
+const baseLinks = [
   { key: 'dashboard', label: 'Resumen', href: '/admin/' },
   { key: 'profile', label: 'Perfil', href: '/admin/perfil/' },
   { key: 'services', label: 'Paquetes', href: '/admin/servicios/' },
@@ -14,20 +15,24 @@ const links = [
   { key: 'categories', label: 'Categorías', href: '/admin/categorias/' },
   { key: 'promotions', label: 'Promociones', href: '/admin/promociones/' },
   { key: 'quotes', label: 'Cotizaciones', href: '/admin/cotizaciones/' },
-  { key: 'leads', label: 'Leads', href: '/admin/leads/' },
+  { key: 'leads', label: 'Consultas', href: '/admin/leads/' },
   { key: 'trackings', label: 'Seguimientos', href: '/admin/seguimientos/' },
   { key: 'projects', label: 'Proyectos', href: '/admin/proyectos/' },
   { key: 'posts', label: 'Publicaciones', href: '/admin/publicaciones/' },
 ];
 
-if (role === 'OWNER') {
-  links.push({ key: 'users', label: 'Usuarios', href: '/admin/usuarios/' });
-}
+const links = isOwner
+  ? [...baseLinks, { key: 'users', label: 'Usuarios', href: '/admin/usuarios/' }]
+  : baseLinks;
 ---
 
 <nav class="admin-nav" aria-label="Navegación del panel">
   {links.map((link) => (
-    <a href={link.href} class:list={['admin-nav-link', { 'is-active': active === link.key }]}>
+    <a
+      href={link.href}
+      class:list={['admin-nav-link', { 'is-active': active === link.key }]}
+      aria-current={active === link.key ? 'page' : undefined}
+    >
       {link.label}
     </a>
   ))}

@@ -754,6 +754,38 @@ export async function postSlugInUse(
   return Boolean(row?.exists);
 }
 
+/** Igual que `productSlugInUse`, pero para categorías. */
+export async function categorySlugInUse(
+  locale: string,
+  slug: string,
+  excludeCategoryId: number | null = null,
+): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (
+            SELECT 1 FROM category_translations
+            WHERE locale = 'es' AND slug = ${slug}
+              AND (${excludeCategoryId}::int IS NULL OR category_id <> ${excludeCategoryId})
+          ) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
+/** Igual que `productSlugInUse`, pero para proyectos. */
+export async function projectSlugInUse(
+  locale: string,
+  slug: string,
+  excludeProjectId: number | null = null,
+): Promise<boolean> {
+  const row = await one<{ exists: boolean }>(
+    sql`SELECT EXISTS (
+            SELECT 1 FROM project_translations
+            WHERE locale = 'es' AND slug = ${slug}
+              AND (${excludeProjectId}::int IS NULL OR project_id <> ${excludeProjectId})
+          ) AS exists`,
+  );
+  return Boolean(row?.exists);
+}
+
 export async function saveProduct(input: ProductInput): Promise<number | null> {
   const client = db();
   if (!client) return null;
@@ -856,7 +888,14 @@ export async function listCategoriesAdmin() {
   );
 }
 
-export async function getCategoryAdmin(id: number) {
+export type CategoryAdmin = {
+  id: number;
+  sortOrder: number;
+  imagePublicId: string | null;
+  translations: { locale: string; slug: string; name: string; description: string }[];
+};
+
+export async function getCategoryAdmin(id: number): Promise<CategoryAdmin | null> {
   const category = await one<Row>(
     sql`SELECT id, sort_order AS "sortOrder", image_public_id AS "imagePublicId" FROM categories WHERE id = ${id}`,
   );
@@ -864,7 +903,7 @@ export async function getCategoryAdmin(id: number) {
   const translations = await safeRows(
     sql`SELECT locale, slug, name, description FROM category_translations WHERE category_id = ${id}`,
   );
-  return { ...category, translations };
+  return { ...category, translations } as unknown as CategoryAdmin;
 }
 
 export async function saveCategory(input: {
@@ -888,11 +927,14 @@ export async function saveCategory(input: {
       id = Number((result.rows[0] as { id: number }).id);
     }
     for (const tr of input.translations) {
+      // Igual que en productos: se reemplaza la traducción de este registro
+      // en ese idioma, sin reasignar el slug de otro.
+      await tx.execute(
+        sql`DELETE FROM category_translations WHERE category_id = ${id} AND locale = ${tr.locale}`,
+      );
       await tx.execute(
         sql`INSERT INTO category_translations (category_id, locale, slug, name, description)
-            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.name}, ${tr.description})
-            ON CONFLICT (locale, slug) DO UPDATE SET category_id = ${id}, name = ${tr.name},
-                description = ${tr.description}`,
+            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.name}, ${tr.description})`,
       );
     }
     return id;
@@ -929,7 +971,22 @@ export async function listPromotionsAdmin() {
   );
 }
 
-export async function getPromotionAdmin(id: number) {
+export type PromotionAdmin = {
+  id: number;
+  name: string;
+  type: string;
+  value: number;
+  startsAt: string;
+  endsAt: string | null;
+  isActive: boolean;
+  priority: number;
+  badgeEs: string;
+  badgeEn: string;
+  productIds: number[];
+  categoryIds: number[];
+};
+
+export async function getPromotionAdmin(id: number): Promise<PromotionAdmin | null> {
   const promotion = await one<Row>(
     sql`SELECT id, name, type, value, starts_at AS "startsAt", ends_at AS "endsAt",
                is_active AS "isActive", priority, badge_es AS "badgeEs", badge_en AS "badgeEn"
@@ -944,7 +1001,7 @@ export async function getPromotionAdmin(id: number) {
     ...promotion,
     productIds: targets.filter((row) => row.productId !== null).map((row) => Number(row.productId)),
     categoryIds: targets.filter((row) => row.categoryId !== null).map((row) => Number(row.categoryId)),
-  };
+  } as unknown as PromotionAdmin;
 }
 
 export async function savePromotion(input: {
@@ -1025,7 +1082,20 @@ export async function listProjectsAdmin() {
   );
 }
 
-export async function getProjectAdmin(id: number) {
+export type ProjectAdmin = {
+  id: number;
+  year: number | null;
+  clientName: string;
+  clientApproved: boolean;
+  isPublished: boolean;
+  coverPublicId: string | null;
+  sortOrder: number;
+  services: string[];
+  translations: { locale: string; slug: string; title: string; summary: string; descriptionMd: string }[];
+  images: { cloudinaryPublicId: string; alt: string; position: number }[];
+};
+
+export async function getProjectAdmin(id: number): Promise<ProjectAdmin | null> {
   const project = await one<Row>(
     sql`SELECT id, year, client_name AS "clientName", client_approved AS "clientApproved",
                services, cover_public_id AS "coverPublicId", is_published AS "isPublished", sort_order AS "sortOrder"
@@ -1038,7 +1108,7 @@ export async function getProjectAdmin(id: number) {
     safeRows(sql`SELECT cloudinary_public_id AS "cloudinaryPublicId", alt, position
                  FROM project_images WHERE project_id = ${id} ORDER BY position ASC`),
   ]);
-  return { ...project, translations, images };
+  return { ...project, translations, images } as unknown as ProjectAdmin;
 }
 
 export async function saveProject(input: {
@@ -1073,11 +1143,14 @@ export async function saveProject(input: {
       id = Number((result.rows[0] as { id: number }).id);
     }
     for (const tr of input.translations) {
+      // Igual que en productos: se reemplaza la traducción de este registro
+      // en ese idioma, sin reasignar el slug de otro.
+      await tx.execute(
+        sql`DELETE FROM project_translations WHERE project_id = ${id} AND locale = ${tr.locale}`,
+      );
       await tx.execute(
         sql`INSERT INTO project_translations (project_id, locale, slug, title, summary, description_md)
-            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.title}, ${tr.summary}, ${tr.descriptionMd})
-            ON CONFLICT (locale, slug) DO UPDATE SET project_id = ${id}, title = ${tr.title},
-                summary = ${tr.summary}, description_md = ${tr.descriptionMd}`,
+            VALUES (${id}, ${tr.locale}, ${tr.slug}, ${tr.title}, ${tr.summary}, ${tr.descriptionMd})`,
       );
     }
     if (input.images.length > 0) {

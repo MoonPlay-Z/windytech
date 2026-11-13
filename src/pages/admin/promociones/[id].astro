@@ -1,0 +1,86 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { getPromotionAdmin } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const promotionId = Number(Astro.params.id);
+const promotion = await getPromotionAdmin(promotionId);
+if (!promotion) return Astro.redirect('/admin/promociones/', 302);
+
+const aFecha = (value?: string | null) => {
+  if (!value) return '';
+  const date = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+const valor = promotion.type === 'FIXED' ? (promotion.value / 100).toFixed(2) : String(promotion.value);
+---
+
+<AdminLayout title="Editar promoción" admin={admin} active="promotions">
+  <section class="admin-card">
+    <h2>Editar promoción</h2>
+    <form class="admin-form" data-admin-form data-endpoint="/api/admin/promotions" data-success="Promoción guardada." data-redirect="/admin/promociones/">
+      <input type="hidden" name="id" data-field="id" data-type="number" value={String(promotion.id)} />
+      <div class="admin-form-row">
+        <label>
+          <span>Nombre</span>
+          <input name="name" data-field="name" type="text" value={promotion.name ?? ''} required />
+        </label>
+        <label>
+          <span>Tipo</span>
+          <select name="type" data-field="type">
+            <option value="PERCENT" selected={promotion.type === 'PERCENT'}>Porcentaje</option>
+            <option value="FIXED" selected={promotion.type === 'FIXED'}>Monto fijo (USD)</option>
+          </select>
+        </label>
+        <label>
+          <span>Valor</span>
+          <input type="number" name="value" data-field="value" data-type="number" min="0" step="0.01" value={valor} required />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Inicio</span>
+          <input type="datetime-local" name="startsAt" data-field="startsAt" value={aFecha(promotion.startsAt)} required />
+        </label>
+        <label>
+          <span>Fin (opcional)</span>
+          <input type="datetime-local" name="endsAt" data-field="endsAt" value={aFecha(promotion.endsAt)} />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label class="admin-check">
+          <input type="checkbox" name="isActive" data-field="isActive" data-type="checkbox" checked={promotion.isActive ? 'checked' : ''} />
+          Promoción activa
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Prioridad</span>
+          <input type="number" name="priority" data-field="priority" data-type="number" min="0" value={String(promotion.priority ?? 0)} />
+        </label>
+        <label>
+          <span>Insignia</span>
+          <input name="badgeEs" data-field="badgeEs" type="text" value={promotion.badgeEs ?? ''} />
+        </label>
+      </div>
+      <label>
+        <span>Productos afectados (IDs, separados por coma)</span>
+        <input name="productIds" data-field="productIds" data-type="array" type="text" value={(promotion.productIds ?? []).join(', ')} />
+        <p class="admin-hint">Déjalo vacío para aplicar a toda la tienda.</p>
+      </label>
+
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <a class="admin-btn admin-btn--ghost" href="/admin/promociones/">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</AdminLayout>
