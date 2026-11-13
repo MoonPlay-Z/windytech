@@ -253,97 +253,66 @@
   }
 
   /* --- admin-desktop.css (escritorio Windows) --- */
+  @media (max-width: 1024px) {
+    /* El panel de acceso rápido se pliega y solo queda la franja de iconos. */
+    .win-body {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .admin-page[data-sidebar='collapsed'] .win-body {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .win-panel {
+      display: none;
+    }
+  }
+
   @media (max-width: 860px) {
-    /* El panel lateral pasa a ser una barra horizontal desplegable. */
+    /* Por debajo de 860 px la franja pasa a ser una barra horizontal. */
     .win-body {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto minmax(0, 1fr);
     }
 
-    .admin-page[data-sidebar='collapsed'] .win-body {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .win-sidebar {
-      position: relative;
-      max-height: 46vh;
+    .win-rail-wrap {
+      width: auto;
+      grid-template-rows: none;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
       border-right: 0;
-      border-bottom: 1px solid var(--win-border);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
-    .admin-page[data-sidebar='collapsed'] .win-sidebar {
+    .win-rail-brand {
+      padding: 8px 10px;
+    }
+
+    .win-rail {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 4px;
+      padding: 6px 4px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .win-rail-button {
+      flex: none;
+      width: 38px;
+      height: 38px;
+    }
+
+    .win-rail-tip {
       display: none;
     }
 
-    .win-sidebar-head {
-      padding: 8px 12px;
-    }
-
-    .win-tree {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      padding: 8px 12px 12px;
-      overflow: visible;
-    }
-
-    .win-tree-group {
-      flex: none;
-    }
-
-    .admin-page[data-sidebar='collapsed'] .win-tree-group + .win-tree-group {
-      margin-top: 0;
-      padding-top: 0;
+    .win-rail-foot {
+      grid-auto-flow: column;
+      gap: 8px;
+      padding: 6px 10px;
       border-top: 0;
-    }
-
-    .win-tree-label {
-      min-height: 24px;
-      padding: 0 8px;
-    }
-
-    .win-tree-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .admin-page[data-sidebar='collapsed'] .win-tree-label,
-    .admin-page[data-sidebar='collapsed'] .win-tree-items {
-      display: flex;
-    }
-
-    .win-tree-link {
-      min-height: 32px;
-      padding: 0 10px;
-      border: 1px solid var(--win-border);
-      border-radius: var(--win-radius);
-      background: var(--win-field);
-      font-size: 12px;
-    }
-
-    .win-tree-link.is-active {
-      border-color: var(--win-accent);
-      box-shadow: none;
-    }
-
-    .admin-page[data-sidebar='collapsed'] .win-tree-link {
-      justify-content: flex-start;
-      padding: 0 10px;
-    }
-
-    .win-sidebar-foot {
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      align-items: center;
-    }
-
-    .win-sidebar-user {
-      justify-content: flex-start;
-    }
-
-    .admin-page[data-sidebar='collapsed'] .win-sidebar-user span,
-    .admin-page[data-sidebar='collapsed'] .win-sidebar-foot .admin-btn {
-      display: block;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .win-workspace {

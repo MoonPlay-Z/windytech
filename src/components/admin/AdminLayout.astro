@@ -159,34 +159,13 @@ const migas = crumbs.length > 0 ? crumbs : [{ label: title }];
       </nav>
 
       <div class="win-body">
-        <aside class="win-sidebar">
-          <div class="win-sidebar-head">
-            <img src="/assets/logo-mark-96.webp" alt="" width="26" height="26" />
-            <span>
-              <strong>Windytech</strong>
-              <small>Panel</small>
-            </span>
-            <button type="button" class="win-sidebar-toggle" data-sidebar-toggle aria-label="Plegar el panel lateral">
-              <Icon name="panel" size={15} />
-            </button>
-          </div>
-
-          <AdminNav
-            active={active}
-            role={admin.role}
-            leads={leadsPendientes}
-            quotes={quotesPendientes}
-          />
-
-          <div class="win-sidebar-foot">
-            <span class="win-sidebar-user">
-              <Icon name="user" size={15} />
-              <span title={admin.email}>{admin.email}</span>
-            </span>
-            <a class="admin-btn admin-btn--ghost admin-btn--sm" href="/admin/perfil/">Mi perfil</a>
-            <button type="button" class="admin-btn admin-btn--ghost admin-btn--sm" data-logout>Cerrar sesión</button>
-          </div>
-        </aside>
+        <AdminNav
+          active={active}
+          role={admin.role}
+          email={admin.email}
+          leads={leadsPendientes}
+          quotes={quotesPendientes}
+        />
 
         <div class="win-content">
           <div class="win-addressbar">
@@ -254,6 +233,16 @@ const migas = crumbs.length > 0 ? crumbs : [{ label: title }];
           <img src="/assets/logo-mark-96.webp" alt="" width="22" height="22" />
           <span>Windytech</span>
         </a>
+        <label class="win-taskbar-search">
+          <Icon name="search" size={14} />
+          <input
+            type="search"
+            placeholder="Escribir aquí para buscar…"
+            aria-label="Buscar en el panel"
+            data-admin-search
+            autocomplete="off"
+          />
+        </label>
         <div class="win-taskbar-apps">
           <a class:list={['win-taskbar-app', { 'is-active': active === 'dashboard' }]} href="/admin/">
             <Icon name="dashboard" size={15} />

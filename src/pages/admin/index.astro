@@ -124,6 +124,51 @@ const alertas = [
     )
   }
 
+  <div class="win-tiles">
+    <a class="win-tile win-tile--blue" href="/admin/productos/nuevo/">
+      <span class="win-tile-icon"><Icon name="plus" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Producto nuevo</strong>
+        <span>Añade un equipo al catálogo</span>
+      </span>
+    </a>
+    <a class="win-tile win-tile--green" href="/admin/cotizaciones/">
+      <span class="win-tile-icon"><Icon name="cotizaciones" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Cotizaciones</strong>
+        <span>{quotes.NEW ?? 0} esperando respuesta</span>
+      </span>
+    </a>
+    <a class="win-tile win-tile--teal" href="/admin/leads/">
+      <span class="win-tile-icon"><Icon name="leads" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Consultas</strong>
+        <span>{leads.new ?? 0} nuevas este mes</span>
+      </span>
+    </a>
+    <a class="win-tile win-tile--orange" href="/admin/seguimientos/">
+      <span class="win-tile-icon"><Icon name="seguimientos" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Seguimientos</strong>
+        <span>Servicios y equipos</span>
+      </span>
+    </a>
+    <a class="win-tile win-tile--purple" href="/admin/publicaciones/nueva/">
+      <span class="win-tile-icon"><Icon name="publicaciones" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Publicación</strong>
+        <span>Escribe en el blog</span>
+      </span>
+    </a>
+    <a class="win-tile win-tile--navy" href="/admin/productos/">
+      <span class="win-tile-icon"><Icon name="productos" size={22} /></span>
+      <span class="win-tile-body">
+        <strong>Catálogo</strong>
+        <span>{products.length} productos cargados</span>
+      </span>
+    </a>
+  </div>
+
   <div class="admin-grid">
     <a class="admin-stat admin-stat--quotes" href="/admin/cotizaciones/">
       <span class="admin-stat-icon" aria-hidden="true"><Icon name="cotizaciones" size={20} /></span>

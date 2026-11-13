@@ -1,8 +1,12 @@
 ---
 /**
- * Panel lateral del administrador, al estilo del árbol de archivos de
- * Windows: grupos plegables, un icono por sección y contadores con lo que
- * hay pendiente de revisar.
+ * Navegación del panel, al estilo del escritorio de Windows 10:
+ *
+ * - Una franja vertical de iconos (una por sección).
+ * - Un panel azul de "Acceso rápido" con las páginas de la sección activa.
+ *
+ * El panel se llama "Acceso rápido" porque es lo que se lee en pantalla, pero
+ * dentro contiene los enlaces de la sección elegida en la franja.
  */
 
 import Icon from '../Icon.astro';
@@ -10,13 +14,15 @@ import Icon from '../Icon.astro';
 interface Props {
   active: string;
   role: 'OWNER' | 'EDITOR';
+  /** Correo del administrador (se muestra en el icono de usuario). */
+  email?: string;
   /** Consultas nuevas pendientes de responder. */
   leads?: number;
   /** Cotizaciones nuevas sin responder. */
   quotes?: number;
 }
 
-const { active, role, leads = 0, quotes = 0 } = Astro.props;
+const { active, role, email = '', leads = 0, quotes = 0 } = Astro.props;
 
 type Item = {
   key: string;
@@ -24,31 +30,27 @@ type Item = {
   href: string;
   icon: string;
   badge?: number;
-  /** Se oculta a los editores. */
   ownerOnly?: boolean;
 };
 
-type Group = {
-  id: string;
+type Section = {
+  key: string;
   label: string;
+  icon: string;
   items: Item[];
-  /** Grupo abierto por defecto. */
-  open?: boolean;
 };
 
-const grupos: Group[] = [
+const sections: Section[] = [
   {
-    id: 'resumen',
+    key: 'resumen',
     label: 'Resumen',
-    open: true,
-    items: [
-      { key: 'dashboard', label: 'Resumen', href: '/admin/', icon: 'dashboard' },
-    ],
+    icon: 'dashboard',
+    items: [{ key: 'dashboard', label: 'Resumen', href: '/admin/', icon: 'dashboard' }],
   },
   {
-    id: 'ventas',
+    key: 'ventas',
     label: 'Ventas',
-    open: true,
+    icon: 'cotizaciones',
     items: [
       {
         key: 'quotes',
@@ -62,9 +64,9 @@ const grupos: Group[] = [
     ],
   },
   {
-    id: 'catalogo',
+    key: 'catalogo',
     label: 'Catálogo',
-    open: true,
+    icon: 'productos',
     items: [
       { key: 'products', label: 'Productos', href: '/admin/productos/', icon: 'productos' },
       { key: 'categories', label: 'Categorías', href: '/admin/categorias/', icon: 'categorias' },
@@ -72,24 +74,26 @@ const grupos: Group[] = [
     ],
   },
   {
-    id: 'contenido',
+    key: 'contenido',
     label: 'Contenido',
-    open: true,
+    icon: 'publicaciones',
     items: [
       { key: 'projects', label: 'Proyectos', href: '/admin/proyectos/', icon: 'proyectos' },
       { key: 'posts', label: 'Publicaciones', href: '/admin/publicaciones/', icon: 'publicaciones' },
     ],
   },
   {
-    id: 'paquetes',
+    key: 'paquetes',
     label: 'Paquetes',
+    icon: 'paquetes',
     items: [
       { key: 'services', label: 'Servicios', href: '/admin/servicios/', icon: 'paquetes' },
     ],
   },
   {
-    id: 'ajustes',
+    key: 'ajustes',
     label: 'Ajustes',
+    icon: 'ajustes',
     items: [
       { key: 'profile', label: 'Mi perfil', href: '/admin/perfil/', icon: 'perfil' },
       { key: 'users', label: 'Usuarios', href: '/admin/usuarios/', icon: 'usuarios', ownerOnly: true },
@@ -97,38 +101,92 @@ const grupos: Group[] = [
   },
 ];
 
-const visibles = grupos
-  .map((grupo) => ({
-    ...grupo,
-    items: grupo.items.filter((item) => !(item.ownerOnly && role !== 'OWNER')),
+const visibles = sections
+  .map((section) => ({
+    ...section,
+    items: section.items.filter((item) => !(item.ownerOnly && role !== 'OWNER')),
   }))
-  .filter((grupo) => grupo.items.length > 0);
+  .filter((section) => section.items.length > 0);
+
+// La sección activa es la que contiene la página actual.
+const seccionActiva =
+  visibles.find((section) => section.items.some((item) => item.key === active)) ?? visibles[0];
 ---
 
-<div class="win-tree" data-tree>
-  {
-    visibles.map((grupo) => (
-      <div class:list={['win-tree-group', { 'is-open': grupo.open }]} data-tree-group={grupo.id}>
-        <button type="button" class="win-tree-label" data-tree-toggle aria-expanded={grupo.open ? 'true' : 'false'}>
-          <Icon name="expandir" size={13} />
-          <span class="win-tree-label-text">{grupo.label}</span>
+<!-- Franja vertical de iconos: una por sección. -->
+<div class="win-rail-wrap">
+  <div class="win-rail-brand">
+    <img src="/assets/logo-mark-96.webp" alt="Windytech" width="30" height="30" />
+  </div>
+
+  <nav class="win-rail" aria-label="Secciones del panel">
+    {
+      visibles.map((section) => (
+        <button
+          type="button"
+          class:list={['win-rail-button', { 'is-active': section.key === seccionActiva.key }]}
+          data-rail-section={section.key}
+          title={section.label}
+          aria-label={section.label}
+        >
+          <Icon name={section.icon} size={19} />
+          <span class="win-rail-tip">{section.label}</span>
         </button>
-        <div class="win-tree-items">
-          {grupo.items.map((item) => (
-            <a
-              class:list={['win-tree-link', { 'is-active': active === item.key }]}
-              href={item.href}
-              title={item.label}
-            >
-              <Icon name={item.icon} size={15} />
-              <span class="win-tree-label-text">{item.label}</span>
-              {item.badge !== undefined && item.badge > 0 && (
-                <span class="win-tree-badge">{item.badge}</span>
-              )}
-            </a>
-          ))}
-        </div>
-      </div>
-    ))
-  }
+      ))
+    }
+  </nav>
+
+  <div class="win-rail-foot">
+    <button
+      type="button"
+      class="win-sidebar-toggle"
+      data-sidebar-toggle
+      aria-label="Plegar el panel lateral"
+      title="Plegar el panel lateral"
+    >
+      <Icon name="panel" size={16} />
+    </button>
+    <span class="win-rail-user" title={email}>
+      <Icon name="user" size={16} />
+    </span>
+  </div>
 </div>
+
+<!-- Panel azul de acceso rápido con las páginas de la sección activa. -->
+<aside class="win-panel" aria-label="Acceso rápido">
+  <p class="win-panel-title">Acceso rápido</p>
+  <ul class="win-panel-list">
+    {
+      seccionActiva.items.map((item) => (
+        <li>
+          <a
+            class:list={['win-panel-link', { 'is-active': active === item.key }]}
+            href={item.href}
+          >
+            <Icon name={item.icon} size={16} />
+            <span>{item.label}</span>
+            {item.badge !== undefined && item.badge > 0 && (
+              <span class="win-tree-badge">{item.badge}</span>
+            )}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="win-panel-title win-panel-title--second">Ir al panel de control</p>
+  <ul class="win-panel-list">
+    <li>
+      <a class="win-panel-link" href="/admin/perfil/">
+        <Icon name="perfil" size={16} />
+        <span>Mi cuenta</span>
+      </a>
+    </li>
+    <li>
+      <a class="win-panel-link" href="/" target="_blank" rel="noopener">
+        <Icon name="arrow-up-right" size={16} />
+        <span>Ver el sitio</span>
+      </a>
+    </li>
+  </ul>
+</aside>

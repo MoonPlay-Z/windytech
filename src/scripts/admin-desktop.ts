@@ -115,6 +115,39 @@ function initTree() {
     });
 }
 
+/**
+ * Franja de iconos: al pulsar una sección se abre su primera página. El
+ * panel de acceso rápido lo dibuja el servidor con la sección de la página
+ * actual, así que los iconos son los del registro central.
+ */
+function initFranja() {
+  const botones = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-rail-section]'),
+  );
+  if (botones.length === 0) return;
+
+  const PRIMERA: Record<string, string> = {
+    resumen: '/admin/',
+    ventas: '/admin/cotizaciones/',
+    catalogo: '/admin/productos/',
+    contenido: '/admin/proyectos/',
+    paquetes: '/admin/servicios/',
+    ajustes: '/admin/perfil/',
+  };
+
+  botones.forEach((boton) => {
+    if (boton.dataset.wtBound) return;
+    boton.dataset.wtBound = 'true';
+
+    boton.addEventListener('click', () => {
+      const destino = PRIMERA[boton.dataset.railSection ?? ''];
+      if (!destino) return;
+      if (boton.classList.contains('is-active')) return;
+      window.location.href = destino;
+    });
+  });
+}
+
 function initReloj() {
   const reloj = document.querySelector<HTMLElement>('[data-clock]');
   if (!reloj) return;
@@ -296,6 +329,7 @@ function init() {
   initMenus();
   initSidebar();
   initTree();
+  initFranja();
   initReloj();
   initBuscadorMenu();
 }

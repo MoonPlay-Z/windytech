@@ -16,8 +16,9 @@
    --------------------------------------------------------------------------- */
 
 html.admin-page {
-  /* Superficies */
-  --win-desktop: #e9ecef;
+  /* Superficies: el escritorio es azul, como en Windows 10. */
+  --win-desktop: #1b4d8f;
+  --win-desktop-deep: #10305f;
   --win-chrome: #f3f3f3;
   --win-chrome-dark: #e4e4e4;
   --win-field: #ffffff;
@@ -31,21 +32,28 @@ html.admin-page {
   --win-muted: #707070;
 
   /* Barra de título (Windows 10) */
-  --win-title: #1f4e79;
-  --win-title-hi: #2c6ca8;
+  --win-title: #10305f;
+  --win-title-hi: #1b4d8f;
   --win-title-text: #ffffff;
 
+  /* Panel lateral azul del menú Inicio */
+  --win-sidebar: #1b4d8f;
+  --win-sidebar-deep: #10305f;
+  --win-sidebar-text: #eaf2fb;
+  --win-sidebar-hover: rgba(255, 255, 255, 0.14);
+  --win-sidebar-active: rgba(255, 255, 255, 0.24);
+
   /* Acento (selección de Windows) */
-  --win-accent: #0078d7;
+  --win-accent: #0078d4;
   --win-accent-dark: #005a9e;
   --win-accent-soft: #e5f1fb;
   --win-accent-ring: rgba(0, 120, 215, 0.32);
 
   /* Barra de tareas */
-  --win-taskbar: #1c1c1c;
-  --win-taskbar-text: #e8e8e8;
-  --win-taskbar-hover: rgba(255, 255, 255, 0.12);
-  --win-taskbar-active: rgba(255, 255, 255, 0.2);
+  --win-taskbar: #10305f;
+  --win-taskbar-text: #f0f6fc;
+  --win-taskbar-hover: rgba(255, 255, 255, 0.14);
+  --win-taskbar-active: rgba(255, 255, 255, 0.24);
 
   /* Semáforo de estados */
   --win-ok: #107c10;
@@ -113,13 +121,23 @@ html.admin-page {
 }
 
 .win-titlebar-text {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   font-size: 12.5px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* El marco de la ventana no puede crecer: si no, empuja el contenido. */
+.win {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.win-titlebar {
+  min-width: 0;
 }
 
 /* Botones de ventana, a la derecha como en Windows 10. */
@@ -264,15 +282,15 @@ html.admin-page {
   font-size: 11.5px;
 }
 
-/* --- Cuerpo: panel lateral + contenido --- */
+/* --- Cuerpo: franja de iconos + panel de acceso rápido + contenido --- */
 .win-body {
   display: grid;
-  grid-template-columns: var(--win-sidebar-w) minmax(0, 1fr);
+  grid-template-columns: 56px 212px minmax(0, 1fr);
   min-height: 0;
 }
 
 .admin-page[data-sidebar='collapsed'] .win-body {
-  grid-template-columns: var(--win-sidebar-w-collapsed) minmax(0, 1fr);
+  grid-template-columns: 56px minmax(0, 1fr);
 }
 
 /* --- Contenido --- */
@@ -400,12 +418,20 @@ html.admin-page {
   border-color: var(--win-accent);
 }
 
-/* --- Área de trabajo --- */
+/* --- Área de trabajo: el escritorio azul de Windows 10 --- */
 .win-workspace {
   min-height: 0;
   overflow: auto;
   padding: 18px 20px 28px;
-  background: var(--win-desktop);
+  background:
+    radial-gradient(70% 60% at 12% 0%, rgba(0, 120, 212, 0.28), transparent 70%),
+    radial-gradient(60% 55% at 88% 100%, rgba(0, 164, 220, 0.22), transparent 70%),
+    linear-gradient(160deg, var(--win-desktop) 0%, var(--win-desktop-deep) 100%);
+}
+
+/* Las tarjetas del panel son "ventanas" blancas sobre el escritorio. */
+.win-workspace .admin-card {
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* --- Barra de tareas --- */
@@ -437,6 +463,46 @@ html.admin-page {
 
 .win-taskbar-start:hover {
   background: var(--win-taskbar-hover);
+}
+
+/* Buscador de la barra de tareas: "Escribir aquí para buscar…". */
+.win-taskbar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 260px;
+  min-width: 130px;
+}
+
+.win-taskbar-search svg {
+  position: absolute;
+  left: 9px;
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.62);
+  pointer-events: none;
+}
+
+.win-taskbar-search input {
+  width: 100%;
+  min-height: 28px;
+  padding: 0 10px 0 29px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--win-radius);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--win-taskbar-text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.win-taskbar-search input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.win-taskbar-search input:focus {
+  outline: none;
+  border-color: var(--win-accent);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .win-taskbar-start img {
@@ -524,8 +590,9 @@ html.admin-page {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-right: 1px solid var(--win-border);
-  background: var(--win-chrome);
+  border-right: 1px solid rgba(0, 0, 0, 0.18);
+  background: var(--win-sidebar);
+  color: var(--win-sidebar-text);
 }
 
 .win-sidebar-head {
@@ -533,7 +600,7 @@ html.admin-page {
   align-items: center;
   gap: 9px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--win-border-soft);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .win-sidebar-head img {
@@ -554,7 +621,7 @@ html.admin-page {
 }
 
 .win-sidebar-head small {
-  color: var(--win-muted);
+  color: rgba(255, 255, 255, 0.62);
   font-size: 10.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -569,13 +636,13 @@ html.admin-page {
   border: 1px solid transparent;
   border-radius: var(--win-radius);
   background: transparent;
-  color: var(--win-text-soft);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
 }
 
 .win-sidebar-toggle:hover {
-  border-color: var(--win-border);
-  background: var(--win-chrome-dark);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--win-sidebar-hover);
 }
 
 .win-sidebar-toggle svg {
@@ -641,23 +708,25 @@ html.admin-page {
   display: flex;
   align-items: center;
   gap: 9px;
-  min-height: 30px;
-  padding: 0 12px 0 26px;
-  border-left: 2px solid transparent;
-  color: var(--win-text-soft);
+  min-height: 32px;
+  padding: 0 12px 0 24px;
+  border-left: 3px solid transparent;
+  color: var(--win-sidebar-text);
   font-size: 12.5px;
   text-decoration: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+  transition: background 120ms ease;
 }
 
 .win-tree-link:hover {
-  background: var(--win-accent-soft);
-  color: var(--win-text);
+  background: var(--win-sidebar-hover);
+  color: #fff;
 }
 
 .win-tree-link.is-active {
-  border-left-color: var(--win-accent);
-  background: var(--win-accent-soft);
-  color: var(--win-text);
+  border-left-color: #fff;
+  background: var(--win-sidebar-active);
+  color: #fff;
   font-weight: 600;
 }
 
@@ -665,11 +734,10 @@ html.admin-page {
   flex: none;
   width: 15px;
   height: 15px;
-  opacity: 0.72;
+  opacity: 0.85;
 }
 
 .win-tree-link.is-active > svg {
-  color: var(--win-accent-dark);
   opacity: 1;
 }
 
@@ -701,8 +769,8 @@ html.admin-page {
   display: grid;
   gap: 7px;
   padding: 10px 12px;
-  border-top: 1px solid var(--win-border-soft);
-  background: var(--win-chrome-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--win-sidebar-deep);
   font-size: 11.5px;
 }
 
@@ -717,12 +785,12 @@ html.admin-page {
   flex: none;
   width: 15px;
   height: 15px;
-  color: var(--win-muted);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .win-sidebar-user span {
   overflow: hidden;
-  color: var(--win-text-soft);
+  color: rgba(255, 255, 255, 0.82);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -974,7 +1042,6 @@ html.admin-page {
     transform: none;
   }
 }
-}
 
 /* ---------------------------------------------------------------------------
    6. Barra de herramientas
@@ -1150,18 +1217,19 @@ html.admin-page {
 .win-sidebar-foot .admin-btn {
   min-height: 30px;
   padding: 0 12px;
-  border: 1px solid var(--win-border-strong);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--win-radius);
-  background: linear-gradient(180deg, #fefefe 0%, #f0f0f0 100%);
-  color: var(--win-text);
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaf2fb;
   font-size: 12px;
   font-weight: 500;
   text-align: center;
 }
 
 .win-sidebar-foot .admin-btn:hover {
-  border-color: var(--win-accent);
-  background: var(--win-accent-soft);
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
 }
 
 /* El reloj de la barra de tareas no debe ocupar más de lo necesario. */
@@ -1775,4 +1843,285 @@ html.admin-page {
 .win-context-icon svg {
   width: 15px;
   height: 15px;
+}
+
+/* ---------------------------------------------------------------------------
+   15. Mosaicos (tiles) del resumen, como en el menú Inicio de Windows 10
+   --------------------------------------------------------------------------- */
+
+.win-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.win-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 148px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--win-radius);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.win-tile:hover {
+  transform: scale(1.02);
+  filter: brightness(1.12);
+}
+
+.win-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--win-radius);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.win-tile-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.win-tile-body strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.win-tile-body span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12.5px;
+}
+
+/* Colores de mosaico: los mismos verdes y azules del menú Inicio. */
+.win-tile--blue {
+  background: linear-gradient(150deg, #0099bc 0%, #0078d4 100%);
+}
+
+.win-tile--teal {
+  background: linear-gradient(150deg, #00b7a3 0%, #008272 100%);
+}
+
+.win-tile--green {
+  background: linear-gradient(150deg, #4cc76a 0%, #2b8a3e 100%);
+}
+
+.win-tile--purple {
+  background: linear-gradient(150deg, #7a6bd6 0%, #5b3fb8 100%);
+}
+
+.win-tile--orange {
+  background: linear-gradient(150deg, #f2a33c 0%, #d2691e 100%);
+}
+
+.win-tile--red {
+  background: linear-gradient(150deg, #e2604f 0%, #b8332a 100%);
+}
+
+.win-tile--navy {
+  background: linear-gradient(150deg, #2b6cb0 0%, #173f7a 100%);
+}
+
+/* ---------------------------------------------------------------------------
+   16. Franja de iconos y panel de acceso rápido (escritorio de Windows 10)
+   --------------------------------------------------------------------------- */
+
+/* Contenedor de la franja: se pega a la izquierda del todo. */
+.win-rail-wrap {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 56px;
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+  background: linear-gradient(180deg, var(--win-sidebar-deep) 0%, #0b2447 100%);
+}
+
+.win-rail-brand {
+  display: grid;
+  place-items: center;
+  padding: 12px 0;
+}
+
+.win-rail-brand img {
+  width: 28px;
+  height: 28px;
+}
+
+/* Franja vertical de iconos. */
+.win-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.win-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.win-rail-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: var(--win-radius);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.win-rail-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.win-rail-button.is-active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  box-shadow: inset 2px 0 0 var(--win-accent);
+}
+
+.win-rail-button svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Etiqueta flotante al pasar el ratón. */
+.win-rail-tip {
+  position: absolute;
+  left: calc(100% + 8px);
+  z-index: 60;
+  padding: 4px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--win-radius);
+  background: rgba(16, 48, 95, 0.97);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.win-rail-button:hover .win-rail-tip {
+  opacity: 1;
+  transform: none;
+}
+
+.win-rail-foot {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  padding: 10px 0 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.win-rail-user {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--win-accent);
+  color: #fff;
+}
+
+/* Panel azul de "Acceso rápido". */
+.win-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 212px;
+  padding: 16px 12px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(0, 0, 0, 0.22);
+  background: var(--win-sidebar);
+  color: var(--win-sidebar-text);
+}
+
+.win-panel-title {
+  margin: 0 0 2px;
+  padding: 0 6px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.win-panel-title--second {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.win-panel-list {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.win-panel-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: var(--win-radius);
+  color: var(--win-sidebar-text);
+  font-size: 12.5px;
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: background 120ms ease;
+}
+
+.win-panel-link:hover {
+  background: var(--win-sidebar-hover);
+  color: #fff;
+}
+
+.win-panel-link.is-active {
+  background: var(--win-sidebar-active);
+  color: #fff;
+  font-weight: 600;
+}
+
+.win-panel-link svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  opacity: 0.85;
+}
+
+.win-panel-link .win-tree-badge {
+  margin-left: auto;
+  background: var(--win-accent);
+  box-shadow: 0 0 0 2px rgba(16, 48, 95, 0.35);
+}
+
+/* Cuando el panel se pliega, la franja se queda con los iconos. */
+.admin-page[data-sidebar='collapsed'] .win-panel {
+  display: none;
+}
+
 }
