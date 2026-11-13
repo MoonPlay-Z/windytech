@@ -1735,6 +1735,12 @@ html.admin-page {
   font-size: 12px;
 }
 
+/* El cierre de la ventana de acceso es decorativo: la sesión se abre
+   con el formulario, no con la X. */
+.admin-login-btn--close:hover {
+  background: #c42b1c;
+}
+
 .admin-login-card {
   display: grid;
   gap: 14px;
