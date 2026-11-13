@@ -1,42 +1,23 @@
 ---
 import '../../styles/global.css';
 import '../../styles/admin.css';
-import '../../styles/admin-desktop.css';
 import '../../styles/responsive/index.css';
 import { ClientRouter } from 'astro:transitions';
 import type { AdminSession } from '../../lib/auth';
 import AdminNav from './AdminNav.astro';
-import Icon from '../Icon.astro';
 import { site } from '../../data/site';
-import { countLeadsByStatus, countQuotesByStatus } from '../../lib/db/queries';
 
 interface Props {
   title: string;
   admin: AdminSession;
   active: string;
-  /** Migas de pan: cada paso es un tramo navegable. */
-  crumbs?: { label: string; href?: string; icon?: string }[];
 }
 
-const { title, admin, active, crumbs = [] } = Astro.props;
-
-/*
- * Contadores del menú lateral: lo que está esperando respuesta. Son dos
- * consultas ligeras y se pagan en la bandeja del panel, no en cada sección.
- */
-const [contadoresLeads, contadoresQuotes] = await Promise.all([
-  countLeadsByStatus(),
-  countQuotesByStatus(),
-]);
-const leadsPendientes = contadoresLeads.new ?? 0;
-const quotesPendientes = contadoresQuotes.NEW ?? 0;
-
-// La página actual siempre es el último crumb y no lleva enlace.
-const migas = crumbs.length > 0 ? crumbs : [{ label: title }];
+const { title, admin, active } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es" class="admin-page" data-sidebar="expanded">
+<html lang="es" class="admin-page">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -48,240 +29,37 @@ const migas = crumbs.length > 0 ? crumbs : [{ label: title }];
     <ClientRouter />
   </head>
   <body class="admin-body">
-    <div class="win">
-      <div class="win-titlebar">
-        <span class="win-titlebar-icon">
-          <Icon name="ventana" size={16} />
-        </span>
-        <span class="win-titlebar-text">Panel Windytech — {title}</span>
-        <div class="win-caption">
-          <button type="button" data-window-action="minimize" aria-label="Minimizar" title="Minimizar">
-            <Icon name="minus" size={14} />
-          </button>
-          <button type="button" data-window-action="maximize" aria-label="Maximizar" title="Maximizar">
-            <Icon name="maximizar" size={13} />
-          </button>
-          <button type="button" data-window-action="close" aria-label="Cerrar sesión" title="Cerrar sesión">
-            <Icon name="close" size={14} />
-          </button>
-        </div>
-      </div>
-
-      <nav class="win-menubar" aria-label="Menú de la aplicación">
-        <div class="win-menubar-item">
-          <button type="button" class="win-menubar-trigger" data-menu="archivo" aria-expanded="false" aria-haspopup="true">
-            Archivo
-          </button>
-          <div class="win-menu" data-menu-panel="archivo" hidden>
-            <button type="button" data-menu-action="nuevo">
-              <Icon name="plus" size={15} />
-              <span>Nuevo</span>
-              <span class="win-menu-key">Ctrl+N</span>
-            </button>
-            <button type="button" data-menu-action="sitio">
-              <Icon name="arrow-up-right" size={15} />
-              <span>Ver el sitio</span>
-            </button>
-            <div class="win-menu-sep"></div>
-            <button type="button" data-logout>
-              <Icon name="log-out" size={15} />
-              <span>Cerrar sesión</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="win-menubar-item">
-          <button type="button" class="win-menubar-trigger" data-menu="editar" aria-expanded="false" aria-haspopup="true">
-            Editar
-          </button>
-          <div class="win-menu" data-menu-panel="editar" hidden>
-            <button type="button" data-menu-action="buscar">
-              <Icon name="search" size={15} />
-              <span>Buscar en el menú</span>
-              <span class="win-menu-key">Ctrl+K</span>
-            </button>
-            <button type="button" data-menu-action="refrescar">
-              <Icon name="refrescar" size={15} />
-              <span>Refrescar</span>
-              <span class="win-menu-key">F5</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="win-menubar-item">
-          <button type="button" class="win-menubar-trigger" data-menu="ver" aria-expanded="false" aria-haspopup="true">
-            Ver
-          </button>
-          <div class="win-menu" data-menu-panel="ver" hidden>
-            <button type="button" data-menu-action="panel">
-              <Icon name="panel" size={15} />
-              <span>Plegar el panel lateral</span>
-            </button>
-            <button type="button" data-menu-action="sitio">
-              <Icon name="globe" size={15} />
-              <span>Ir al sitio público</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="win-menubar-item">
-          <button type="button" class="win-menubar-trigger" data-menu="herramientas" aria-expanded="false" aria-haspopup="true">
-            Herramientas
-          </button>
-          <div class="win-menu" data-menu-panel="herramientas" hidden>
-            <button type="button" data-menu-action="cuenta">
-              <Icon name="user" size={15} />
-              <span>Panel del cliente</span>
-            </button>
-            <button type="button" data-menu-action="panel">
-              <Icon name="panel" size={15} />
-              <span>Plegar el panel lateral</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="win-menubar-item">
-          <button type="button" class="win-menubar-trigger" data-menu="ayuda" aria-expanded="false" aria-haspopup="true">
-            Ayuda
-          </button>
-          <div class="win-menu" data-menu-panel="ayuda" hidden>
-            <button type="button" data-menu-action="atajos">
-              <Icon name="teclado" size={15} />
-              <span>Atajos de teclado</span>
-              <span class="win-menu-key">?</span>
-            </button>
-            <button type="button" data-menu-action="acerca">
-              <Icon name="info" size={15} />
-              <span>Acerca del panel</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <div class="win-body">
-        <AdminNav
-          active={active}
-          role={admin.role}
-          email={admin.email}
-          leads={leadsPendientes}
-          quotes={quotesPendientes}
-        />
-
-        <div class="win-content">
-          <div class="win-addressbar">
-            <a class="win-addressbar-home" href="/admin/">
-              <Icon name="home" size={15} />
-              <span>Inicio</span>
-            </a>
-            <nav class="win-crumbs" aria-label="Ruta de navegación">
-              {
-                migas.map((miga, index) => (
-                  <>
-                    {index > 0 && (
-                      <span class="win-crumb-sep" aria-hidden="true">
-                        ›
-                      </span>
-                    )}
-                    {miga.href && index < migas.length - 1 ? (
-                      <a class="win-crumb" href={miga.href}>
-                        {miga.icon && <Icon name={miga.icon} size={14} />}
-                        {miga.label}
-                      </a>
-                    ) : (
-                      <span class="win-crumb" aria-current="page">
-                        {miga.icon && <Icon name={miga.icon} size={14} />}
-                        {miga.label}
-                      </span>
-                    )}
-                  </>
-                ))
-              }
-            </nav>
-          </div>
-
-          <div class="win-toolbar">
-            <label class="win-toolbar-search">
-              <Icon name="search" size={15} />
-              <input
-                type="search"
-                placeholder="Buscar en el panel…"
-                aria-label="Buscar en el panel"
-                data-admin-search
-                autocomplete="off"
-              />
-            </label>
-            <slot name="toolbar" />
-            <span class="win-toolbar-spacer"></span>
-            <span class="win-toolbar-status">
-              <Icon name="clock" size={13} />
-              <span>Sesión segura</span>
-            </span>
-            <a class="admin-btn admin-btn--sm" href={site.url} target="_blank" rel="noopener">
-              Ver sitio
-              <Icon name="arrow-up-right" size={13} />
-            </a>
-          </div>
-
-          <div class="win-workspace">
-            <slot />
-          </div>
-        </div>
-      </div>
-
-      <div class="win-taskbar">
-        <a class="win-taskbar-start" href="/admin/">
-          <img src="/assets/logo-mark-96.webp" alt="" width="22" height="22" />
-          <span>Windytech</span>
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <a class="admin-brand" href="/admin/">
+          <img src="/assets/logo-mark-96.webp" alt="" width="40" height="40" />
+          <span>Windytech<small>Panel</small></span>
         </a>
-        <label class="win-taskbar-search">
-          <Icon name="search" size={14} />
-          <input
-            type="search"
-            placeholder="Escribir aquí para buscar…"
-            aria-label="Buscar en el panel"
-            data-admin-search
-            autocomplete="off"
-          />
-        </label>
-        <div class="win-taskbar-apps">
-          <a class:list={['win-taskbar-app', { 'is-active': active === 'dashboard' }]} href="/admin/">
-            <Icon name="dashboard" size={15} />
-            <span>Resumen</span>
-          </a>
-          <a class:list={['win-taskbar-app', { 'is-active': active === 'products' }]} href="/admin/productos/">
-            <Icon name="productos" size={15} />
-            <span>Productos</span>
-          </a>
-          <a class:list={['win-taskbar-app', { 'is-active': active === 'quotes' }]} href="/admin/cotizaciones/">
-            <Icon name="cotizaciones" size={15} />
-            <span>Cotizaciones</span>
-          </a>
-          <a class:list={['win-taskbar-app', { 'is-active': active === 'leads' }]} href="/admin/leads/">
-            <Icon name="leads" size={15} />
-            <span>Consultas</span>
-          </a>
-          <a class:list={['win-taskbar-app', { 'is-active': active === 'trackings' }]} href="/admin/seguimientos/">
-            <Icon name="seguimientos" size={15} />
-            <span>Seguimientos</span>
-          </a>
+        <AdminNav active={active} role={admin.role} />
+        <div class="admin-sidebar-footer">
+          <span>{admin.email}</span>
+          <span class="admin-role">{admin.role}</span>
+          <a href="/admin/perfil/" class="admin-btn admin-btn--ghost" style="font-size:12px">Mi perfil</a>
+          <button type="button" class="admin-btn admin-btn--ghost" data-logout>Cerrar sesión</button>
         </div>
-        <div class="win-taskbar-tray">
-          <a class="win-taskbar-app" href={site.url} target="_blank" rel="noopener" title="Ver el sitio">
-            <Icon name="globe" size={15} />
-          </a>
-          <span class="win-taskbar-clock" data-clock>
-            <strong>--:--</strong>
-            <small>--/--/----</small>
-          </span>
-        </div>
+      </aside>
+
+      <div class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <span class="admin-overline">WINDYTECH / ADMINISTRACIÓN</span>
+            <h1>{title}</h1>
+          </div>
+          <div class="admin-topbar-actions">
+            <span class="admin-online"><span></span> Sesión segura</span>
+            <a class="admin-btn admin-btn--ghost" href={site.url} target="_blank" rel="noopener">
+              Ver sitio <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </header>
+        <slot />
       </div>
     </div>
-
-    <div class="win-toast-area" data-toast-area aria-live="polite"></div>
-
-    <script>
-      import '../../scripts/admin-desktop';
-    </script>
     <script>
       import '../../scripts/admin';
     </script>

@@ -20,9 +20,7 @@ const esTranslation = translations.find((item: any) => item.locale === 'es') ?? 
 const price = (plan.priceCents / 100).toFixed(2);
 ---
 
-<AdminLayout title="Editar paquete" admin={admin} active="services"
-  crumbs={[{ label: 'Paquetes', href: '/admin/servicios/', icon: 'paquetes' }, { label: 'Servicios', href: '/admin/servicios/', icon: 'paquetes' }, { label: 'Editar paquete' }]}
->
+<AdminLayout title="Editar paquete" admin={admin} active="services">
   <section class="admin-card">
     <h2>Editar paquete de servicio</h2>
     <form

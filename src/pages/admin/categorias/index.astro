@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listCategoriesAdmin } from '../../../lib/db/queries';
 
@@ -12,25 +11,14 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const categories = await listCategoriesAdmin();
 ---
 
-<AdminLayout title="Categorías" admin={admin} active="categories"
-  crumbs={[{ label: 'Catálogo', href: '/admin/productos/', icon: 'productos' }, { label: 'Categorías', icon: 'categorias' }]}
->
+<AdminLayout title="Categorías" admin={admin} active="categories">
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nueva/">Nueva categoría</a>
     </header>
-    <AdminTable
-      empty="Sin registros."
-      columns={[
-    { key: 'numero', label: 'Número' },
-    { key: 'nombre', label: 'Nombre' },
-    { key: 'slug', label: 'Slug' },
-    { key: 'productos', label: 'Productos' },
-      ]}
-    >
-      <table class="admin-table win-table-grid">
+    <table class="admin-table">
       <thead>
-        <tr><th data-column="numero" style="width:40px">#</th><th data-column="nombre">Nombre (ES)</th><th data-column="slug">Slug ES</th><th data-column="productos">Productos</th><th>Acciones</th></tr>
+        <tr><th style="width:40px">#</th><th>Nombre (ES)</th><th>Slug ES</th><th>Productos</th><th>Acciones</th></tr>
       </thead>
       <tbody>
         {categories.map((category) => (
@@ -52,10 +40,6 @@ const categories = await listCategoriesAdmin();
         ))}
         {categories.length === 0 && <tr><td colspan="5">Sin categorías.</td></tr>}
       </tbody>
-      </table>
-    </AdminTable>
+    </table>
   </section>
-  <script>
-    import '../../../scripts/admin-table';
-  </script>
 </AdminLayout>

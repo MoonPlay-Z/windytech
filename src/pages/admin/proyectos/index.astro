@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listProjectsAdmin } from '../../../lib/db/queries';
 
@@ -12,27 +11,14 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const projects = await listProjectsAdmin();
 ---
 
-<AdminLayout title="Proyectos" admin={admin} active="projects"
-  crumbs={[{ label: 'Contenido', icon: 'proyectos' }, { label: 'Proyectos' }]}
->
+<AdminLayout title="Proyectos" admin={admin} active="projects">
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Nuevo proyecto</a>
     </header>
-    <AdminTable
-      empty="Sin registros."
-      columns={[
-    { key: 'numero', label: 'Número' },
-    { key: 'titulo', label: 'Título' },
-    { key: 'anio', label: 'Año' },
-    { key: 'cliente', label: 'Cliente' },
-    { key: 'publicado', label: 'Publicado' },
-    { key: 'aprobado', label: 'Aprobado' },
-      ]}
-    >
-      <table class="admin-table win-table-grid">
+    <table class="admin-table">
       <thead>
-        <tr><th data-column="numero" style="width:40px">#</th><th data-column="titulo">Título</th><th data-column="anio">Año</th><th data-column="cliente">Cliente</th><th data-column="publicado">Publicado</th><th data-column="aprobado">Aprobado</th></tr>
+        <tr><th style="width:40px">#</th><th>Título</th><th>Año</th><th>Cliente</th><th>Publicado</th><th>Aprobado</th></tr>
       </thead>
       <tbody>
         {projects.map((project) => (
@@ -47,10 +33,6 @@ const projects = await listProjectsAdmin();
         ))}
         {projects.length === 0 && <tr><td colspan="6">Sin proyectos.</td></tr>}
       </tbody>
-      </table>
-    </AdminTable>
+    </table>
   </section>
-  <script>
-    import '../../../scripts/admin-table';
-  </script>
 </AdminLayout>

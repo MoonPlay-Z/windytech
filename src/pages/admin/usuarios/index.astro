@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { requireOwner } from '../../../lib/api';
 import { listAdmins } from '../../../lib/db/queries';
@@ -14,26 +13,15 @@ if (!requireOwner(admin)) return Astro.redirect('/admin/', 302);
 const users = await listAdmins();
 ---
 
-<AdminLayout title="Usuarios" admin={admin} active="users"
-  crumbs={[{ label: 'Ajustes', href: '/admin/perfil/', icon: 'ajustes' }, { label: 'Usuarios', icon: 'usuarios' }]}
->
+<AdminLayout title="Usuarios" admin={admin} active="users">
   <section class="admin-card">
-    <AdminTable
-      empty="Sin registros."
-      columns={[
-    { key: 'numero', label: 'Número' },
-    { key: 'correo', label: 'Correo' },
-    { key: 'rol', label: 'Rol' },
-    { key: 'activo', label: 'Activo' },
-      ]}
-    >
-      <table class="admin-table win-table-grid">
+    <table class="admin-table">
       <thead>
         <tr>
-          <th data-column="numero" style="width:40px">#</th>
-          <th data-column="correo">Correo</th>
-          <th data-column="rol">Rol</th>
-          <th data-column="activo">Activo</th>
+          <th style="width:40px">#</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Activo</th>
           <th style="width:170px">Acciones</th>
         </tr>
       </thead>
@@ -67,12 +55,8 @@ const users = await listAdmins();
           <tr><td colspan="5">Sin usuarios.</td></tr>
         )}
       </tbody>
-      </table>
-    </AdminTable>
+    </table>
   </section>
-  <script>
-    import '../../../scripts/admin-table';
-  </script>
 </AdminLayout>
 
 <script>

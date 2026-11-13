@@ -78,37 +78,6 @@ export const ICON_GROUPS = {
     youtube: 'simple-icons:youtube',
     tiktok: 'simple-icons:tiktok',
   },
-
-  /** Panel de administración: cada sección tiene su icono. */
-  admin: {
-    dashboard: 'lucide:layout-dashboard',
-    cotizaciones: 'lucide:receipt',
-    leads: 'lucide:user-plus',
-    seguimientos: 'lucide:list-checks',
-    productos: 'lucide:package',
-    categorias: 'lucide:tags',
-    promociones: 'lucide:badge-percent',
-    proyectos: 'lucide:layout-template',
-    publicaciones: 'lucide:file-text',
-    paquetes: 'lucide:layers',
-    perfil: 'lucide:user-cog',
-    usuarios: 'lucide:users',
-    ajustes: 'lucide:settings',
-    home: 'lucide:house',
-    ventana: 'lucide:app-window',
-    refrescar: 'lucide:refresh-cw',
-    descargar: 'lucide:download',
-    filtro: 'lucide:list-filter',
-    ordenar: 'lucide:arrow-up-down',
-    expandir: 'lucide:chevron-right',
-    maximizar: 'lucide:square',
-    restaurar: 'lucide:copy',
-    panel: 'lucide:panel-left',
-    teclado: 'lucide:keyboard',
-    ayuda: 'lucide:circle-help',
-    mas: 'lucide:ellipsis-vertical',
-    papelera: 'lucide:trash-2',
-  },
 } as const;
 
 /** Todos los iconos, sin duplicados, listos para usar por nombre. */

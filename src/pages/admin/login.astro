@@ -1,7 +1,6 @@
 ---
 import '../../styles/global.css';
 import '../../styles/admin.css';
-import '../../styles/admin-desktop.css';
 import '../../styles/responsive/index.css';
 import { sessionFromRequest } from '../../lib/auth';
 
@@ -12,7 +11,7 @@ if (admin) return Astro.redirect('/admin/', 302);
 ---
 
 <!doctype html>
-<html lang="es" class="admin-page">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,61 +19,23 @@ if (admin) return Astro.redirect('/admin/', 302);
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
   </head>
-  <body class="admin-body admin-body--login">
+  <body class="admin-body">
     <main class="admin-login">
-      <div class="admin-login-window">
-        <header class="win-dialog-titlebar admin-login-titlebar">
-          <span class="win-dialog-title">Panel Windytech — Acceso</span>
-          <span class="admin-login-window-buttons" aria-hidden="true">
-            <span class="admin-login-btn"><span aria-hidden="true">─</span></span>
-            <span class="admin-login-btn"><span aria-hidden="true">☐</span></span>
-            <span class="admin-login-btn admin-login-btn--close"><span aria-hidden="true">✕</span></span>
-          </span>
-        </header>
-
-        <form class="admin-login-card admin-form" data-login-form>
-          <div class="admin-login-brand">
-            <img src="/assets/logo-mark-96.webp" alt="" width="52" height="52" />
-            <div>
-              <strong>Windytech</strong>
-              <span>Panel de administración</span>
-            </div>
-          </div>
-
-          <p class="admin-hint">
-            Acceso para el equipo autorizado. Las sesiones duran 8 horas.
-          </p>
-
-          <label>
-            <span>Correo</span>
-            <input
-              type="email"
-              name="email"
-              autocomplete="username"
-              placeholder="tu@windytech.studio"
-              required
-            />
-          </label>
-          <label>
-            <span>Contraseña</span>
-            <input
-              type="password"
-              name="password"
-              autocomplete="current-password"
-              minlength="8"
-              required
-            />
-          </label>
-
-          <p class="admin-message" data-form-message hidden></p>
-
-          <button class="admin-btn admin-btn--primary" type="submit">Entrar</button>
-
-          <p class="admin-hint">
-            ¿Olvidaste la contraseña? Pide al propietario que la restablezca.
-          </p>
-        </form>
-      </div>
+      <form class="admin-login-card admin-form" data-login-form>
+        <h1>Panel Windytech</h1>
+        <p class="admin-hint">Acceso para el equipo autorizado. Las sesiones duran 8 horas.</p>
+        <label>
+          <span>Correo</span>
+          <input type="email" name="email" autocomplete="username" required />
+        </label>
+        <label>
+          <span>Contraseña</span>
+          <input type="password" name="password" autocomplete="current-password" minlength="8" required />
+        </label>
+        <p class="admin-message" data-form-message hidden></p>
+        <button class="admin-btn" type="submit">Entrar</button>
+        <p class="admin-hint">¿Olvidaste la contraseña? Pide al propietario que la restablezca.</p>
+      </form>
     </main>
     <script>
       import '../../scripts/admin';

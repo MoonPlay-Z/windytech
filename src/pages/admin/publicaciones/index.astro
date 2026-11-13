@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listPostsAdmin } from '../../../lib/db/queries';
 
@@ -12,25 +11,14 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const posts = await listPostsAdmin();
 ---
 
-<AdminLayout title="Publicaciones" admin={admin} active="posts"
-  crumbs={[{ label: 'Contenido', href: '/admin/proyectos/', icon: 'proyectos' }, { label: 'Publicaciones', icon: 'publicaciones' }]}
->
+<AdminLayout title="Publicaciones" admin={admin} active="posts">
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nueva/">Nueva publicación</a>
     </header>
-    <AdminTable
-      empty="Sin registros."
-      columns={[
-    { key: 'numero', label: 'Número' },
-    { key: 'titulo', label: 'Título' },
-    { key: 'autor', label: 'Autor' },
-    { key: 'publicada', label: 'Publicada' },
-      ]}
-    >
-      <table class="admin-table win-table-grid">
+    <table class="admin-table">
       <thead>
-        <tr><th data-column="numero" style="width:40px">#</th><th data-column="titulo">Título (ES)</th><th data-column="autor">Autor</th><th data-column="publicada">Publicada</th><th>Acciones</th></tr>
+        <tr><th style="width:40px">#</th><th>Título (ES)</th><th>Autor</th><th>Publicada</th><th>Acciones</th></tr>
       </thead>
       <tbody>
         {posts.map((post) => (
@@ -55,10 +43,6 @@ const posts = await listPostsAdmin();
         ))}
         {posts.length === 0 && <tr><td colspan="5">Sin publicaciones.</td></tr>}
       </tbody>
-      </table>
-    </AdminTable>
+    </table>
   </section>
-  <script>
-    import '../../../scripts/admin-table';
-  </script>
 </AdminLayout>

@@ -12,9 +12,7 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
 const categories = await listCategoriesAdmin();
 ---
 
-<AdminLayout title="Nuevo producto" admin={admin} active="products"
-  crumbs={[{ label: 'Catálogo', href: '/admin/productos/', icon: 'productos' }, { label: 'Productos', href: '/admin/productos/', icon: 'productos' }, { label: 'Nuevo producto' }]}
->
+<AdminLayout title="Nuevo producto" admin={admin} active="products">
   <section class="admin-card">
     <h2>Nuevo producto</h2>
     <form class="admin-form" data-admin-form data-endpoint="/api/admin/products" data-success="Producto creado." data-redirect="/admin/productos/">

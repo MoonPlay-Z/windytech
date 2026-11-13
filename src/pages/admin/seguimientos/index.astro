@@ -1,7 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import AdminTable from '../../../components/admin/AdminTable.astro';
-import AdminDialog from '../../../components/admin/AdminDialog.astro';
 import Icon from '../../../components/Icon.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listTrackingsAdmin } from '../../../lib/db/queries';
@@ -22,37 +20,23 @@ const fecha = (value: string | null) =>
     : null;
 ---
 
-<AdminLayout title="Seguimientos" admin={admin} active="trackings"
-  crumbs={[{ label: 'Ventas', href: '/admin/cotizaciones/', icon: 'cotizaciones' }, { label: 'Seguimientos', icon: 'seguimientos' }]}
->
+<AdminLayout title="Seguimientos" admin={admin} active="trackings">
   <section class="admin-card">
     <header class="admin-actions">
-      <button type="button" class="admin-btn" data-open-dialog="dialogo-seguimiento" data-admin-nuevo>+ Nuevo seguimiento</button>
+      <a class="admin-btn" href="#nuevo">+ Nuevo seguimiento</a>
       <span class="admin-text-muted">{trackings.length} seguimientos</span>
     </header>
 
-    <AdminTable
-      empty="Sin registros."
-      columns={[
-    { key: 'numero', label: 'Número' },
-    { key: 'cliente', label: 'Cliente' },
-    { key: 'seguimiento', label: 'Seguimiento' },
-    { key: 'tipo', label: 'Tipo' },
-    { key: 'estado', label: 'Estado' },
-    { key: 'avance', label: 'Avance' },
-    { key: 'entrega', label: 'Entrega' },
-      ]}
-    >
-      <table class="admin-table win-table-grid">
+    <table class="admin-table">
       <thead>
         <tr>
-          <th data-column="numero" style="width:40px">#</th>
-          <th data-column="cliente">Cliente</th>
-          <th data-column="seguimiento">Seguimiento</th>
-          <th data-column="tipo">Tipo</th>
-          <th data-column="estado" style="width:220px">Estado</th>
-          <th data-column="avance">Avance</th>
-          <th data-column="entrega">Entrega</th>
+          <th style="width:40px">#</th>
+          <th>Cliente</th>
+          <th>Seguimiento</th>
+          <th>Tipo</th>
+          <th style="width:220px">Estado</th>
+          <th>Avance</th>
+          <th>Entrega</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -129,80 +113,82 @@ const fecha = (value: string | null) =>
           )
         }
       </tbody>
-      </table>
-    </AdminTable>
+    </table>
   </section>
 
-  <AdminDialog id="dialogo-seguimiento" title="Nuevo seguimiento">
-      <form
-        class="admin-form"
-        data-admin-form
-        data-endpoint="/api/admin/trackings"
-        data-success="Seguimiento creado."
-        data-redirect="/admin/seguimientos/"
-      >
-        <div class="admin-form-row">
-          <label>
-            <span>Cliente (coro)</span>
-            <input type="email" name="customerEmail" data-field="customerEmail" placeholder="cliente@ejemplo.com" required />
-          </label>
-          <label>
-            <span>Tipo</span>
-            <select name="kind" data-field="kind" data-tracking-kind-select>
-              {TRACKING_KIND_LIST.map((kind) => (
-                <option value={kind.id}>{kind.plural}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>Estado</span>
-            <select name="status" data-field="status" data-tracking-status-select>
-              {TRACKING_KIND_LIST[0].statuses.map((status) => (
-                <option value={status.id}>{status.label}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div class="admin-form-row">
-          <label>
-            <span>Título</span>
-            <input type="text" name="title" data-field="title" placeholder="Automatización de WhatsApp" required />
-          </label>
-          <label>
-            <span>Referencia</span>
-            <input type="text" name="reference" data-field="reference" placeholder="WQ-2026-0001" />
-          </label>
-          <label>
-            <span>Avance (%)</span>
-            <input type="number" name="progress" data-field="progress" data-type="number" min="0" max="100" value="0" />
-          </label>
-        </div>
-        <div class="admin-form-row">
-          <label>
-            <span>Entrega estimada</span>
-            <input type="date" name="eta" data-field="eta" />
-          </label>
-          <label>
-            <span>Nota inicial</span>
-            <input type="text" name="note" data-field="note" placeholder="Seguimiento creado desde el panel" />
-          </label>
-        </div>
+  <section class="admin-card" id="nuevo">
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">ALTA</p>
+        <h2>Nuevo seguimiento</h2>
+      </div>
+    </div>
+
+    <form
+      class="admin-form"
+      data-admin-form
+      data-endpoint="/api/admin/trackings"
+      data-success="Seguimiento creado."
+      data-redirect="/admin/seguimientos/"
+    >
+      <div class="admin-form-row">
         <label>
-          <span>Resumen para el cliente</span>
-          <textarea name="summary" data-field="summary" rows="3"></textarea>
+          <span>Cliente (coro)</span>
+          <input type="email" name="customerEmail" data-field="customerEmail" placeholder="cliente@ejemplo.com" required />
         </label>
-        <p class="admin-message" data-form-message hidden></p>
-        <div class="admin-actions">
-          <button class="admin-btn" type="submit">Crear seguimiento</button>
-        </div>
-      </form>
-  </AdminDialog>
+        <label>
+          <span>Tipo</span>
+          <select name="kind" data-field="kind" data-tracking-kind-select>
+            {TRACKING_KIND_LIST.map((kind) => (
+              <option value={kind.id}>{kind.plural}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Estado</span>
+          <select name="status" data-field="status" data-tracking-status-select>
+            {TRACKING_KIND_LIST[0].statuses.map((status) => (
+              <option value={status.id}>{status.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Título</span>
+          <input type="text" name="title" data-field="title" placeholder="Automatización de WhatsApp" required />
+        </label>
+        <label>
+          <span>Referencia</span>
+          <input type="text" name="reference" data-field="reference" placeholder="WQ-2026-0001" />
+        </label>
+        <label>
+          <span>Avance (%)</span>
+          <input type="number" name="progress" data-field="progress" data-type="number" min="0" max="100" value="0" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Entrega estimada</span>
+          <input type="date" name="eta" data-field="eta" />
+        </label>
+        <label>
+          <span>Nota inicial</span>
+          <input type="text" name="note" data-field="note" placeholder="Seguimiento creado desde el panel" />
+        </label>
+      </div>
+      <label>
+        <span>Resumen para el cliente</span>
+        <textarea name="summary" data-field="summary" rows="3"></textarea>
+      </label>
+      <p class="admin-message" data-form-message hidden></p>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Crear seguimiento</button>
+      </div>
+    </form>
+  </section>
 
   <script>
     import '../../../scripts/trackings';
-  </script>
-  <script>
-    import '../../../scripts/admin-table';
-    import '../../../scripts/admin-dialog';
   </script>
 </AdminLayout>
