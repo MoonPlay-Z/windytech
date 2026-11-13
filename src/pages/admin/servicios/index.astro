@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listServicePlansAdmin } from '../../../lib/db/queries';
 
@@ -24,14 +25,24 @@ const periodLabels: Record<string, string> = {
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Nuevo paquete</a>
     </header>
-    <table class="admin-table">
+    <AdminTable
+      empty="Sin registros."
+      columns={[
+    { key: 'numero', label: 'Número' },
+    { key: 'paquete', label: 'Paquete' },
+    { key: 'precio', label: 'Precio' },
+    { key: 'tiempo', label: 'Tiempo de aplicación' },
+    { key: 'estado', label: 'Estado' },
+      ]}
+    >
+      <table class="admin-table win-table-grid">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Paquete</th>
-          <th>Precio</th>
-          <th>Tiempo de aplicación</th>
-          <th>Estado</th>
+          <th data-column="numero" style="width:40px">#</th>
+          <th data-column="paquete">Paquete</th>
+          <th data-column="precio">Precio</th>
+          <th data-column="tiempo">Tiempo de aplicación</th>
+          <th data-column="estado">Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -68,6 +79,10 @@ const periodLabels: Record<string, string> = {
           <tr><td colspan="6">Sin paquetes. Crea el primero para mostrarlo en la página de servicios.</td></tr>
         )}
       </tbody>
-    </table>
+      </table>
+    </AdminTable>
   </section>
+  <script>
+    import '../../../scripts/admin-table';
+  </script>
 </AdminLayout>

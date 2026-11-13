@@ -1,0 +1,65 @@
+---
+/**
+ * Tabla del panel con comportamiento de hoja de cálculo.
+ *
+ * Aporta: orden por columna, filtros por columna, paginación, selección
+ * múltiple y badges de estado. Es puramente de presentación: cada página
+ * sigue pintando sus propias filas.
+ */
+
+interface Props {
+  /** Columnas ordenables. `key` es el nombre del campo en la fila. */
+  columns?: { key: string; label: string; sortable?: boolean; width?: string }[];
+  /** Clave del campo por el que se ordena al principio. */
+  sort?: string;
+  /** Filas por página. */
+  perPage?: number;
+  /** Texto cuando no hay filas. */
+  empty?: string;
+  class?: string;
+}
+
+const {
+  columns = [],
+  sort = '',
+  perPage = 25,
+  empty = 'Sin registros.',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['win-table', className]} data-win-table>
+  {
+    columns.length > 0 && (
+      <div class="win-table-filters" data-table-filters>
+        {columns.map((column) => (
+          <input
+            type="search"
+            class="win-table-filter"
+            data-filter-column={column.key}
+            placeholder={`Filtrar ${column.label.toLowerCase()}`}
+            aria-label={`Filtrar por ${column.label}`}
+            autocomplete="off"
+          />
+        ))}
+      </div>
+    )
+  }
+
+  <div class="win-table-scroll">
+    <table class="admin-table win-table-grid">
+      <slot />
+    </table>
+  </div>
+
+  <div class="win-table-foot">
+    <p class="win-table-count" data-table-count>0 registros</p>
+    <div class="win-table-pager" data-table-pager>
+      <button type="button" class="admin-btn admin-btn--sm" data-page-prev>Anterior</button>
+      <span data-page-label>1 de 1</span>
+      <button type="button" class="admin-btn admin-btn--sm" data-page-next>Siguiente</button>
+    </div>
+  </div>
+
+  <p class="win-table-empty" data-table-empty hidden>{empty}</p>
+</div>

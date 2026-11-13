@@ -157,24 +157,58 @@ function setupForms() {
       const endpoint = form.dataset.endpoint ?? '';
       const redirect = form.dataset.redirect ?? '';
       const button = form.querySelector<HTMLButtonElement>('[type="submit"]');
-      if (button) button.disabled = true;
+      const textoOriginal = button?.textContent ?? '';
+
+      if (button) {
+        button.disabled = true;
+        button.dataset.cargando = 'true';
+        button.textContent = 'Guardando…';
+      }
+
       try {
         const { payload, errors } = collect(form);
         if (errors.length > 0) {
           message(form, errors[0]);
+          avisar(errors[0], 'error');
           return;
         }
         await submitJson(endpoint, 'POST', payload);
-        message(form, form.dataset.success ?? 'Guardado.', 'ok');
+        const exito = form.dataset.success ?? 'Guardado.';
+        message(form, exito, 'ok');
+        avisar(exito, 'ok');
         if (redirect) window.location.href = redirect;
         else window.location.reload();
       } catch (error) {
-        message(form, error instanceof Error ? error.message : 'Error');
+        const fallo = error instanceof Error ? error.message : 'Error';
+        message(form, fallo);
+        avisar(fallo, 'error');
       } finally {
-        if (button) button.disabled = false;
+        if (button) {
+          button.disabled = false;
+          delete button.dataset.cargando;
+          button.textContent = textoOriginal;
+        }
       }
     });
   });
+}
+
+/** Muestra un aviso flotante en la esquina de la pantalla. */
+function avisar(texto: string, tipo: 'ok' | 'error' | 'info') {
+  const area = document.querySelector<HTMLElement>('[data-toast-area]');
+  if (!area) return;
+
+  const nodo = document.createElement('div');
+  nodo.className = 'win-toast';
+  nodo.dataset.kind = tipo;
+  nodo.textContent = texto;
+  area.append(nodo);
+
+  window.setTimeout(() => {
+    nodo.style.opacity = '0';
+    nodo.style.transition = 'opacity 220ms ease';
+    window.setTimeout(() => nodo.remove(), 240);
+  }, 4200);
 }
 
 function setupDelete() {
@@ -188,9 +222,11 @@ function setupDelete() {
       if (!window.confirm(confirmText)) return;
       try {
         await submitJson(endpoint, 'DELETE');
+        avisar('Registro eliminado.', 'ok');
         window.location.reload();
       } catch (error) {
-        window.alert(error instanceof Error ? error.message : 'Error');
+        const fallo = error instanceof Error ? error.message : 'Error';
+        avisar(fallo, 'error');
       }
     });
   });
@@ -377,6 +413,17 @@ function setupQuoteStatus() {
     if (select.dataset.wtBound === 'true') return;
     select.dataset.wtBound = 'true';
 
+    // El badge de la celda refleja el estado y se repinta al cambiarlo.
+    const celda = select.closest<HTMLTableCellElement>('td');
+    const badge = celda?.querySelector<HTMLElement>('[data-quote-badge]');
+    const tonos: Record<string, string> = {
+      NEW: 'ok',
+      CONTACTED: 'info',
+      QUOTED: 'warn',
+      CLOSED: 'info',
+      LOST: 'error',
+    };
+
     select.addEventListener('change', async () => {
       try {
         await submitJson('/api/admin/quotes', 'PATCH', {
@@ -384,6 +431,11 @@ function setupQuoteStatus() {
           status: select.value,
         });
         select.dataset.saved = 'true';
+        if (badge) {
+          badge.dataset.tone = tonos[select.value] ?? 'neutral';
+          badge.textContent = select.options[select.selectedIndex]?.text ?? select.value;
+        }
+        if (celda) celda.dataset.value = select.value;
       } catch (error) {
         window.alert(error instanceof Error ? error.message : 'Error');
       }

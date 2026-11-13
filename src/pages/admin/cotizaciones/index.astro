@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listQuotes } from '../../../lib/db/queries';
 
@@ -9,44 +10,90 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const quotes = await listQuotes();
+
+/** Estado de la cotización con su color: es la columna que más se mira. */
+const estados: Record<string, { label: string; tone: string }> = {
+  NEW: { label: 'Nueva', tone: 'ok' },
+  CONTACTED: { label: 'Contactada', tone: 'info' },
+  QUOTED: { label: 'Cotizada', tone: 'warn' },
+  CLOSED: { label: 'Cerrada', tone: 'info' },
+  LOST: { label: 'Perdida', tone: 'error' },
+};
 ---
 
 <AdminLayout title="Cotizaciones" admin={admin} active="quotes"
   crumbs={[{ label: 'Ventas', href: '/admin/leads/', icon: 'leads' }, { label: 'Cotizaciones', icon: 'cotizaciones' }]}
 >
   <section class="admin-card">
-    <table class="admin-table">
+    <header class="admin-actions">
+      <a class="admin-btn admin-btn--ghost" href="/cotizaciones/">Ver como cliente</a>
+      <span class="admin-text-muted">{quotes.length} cotizaciones</span>
+    </header>
+
+    <AdminTable
+      empty="Sin cotizaciones todavía."
+      columns={[
+        { key: 'numero', label: 'Número' },
+        { key: 'cliente', label: 'Cliente' },
+        { key: 'telefono', label: 'Teléfono' },
+        { key: 'total', label: 'Total' },
+        { key: 'estado', label: 'Estado' },
+        { key: 'fecha', label: 'Fecha' },
+      ]}
+    >
       <thead>
         <tr>
-          <th style="width:110px">Número</th>
-          <th>Cliente</th>
-          <th>Teléfono</th>
-          <th style="width:90px">Total</th>
-          <th style="width:90px">Estado</th>
-          <th style="width:130px">Fecha</th>
+          <th data-column="numero" style="width:120px">Número</th>
+          <th data-column="cliente">Cliente</th>
+          <th data-column="telefono">Teléfono</th>
+          <th data-column="total" style="width:110px">Total</th>
+          <th data-column="estado" style="width:150px">Estado</th>
+          <th data-column="fecha" style="width:130px">Fecha</th>
         </tr>
       </thead>
       <tbody>
-        {quotes.map((quote) => (
-          <tr>
-            <td><a href={`/cotizacion/${quote.publicToken}/`}>{quote.number}</a></td>
-            <td>{quote.customerName}</td>
-            <td>{quote.phone}</td>
-            <td>${(quote.totalCents / 100).toFixed(2)} {quote.currency}</td>
-            <td>
-              <select data-quote-status={quote.id}>
-                <option value="NEW" selected={quote.status === 'NEW'}>Nueva</option>
-                <option value="CONTACTED" selected={quote.status === 'CONTACTED'}>Contactada</option>
-                <option value="QUOTED" selected={quote.status === 'QUOTED'}>Cotizada</option>
-                <option value="CLOSED" selected={quote.status === 'CLOSED'}>Cerrada</option>
-                <option value="LOST" selected={quote.status === 'LOST'}>Perdida</option>
-              </select>
-            </td>
-            <td>{new Date(quote.createdAt).toLocaleDateString('es-VE')}</td>
-          </tr>
-        ))}
-        {quotes.length === 0 && <tr><td colspan="6">Sin cotizaciones.</td></tr>}
+        {
+          quotes.map((quote) => {
+            const estado = estados[quote.status] ?? {
+              label: quote.status,
+              tone: 'neutral',
+            };
+            return (
+              <tr>
+                <td>
+                  <a href={`/cotizacion/${quote.publicToken}/`}>{quote.number}</a>
+                </td>
+                <td>{quote.customerName}</td>
+                <td>{quote.phone}</td>
+                <td class="win-num">
+                  ${(quote.totalCents / 100).toFixed(2)} {quote.currency}
+                </td>
+                <td data-value={quote.status}>
+                  <span class="win-badge" data-tone={estado.tone} data-quote-badge>
+                    {estado.label}
+                  </span>
+                  <select
+                    class="admin-select win-status-select"
+                    data-quote-status={quote.id}
+                    aria-label={`Estado de la cotización ${quote.number}`}
+                  >
+                    <option value="NEW" selected={quote.status === 'NEW'}>Nueva</option>
+                    <option value="CONTACTED" selected={quote.status === 'CONTACTED'}>Contactada</option>
+                    <option value="QUOTED" selected={quote.status === 'QUOTED'}>Cotizada</option>
+                    <option value="CLOSED" selected={quote.status === 'CLOSED'}>Cerrada</option>
+                    <option value="LOST" selected={quote.status === 'LOST'}>Perdida</option>
+                  </select>
+                </td>
+                <td>{new Date(quote.createdAt).toLocaleDateString('es-VE')}</td>
+              </tr>
+            );
+          })
+        }
       </tbody>
-    </table>
+    </AdminTable>
   </section>
+
+  <script>
+    import '../../../scripts/admin-table';
+  </script>
 </AdminLayout>

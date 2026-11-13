@@ -1,0 +1,48 @@
+---
+/**
+ * Diálogo del panel, con aspecto de ventana de Windows.
+ *
+ * Se abre con `data-open-dialog` (un botón que lleva al id del diálogo) y se
+ * cierra con la X, con Escape o pulsando fuera. El contenido se pinta siempre
+ * en el HTML: el diálogo solo lo muestra u oculta, así que el formulario
+ * sigue funcionando igual (y es indexable por los navegadores).
+ */
+
+interface Props {
+  /** Identificador del diálogo. */
+  id: string;
+  title: string;
+  /** Texto del botón que abre el diálogo. */
+  trigger?: string;
+  /** Icono del botón que abre el diálogo. */
+  triggerIcon?: string;
+  class?: string;
+}
+
+import Icon from '../Icon.astro';
+
+const { id, title, trigger, triggerIcon, class: className = '' } = Astro.props;
+---
+
+{
+  trigger && (
+    <button type="button" class="admin-btn" data-open-dialog={id}>
+      {triggerIcon && <Icon name={triggerIcon} size={15} />}
+      {trigger}
+    </button>
+  )
+}
+
+<div class="win-dialog" id={id} role="dialog" aria-modal="true" aria-label={title} hidden>
+  <div class="win-dialog-frame">
+    <header class="win-dialog-titlebar">
+      <span class="win-dialog-title">{title}</span>
+      <button type="button" class="win-dialog-close" data-close-dialog aria-label="Cerrar">
+        <Icon name="close" size={14} />
+      </button>
+    </header>
+    <div class="win-dialog-body">
+      <slot />
+    </div>
+  </div>
+</div>

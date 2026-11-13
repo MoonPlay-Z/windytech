@@ -1,5 +1,7 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listProductsAdmin } from '../../../lib/db/queries';
 
@@ -9,6 +11,13 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const products = await listProductsAdmin();
+
+/** Disponibilidad con su color: es lo que más se mira en esta tabla. */
+const disponibilidad: Record<string, { label: string; tone: string }> = {
+  IN_STOCK: { label: 'Disponible', tone: 'ok' },
+  OUT_OF_STOCK: { label: 'Agotado', tone: 'error' },
+  PREORDER: { label: 'Preventa', tone: 'warn' },
+};
 ---
 
 <AdminLayout title="Productos" admin={admin} active="products"
@@ -16,47 +25,83 @@ const products = await listProductsAdmin();
 >
   <section class="admin-card">
     <header class="admin-actions">
-      <a class="admin-btn" href="nuevo/">Añadir producto</a>
+      <a class="admin-btn" href="nuevo/" data-admin-nuevo>+ Añadir producto</a>
+      <span class="admin-text-muted">{products.length} productos</span>
     </header>
-    <table class="admin-table">
+
+    <AdminTable
+      empty="Sin productos. Crea el primero con el botón de arriba."
+      columns={[
+        { key: 'numero', label: 'Número' },
+        { key: 'producto', label: 'Producto' },
+        { key: 'sku', label: 'SKU' },
+        { key: 'precio', label: 'Precio' },
+        { key: 'estado', label: 'Estado' },
+        { key: 'activo', label: 'Activo' },
+      ]}
+    >
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Producto</th>
-          <th>SKU</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Activo</th>
-          <th>Acciones</th>
+          <th data-column="numero" style="width:52px">#</th>
+          <th data-column="producto">Producto</th>
+          <th data-column="sku">SKU</th>
+          <th data-column="precio">Precio</th>
+          <th data-column="estado">Estado</th>
+          <th data-column="activo">Activo</th>
+          <th style="width:170px">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {products.map((product) => (
-          <tr>
-            <td>{product.id}</td>
-            <td>
-              <a href={`/admin/productos/${product.id}/`}>{product.name}</a>
-            </td>
-            <td>{product.sku}</td>
-            <td>${(product.priceCents / 100).toFixed(2)}</td>
-            <td>{product.availability}</td>
-            <td>{product.isActive ? 'Sí' : 'No'}</td>
-            <td>
-              <a class="admin-btn admin-btn--ghost admin-btn--sm" href={`/admin/productos/${product.id}/`}>Editar</a>
-              <button
-                class="admin-btn admin-btn--danger admin-btn--sm"
-                data-delete={`/api/admin/products?id=${product.id}`}
-                data-confirm="¿Eliminar este producto y sus imágenes?"
-              >
-                Eliminar
-              </button>
-            </td>
-          </tr>
-        ))}
-        {products.length === 0 && (
-          <tr><td colspan="7">Sin productos.</td></tr>
-        )}
+        {
+          products.map((product) => {
+            const estado = disponibilidad[product.availability] ?? {
+              label: product.availability,
+              tone: 'neutral',
+            };
+            return (
+              <tr>
+                <td>{product.id}</td>
+                <td>
+                  <a href={`/admin/productos/${product.id}/`}>{product.name}</a>
+                </td>
+                <td>{product.sku}</td>
+                <td class="win-num">${(product.priceCents / 100).toFixed(2)}</td>
+                <td>
+                  <span class="win-badge" data-tone={estado.tone}>
+                    {estado.label}
+                  </span>
+                </td>
+                <td>
+                  <span class:list={['admin-active-state', { 'is-inactive': !product.isActive }]}>
+                    <span></span>{product.isActive ? 'Sí' : 'No'}
+                  </span>
+                </td>
+                <td>
+                  <div class="admin-actions-cell">
+                    <a
+                      class="admin-btn admin-btn--ghost admin-btn--sm"
+                      href={`/admin/productos/${product.id}/`}
+                    >
+                      Editar
+                    </a>
+                    <button
+                      class="admin-btn admin-btn--danger admin-btn--sm"
+                      data-delete={`/api/admin/products?id=${product.id}`}
+                      data-confirm="¿Eliminar este producto y sus imágenes?"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })
+        }
       </tbody>
-    </table>
+    </AdminTable>
   </section>
+
+  <script>
+    import '../../../scripts/admin-table';
+  </script>
 </AdminLayout>

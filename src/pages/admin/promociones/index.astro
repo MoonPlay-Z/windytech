@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listPromotionsAdmin } from '../../../lib/db/queries';
 
@@ -18,15 +19,26 @@ const promotions = await listPromotionsAdmin();
     <header class="admin-actions">
       <a class="admin-btn" href="nueva/">Nueva promoción</a>
     </header>
-    <table class="admin-table">
+    <AdminTable
+      empty="Sin registros."
+      columns={[
+    { key: 'numero', label: 'Número' },
+    { key: 'promocion', label: 'Nombre' },
+    { key: 'descuento', label: 'Tipo' },
+    { key: 'tipo', label: 'Valor' },
+    { key: 'estado', label: 'Prioridad' },
+    { key: 'vigencia', label: 'Activa' },
+      ]}
+    >
+      <table class="admin-table win-table-grid">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Valor</th>
-          <th>Prioridad</th>
-          <th>Activa</th>
+          <th data-column="numero" style="width:40px">#</th>
+          <th data-column="promocion">Nombre</th>
+          <th data-column="descuento">Tipo</th>
+          <th data-column="tipo">Valor</th>
+          <th data-column="estado">Prioridad</th>
+          <th data-column="vigencia">Activa</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -52,6 +64,10 @@ const promotions = await listPromotionsAdmin();
         ))}
         {promotions.length === 0 && <tr><td colspan="7">Sin promociones.</td></tr>}
       </tbody>
-    </table>
+      </table>
+    </AdminTable>
   </section>
+  <script>
+    import '../../../scripts/admin-table';
+  </script>
 </AdminLayout>

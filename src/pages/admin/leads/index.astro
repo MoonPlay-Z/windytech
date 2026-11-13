@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import Icon from '../../../components/Icon.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listLeads } from '../../../lib/db/queries';
@@ -37,15 +38,26 @@ const wa = (lead: (typeof leads)[number]) => {
       <span class="admin-text-muted">{leads.length} consultas recibidas</span>
     </header>
 
-    <table class="admin-table">
+    <AdminTable
+      empty="Sin registros."
+      columns={[
+    { key: 'numero', label: 'Número' },
+    { key: 'contacto', label: 'Contacto' },
+    { key: 'interes', label: 'Interés' },
+    { key: 'canal', label: 'Canal' },
+    { key: 'estado', label: 'Estado' },
+    { key: 'recibida', label: 'Recibida' },
+      ]}
+    >
+      <table class="admin-table win-table-grid">
       <thead>
         <tr>
-          <th style="width:40px">#</th>
-          <th>Contacto</th>
-          <th>Interés</th>
-          <th>Canal</th>
-          <th>Estado</th>
-          <th>Recibida</th>
+          <th data-column="numero" style="width:40px">#</th>
+          <th data-column="contacto">Contacto</th>
+          <th data-column="interes">Interés</th>
+          <th data-column="canal">Canal</th>
+          <th data-column="estado">Estado</th>
+          <th data-column="recibida">Recibida</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -118,10 +130,14 @@ const wa = (lead: (typeof leads)[number]) => {
           )
         }
       </tbody>
-    </table>
+      </table>
+    </AdminTable>
   </section>
 
   <script>
     import '../../../scripts/leads';
+  </script>
+  <script>
+    import '../../../scripts/admin-table';
   </script>
 </AdminLayout>

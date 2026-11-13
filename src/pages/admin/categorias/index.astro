@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import AdminTable from '../../../components/admin/AdminTable.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listCategoriesAdmin } from '../../../lib/db/queries';
 
@@ -18,9 +19,18 @@ const categories = await listCategoriesAdmin();
     <header class="admin-actions">
       <a class="admin-btn" href="nueva/">Nueva categoría</a>
     </header>
-    <table class="admin-table">
+    <AdminTable
+      empty="Sin registros."
+      columns={[
+    { key: 'numero', label: 'Número' },
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'slug', label: 'Slug' },
+    { key: 'productos', label: 'Productos' },
+      ]}
+    >
+      <table class="admin-table win-table-grid">
       <thead>
-        <tr><th style="width:40px">#</th><th>Nombre (ES)</th><th>Slug ES</th><th>Productos</th><th>Acciones</th></tr>
+        <tr><th data-column="numero" style="width:40px">#</th><th data-column="nombre">Nombre (ES)</th><th data-column="slug">Slug ES</th><th data-column="productos">Productos</th><th>Acciones</th></tr>
       </thead>
       <tbody>
         {categories.map((category) => (
@@ -42,6 +52,10 @@ const categories = await listCategoriesAdmin();
         ))}
         {categories.length === 0 && <tr><td colspan="5">Sin categorías.</td></tr>}
       </tbody>
-    </table>
+      </table>
+    </AdminTable>
   </section>
+  <script>
+    import '../../../scripts/admin-table';
+  </script>
 </AdminLayout>

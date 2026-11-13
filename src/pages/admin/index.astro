@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../components/admin/AdminLayout.astro';
+import Icon from '../../components/Icon.astro';
 import { sessionFromRequest } from '../../lib/auth';
 import {
   countLeadsByStatus,
@@ -29,24 +30,62 @@ const [products, projects, posts, quotes, plans, leads, trackings] = await Promi
   countTrackingsByStatus(),
 ]);
 
+/*
+ * El embudo se dibuja en SVG: consulta → cotización → cierre → entrega.
+ * Se calculan los porcentajes para dibujar las barras proporcionales.
+ */
 const embudo = [
-  { label: 'Consultas recibidas', value: leads.new ?? 0, href: '/admin/leads/' },
+  { label: 'Consultas recibidas', value: leads.new ?? 0, href: '/admin/leads/', icon: 'leads' },
   {
     label: 'Cotizaciones',
     value: Object.values(quotes).reduce((a, b) => a + b, 0),
     href: '/admin/cotizaciones/',
+    icon: 'cotizaciones',
   },
-  { label: 'Cotizaciones nuevas', value: quotes.NEW ?? 0, href: '/admin/cotizaciones/' },
-  { label: 'Cerradas (aceptadas)', value: quotes.CLOSED ?? 0, href: '/admin/cotizaciones/' },
+  { label: 'Cotizaciones nuevas', value: quotes.NEW ?? 0, href: '/admin/cotizaciones/', icon: 'cotizaciones' },
+  { label: 'Cerradas (aceptadas)', value: quotes.CLOSED ?? 0, href: '/admin/cotizaciones/', icon: 'cotizaciones' },
   {
     label: 'Seguimientos activos',
     value: Object.entries(trackings)
       .filter(([status]) => status !== 'entregado' && status !== 'cancelado')
       .reduce((a, [, b]) => a + b, 0),
     href: '/admin/seguimientos/',
+    icon: 'seguimientos',
   },
-  { label: 'Equipos entregados', value: trackings.entregado ?? 0, href: '/admin/seguimientos/' },
+  { label: 'Equipos entregados', value: trackings.entregado ?? 0, href: '/admin/seguimientos/', icon: 'seguimientos' },
 ];
+
+// Barras del gráfico: ancho proporcional al máximo.
+const maximoEmbudo = Math.max(1, ...embudo.map((paso) => paso.value));
+const ancho = (valor: number) => Math.max(3, Math.round((valor / maximoEmbudo) * 100));
+
+/* Avisos: lo que necesita una respuesta del administrador. */
+const alertas = [
+  {
+    icono: 'cotizaciones',
+    texto:
+      (quotes.NEW ?? 0) > 0
+        ? `${quotes.NEW} cotización${(quotes.NEW ?? 0) === 1 ? '' : 'es'} nueva${(quotes.NEW ?? 0) === 1 ? '' : 's'} sin responder`
+        : '',
+    enlace: '/admin/cotizaciones/',
+  },
+  {
+    icono: 'leads',
+    texto:
+      (leads.new ?? 0) > 0
+        ? `${leads.new} consulta${(leads.new ?? 0) === 1 ? '' : 's'} esperando respuesta`
+        : '',
+    enlace: '/admin/leads/',
+  },
+  {
+    icono: 'seguimientos',
+    texto:
+      (trackings.entregado ?? 0) > 0
+        ? `${trackings.entregado} seguimiento${(trackings.entregado ?? 0) === 1 ? '' : 's'} entregado${(trackings.entregado ?? 0) === 1 ? '' : 's'}: pide reseña`
+        : '',
+    enlace: '/admin/seguimientos/',
+  },
+].filter((alerta) => alerta.texto.length > 0);
 ---
 
 <AdminLayout title="Resumen" admin={admin} active="dashboard">
@@ -56,47 +95,59 @@ const embudo = [
       <h2>Hola, {admin.email.split('@')[0]}</h2>
       <p>Este es el resumen de actividad de tu tienda.</p>
     </div>
-    <a class="admin-btn" href="/admin/productos/nuevo/">+ Añadir producto</a>
+    <a class="admin-btn" href="/admin/productos/nuevo/" data-admin-nuevo>+ Añadir producto</a>
   </section>
 
+  {
+    alertas.length > 0 && (
+      <section class="admin-card admin-alerts">
+        <header class="admin-card-heading">
+          <div>
+            <p class="admin-section-kicker">PENDIENTE</p>
+            <h2>Lo que necesita tu atención</h2>
+          </div>
+        </header>
+        <ul class="admin-alert-list">
+          {alertas.map((alerta) => (
+            <li>
+              <a href={alerta.enlace}>
+                <span class="admin-alert-icon">
+                  <Icon name={alerta.icono as any} size={16} />
+                </span>
+                <span>{alerta.texto}</span>
+                <Icon name="arrow-right" size={15} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
   <div class="admin-grid">
-    <a class="admin-stat admin-stat--products" href="/admin/productos/">
-      <span class="admin-stat-icon" aria-hidden="true">▦</span>
-      <span class="admin-stat-label">CATÁLOGO</span>
-      <strong>{products.length}</strong>
-      <span class="admin-stat-caption">Productos registrados</span>
-      <span class="admin-stat-link">Ver productos <span aria-hidden="true">→</span></span>
-    </a>
     <a class="admin-stat admin-stat--quotes" href="/admin/cotizaciones/">
-      <span class="admin-stat-icon" aria-hidden="true">◷</span>
+      <span class="admin-stat-icon" aria-hidden="true"><Icon name="cotizaciones" size={20} /></span>
       <span class="admin-stat-label">PENDIENTES</span>
       <strong>{quotes.NEW ?? 0}</strong>
       <span class="admin-stat-caption">Cotizaciones nuevas</span>
       <span class="admin-stat-link">Revisar solicitudes <span aria-hidden="true">→</span></span>
     </a>
-    <a class="admin-stat admin-stat--projects" href="/admin/proyectos/">
-      <span class="admin-stat-icon" aria-hidden="true">◇</span>
-      <span class="admin-stat-label">PORTAFOLIO</span>
-      <strong>{projects.length}</strong>
-      <span class="admin-stat-caption">Proyectos registrados</span>
-      <span class="admin-stat-link">Ver proyectos <span aria-hidden="true">→</span></span>
-    </a>
-    <a class="admin-stat admin-stat--posts" href="/admin/publicaciones/">
-      <span class="admin-stat-icon" aria-hidden="true">▤</span>
-      <span class="admin-stat-label">CONTENIDO</span>
-      <strong>{posts.length}</strong>
-      <span class="admin-stat-caption">Publicaciones</span>
-      <span class="admin-stat-link">Gestionar contenido <span aria-hidden="true">→</span></span>
-    </a>
     <a class="admin-stat admin-stat--leads" href="/admin/leads/">
-      <span class="admin-stat-icon" aria-hidden="true">◎</span>
+      <span class="admin-stat-icon" aria-hidden="true"><Icon name="leads" size={20} /></span>
       <span class="admin-stat-label">CONSULTAS</span>
       <strong>{leads.new ?? 0}</strong>
       <span class="admin-stat-caption">Consultas nuevas</span>
       <span class="admin-stat-link">Ver consultas <span aria-hidden="true">→</span></span>
     </a>
+    <a class="admin-stat admin-stat--products" href="/admin/productos/">
+      <span class="admin-stat-icon" aria-hidden="true"><Icon name="productos" size={20} /></span>
+      <span class="admin-stat-label">CATÁLOGO</span>
+      <strong>{products.length}</strong>
+      <span class="admin-stat-caption">Productos registrados</span>
+      <span class="admin-stat-link">Ver productos <span aria-hidden="true">→</span></span>
+    </a>
     <a class="admin-stat admin-stat--services" href="/admin/servicios/">
-      <span class="admin-stat-icon" aria-hidden="true">◈</span>
+      <span class="admin-stat-icon" aria-hidden="true"><Icon name="paquetes" size={20} /></span>
       <span class="admin-stat-label">PAQUETES</span>
       <strong>{plans.length}</strong>
       <span class="admin-stat-caption">Paquetes de servicio</span>
@@ -107,31 +158,22 @@ const embudo = [
   <section class="admin-card">
     <div class="admin-card-heading">
       <div>
-        <p class="admin-section-kicker">ATAJOS</p>
-        <h2>Accesos rápidos</h2>
-      </div>
-    </div>
-    <div class="admin-quick-links">
-      <a href="/admin/productos/nuevo/"><span>＋</span><strong>Añadir producto</strong><small>Incorpora un artículo al catálogo</small></a>
-      <a href="/admin/cotizaciones/"><span>↗</span><strong>Ver cotizaciones</strong><small>Responde solicitudes de clientes</small></a>
-      <a href="/admin/publicaciones/"><span>✎</span><strong>Crear publicación</strong><small>Actualiza el contenido del sitio</small></a>
-    </div>
-  </section>
-
-  <section class="admin-card">
-    <div class="admin-card-heading">
-      <div>
         <p class="admin-section-kicker">EMBUDO</p>
         <h2>De la consulta a la entrega</h2>
       </div>
     </div>
-    <div class="admin-funnel">
-      {embudo.map((paso) => (
-        <a class="admin-funnel-step" href={paso.href}>
-          <strong>{paso.value}</strong>
-          <span>{paso.label}</span>
-        </a>
-      ))}
+    <div class="admin-funnel-chart">
+      {
+        embudo.map((paso) => (
+          <a class="admin-funnel-row" href={paso.href}>
+            <span class="admin-funnel-label">{paso.label}</span>
+            <span class="admin-funnel-track">
+              <span class="admin-funnel-bar" style={`width:${ancho(paso.value)}%`} />
+            </span>
+            <strong class="admin-funnel-value">{paso.value}</strong>
+          </a>
+        ))
+      }
     </div>
   </section>
 
@@ -152,7 +194,7 @@ const embudo = [
           {products.slice(0, 8).map((product) => (
             <tr>
               <td><a href={`/admin/productos/${product.id}/`}>{product.name}</a></td>
-              <td>${(product.priceCents / 100).toFixed(2)}</td>
+              <td class="win-num">${(product.priceCents / 100).toFixed(2)}</td>
               <td><span class="admin-badge">{product.availability.replaceAll('_', ' ')}</span></td>
               <td>
                 <span class:list={['admin-active-state', { 'is-inactive': !product.isActive }]}>
@@ -166,6 +208,29 @@ const embudo = [
           )}
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <section class="admin-card">
+    <div class="admin-card-heading">
+      <div>
+        <p class="admin-section-kicker">CONTENIDO</p>
+        <h2>Proyectos y publicaciones</h2>
+      </div>
+    </div>
+    <div class="admin-grid admin-grid--compact">
+      <a class="admin-stat" href="/admin/proyectos/">
+        <span class="admin-stat-icon" aria-hidden="true"><Icon name="proyectos" size={20} /></span>
+        <span class="admin-stat-label">PORTAFOLIO</span>
+        <strong>{projects.length}</strong>
+        <span class="admin-stat-caption">Proyectos publicados</span>
+      </a>
+      <a class="admin-stat" href="/admin/publicaciones/">
+        <span class="admin-stat-icon" aria-hidden="true"><Icon name="publicaciones" size={20} /></span>
+        <span class="admin-stat-label">CONTENIDO</span>
+        <strong>{posts.length}</strong>
+        <span class="admin-stat-caption">Publicaciones</span>
+      </a>
     </div>
   </section>
 </AdminLayout>
