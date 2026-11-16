@@ -47,45 +47,67 @@ export type EbayPublishResult = {
 
 let tokenCache: { accessToken: string; expiresAt: number } | null = null;
 
+/** Scope público para tokens de aplicación (Browse API, sin usuario). */
+const APP_SCOPE = 'https://api.ebay.com/oauth/api_scope';
+
+async function requestToken(params: URLSearchParams): Promise<string> {
+  const env = serverEnv;
+  const response = await fetch(TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${btoa(`${env.ebayClientId}:${env.ebayClientSecret}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(
+      `No se pudo obtener el token de eBay (${response.status}): ${detail.slice(0, 200)}`,
+    );
+  }
+  const data = (await response.json()) as { access_token?: string; expires_in?: number };
+  if (!data.access_token) throw new Error('eBay no devolvió access_token.');
+  tokenCache = {
+    accessToken: data.access_token,
+    expiresAt: Date.now() + Number(data.expires_in ?? 3600) * 1000,
+  };
+  return tokenCache.accessToken;
+}
+
 async function getAccessToken(): Promise<string> {
   const env = serverEnv;
-  // Token manual para pruebas: evita el flujo de refresh (caduca en ~2 h).
+  // Token manual para pruebas: evita cualquier flujo (caduca en ~2 h).
   if (env.ebayAccessToken) return env.ebayAccessToken;
-  if (!env.ebayClientId || !env.ebayClientSecret || !env.ebayRefreshToken) {
+  if (!env.ebayClientId || !env.ebayClientSecret) {
     throw new Error(
-      'eBay no está configurado: faltan EBAY_CLIENT_ID, EBAY_CLIENT_SECRET o EBAY_REFRESH_TOKEN.',
+      'eBay no está configurado: faltan EBAY_CLIENT_ID o EBAY_CLIENT_SECRET.',
     );
   }
   const cached = tokenCache;
   if (cached && cached.expiresAt - 60_000 > Date.now()) {
     return cached.accessToken;
   }
-  const basicAuth = `Basic ${btoa(`${env.ebayClientId}:${env.ebayClientSecret}`)}`;
-  const params = new URLSearchParams({
-    grant_type: 'refresh_token',
-    refresh_token: env.ebayRefreshToken,
-    scope: env.ebayOAuthScope,
-  });
-  const response = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: basicAuth,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params.toString(),
-  });
-  if (!response.ok) {
-    throw new Error(`No se pudo obtener el token de acceso de eBay (${response.status}).`);
+
+  // 1) Token de usuario (necesario para publicar en eBay).
+  if (env.ebayRefreshToken) {
+    try {
+      return await requestToken(
+        new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: env.ebayRefreshToken,
+          scope: env.ebayOAuthScope,
+        }),
+      );
+    } catch (error) {
+      console.error('[ebay] el refresh token falló; se usa un token de aplicación:', error);
+    }
   }
-  const data = (await response.json()) as { access_token?: string; expires_in?: number };
-  if (!data.access_token) {
-    throw new Error('eBay no devolvió access_token.');
-  }
-  tokenCache = {
-    accessToken: data.access_token,
-    expiresAt: Date.now() + Number(data.expires_in ?? 3600) * 1000,
-  };
-  return tokenCache.accessToken;
+
+  // 2) Token de aplicación (suficiente para buscar e importar del catálogo).
+  return requestToken(
+    new URLSearchParams({ grant_type: 'client_credentials', scope: APP_SCOPE }),
+  );
 }
 
 async function ebayRequest<T = unknown>(path: string, init: { method: string; body?: unknown }): Promise<T> {
