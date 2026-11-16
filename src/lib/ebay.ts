@@ -190,11 +190,12 @@ function parsePriceCents(price?: { value?: string; currency?: string } | null): 
  * Busca items en el catálogo de eBay (Browse API /item_summary/search).
  * Se usa para descubrir productos que luego se importan al catálogo propio.
  */
-export async function searchEbayItems(query: string, limit = 10): Promise<EbayItemSummary[]> {
+export async function searchEbayItems(query: string, limit = 10, offset = 0): Promise<EbayItemSummary[]> {
   const accessToken = await getAccessToken();
   const url = new URL(`${API_BASE}/buy/browse/v1/item_summary/search`);
   url.searchParams.set('q', query);
   url.searchParams.set('limit', String(limit));
+  url.searchParams.set('offset', String(offset));
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -216,7 +217,8 @@ export async function searchEbayItems(query: string, limit = 10): Promise<EbayIt
       itemWebUrl?: string;
     }>;
   };
-  return (data.itemSummaries ?? []).map((item) => ({
+  const items = data.itemSummaries ?? [];
+  return items.map((item) => ({
     itemId: String(item.itemId ?? ''),
     title: String(item.title ?? ''),
     priceValueCents: parsePriceCents(item.price),

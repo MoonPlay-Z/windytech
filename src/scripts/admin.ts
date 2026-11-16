@@ -639,9 +639,22 @@ function setupEbayImport() {
   const searchButton = root.querySelector<HTMLButtonElement>('[data-ebay-search]');
   const messageNode = root.querySelector<HTMLElement>('[data-ebay-message]');
   const resultsNode = root.querySelector<HTMLElement>('[data-ebay-results]');
-  if (!queryInput || !marginInput || !searchButton || !messageNode || !resultsNode) return;
+  const loadMoreWrap = root.querySelector<HTMLElement>('[data-ebay-load-more]');
+  const loadMoreButton = root.querySelector<HTMLButtonElement>('[data-ebay-load-more-btn]');
+  if (!queryInput || !marginInput || !searchButton || !messageNode || !resultsNode || !loadMoreWrap || !loadMoreButton) return;
 
   const itemCache = new Map<string, EbaySearchItem>();
+  const pageSize = 12;
+  const state = { query: '', loaded: 0, hasMore: false };
+  let isLoadingMore = false;
+
+  const renderLoadMore = () => {
+    if (!loadMoreWrap || !loadMoreButton) return;
+    loadMoreWrap.style.display = state.hasMore ? 'flex' : 'none';
+    loadMoreButton.disabled = !state.hasMore || isLoadingMore;
+    loadMoreButton.textContent = isLoadingMore ? 'Cargando…' : 'Ver más resultados';
+  };
+  renderLoadMore();
 
   const runSearch = async () => {
     const query = queryInput.value.trim();
@@ -654,6 +667,11 @@ function setupEbayImport() {
     searchButton.disabled = true;
     searchButton.textContent = 'Buscando…';
     resultsNode.replaceChildren();
+    itemCache.clear();
+    state.query = query;
+    state.loaded = 0;
+    state.hasMore = true;
+    renderLoadMore();
     setEbayMessage(messageNode, 'Consultando eBay…', 'ok');
 
     try {
@@ -661,26 +679,31 @@ function setupEbayImport() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ query, limit: 12 }),
+        body: JSON.stringify({ query, limit: pageSize }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         items?: EbaySearchItem[];
         error?: string;
+        hasMore?: boolean;
       };
       if (!response.ok) throw new Error(data.error ?? 'No se pudo buscar en eBay.');
 
       const items = Array.isArray(data.items) ? data.items : [];
       if (items.length === 0) {
+        state.hasMore = false;
+        renderLoadMore();
         setEbayMessage(messageNode, `Sin resultados para “${query}”. Prueba otras palabras.`, 'error');
         return;
       }
 
       const marginPercent = Math.max(0, Number(marginInput.value) || 0);
-      itemCache.clear();
       for (const item of items) {
         itemCache.set(item.itemId, item);
         resultsNode.append(ebayCard(item, marginPercent));
       }
+      state.loaded = items.length;
+      state.hasMore = items.length >= pageSize && Boolean(data.hasMore);
+      renderLoadMore();
       setEbayMessage(messageNode, `${items.length} resultado(s). Elige uno y pulsa “Importar”.`, 'ok');
     } catch (error) {
       setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al buscar en eBay.', 'error');
@@ -690,7 +713,46 @@ function setupEbayImport() {
     }
   };
 
+  const runLoadMore = async () => {
+    if (isLoadingMore) return;
+    const query = state.query;
+    if (query.length < 2) return;
+    isLoadingMore = true;
+    renderLoadMore();
+    try {
+      const response = await fetch('/api/admin/ebay/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ query, limit: pageSize, offset: state.loaded }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        items?: EbaySearchItem[];
+        error?: string;
+        hasMore?: boolean;
+      };
+      if (!response.ok) throw new Error(data.error ?? 'No se pudo buscar en eBay.');
+
+      const items = Array.isArray(data.items) ? data.items : [];
+      const marginPercent = Math.max(0, Number(marginInput.value) || 0);
+      for (const item of items) {
+        if (itemCache.has(item.itemId)) continue;
+        itemCache.set(item.itemId, item);
+        resultsNode.append(ebayCard(item, marginPercent));
+      }
+      state.loaded += items.length;
+      state.hasMore = items.length >= pageSize && Boolean(data.hasMore);
+      renderLoadMore();
+    } catch (error) {
+      setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al buscar en eBay.', 'error');
+    } finally {
+      isLoadingMore = false;
+      renderLoadMore();
+    }
+  };
+
   searchButton.addEventListener('click', () => void runSearch());
+  loadMoreButton.addEventListener('click', () => void runLoadMore());
   queryInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();

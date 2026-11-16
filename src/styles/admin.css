@@ -1141,6 +1141,10 @@ html.admin-page {
   display: none;
 }
 
+.ebay-load-more {
+  margin-top: 12px;
+}
+
 .ebay-card {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
