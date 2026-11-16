@@ -44,6 +44,9 @@ services:
         sync: false
       - key: EBAY_REFRESH_TOKEN
         sync: false
+      # Token manual solo para pruebas (caduca en ~2 h). Vacío en producción normal.
+      - key: EBAY_ACCESS_TOKEN
+        sync: false
       - key: EBAY_SANDBOX
         value: "true"
       - key: EBAY_REDIRECT_URI

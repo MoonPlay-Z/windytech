@@ -59,6 +59,10 @@ export const serverEnv = {
   get ebayRefreshToken() {
     return read('EBAY_REFRESH_TOKEN');
   },
+  /** Access token manual para pruebas rápidas (caduca en ~2 h; no usar en producción). */
+  get ebayAccessToken() {
+    return read('EBAY_ACCESS_TOKEN');
+  },
   get ebayDevId() {
     return read('EBAY_DEV_ID');
   },

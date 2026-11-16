@@ -49,6 +49,8 @@ let tokenCache: { accessToken: string; expiresAt: number } | null = null;
 
 async function getAccessToken(): Promise<string> {
   const env = serverEnv;
+  // Token manual para pruebas: evita el flujo de refresh (caduca en ~2 h).
+  if (env.ebayAccessToken) return env.ebayAccessToken;
   if (!env.ebayClientId || !env.ebayClientSecret || !env.ebayRefreshToken) {
     throw new Error(
       'eBay no está configurado: faltan EBAY_CLIENT_ID, EBAY_CLIENT_SECRET o EBAY_REFRESH_TOKEN.',
