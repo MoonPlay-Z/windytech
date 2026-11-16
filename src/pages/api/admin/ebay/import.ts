@@ -305,6 +305,7 @@ export const POST: APIRoute = async ({ request }) => {
     priceCents,
     marginPercent,
     images: images.length,
+    isActive: Boolean(body?.activate),
   });
 
   return json(

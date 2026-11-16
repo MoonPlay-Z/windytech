@@ -20,7 +20,7 @@ const categories = await listCategoriesAdmin();
         <span class="admin-overline">eBay</span>
         <h2>Importar productos desde eBay</h2>
       </div>
-      <span class="admin-hint">Se crean como borrador con el precio de reventa.</span>
+      <span class="admin-hint">Se importan con el precio de reventa; puedes publicarlos al catálogo o guardarlos como borrador.</span>
     </header>
     <div class="admin-form">
       <div class="admin-form-row">
@@ -44,6 +44,10 @@ const categories = await listCategoriesAdmin();
           </select>
         </label>
       </div>
+      <label class="admin-check">
+        <input type="checkbox" data-ebay-activate checked />
+        Publicar en el catálogo al importar (desmárcalo para guardarlo como borrador)
+      </label>
       <div class="admin-actions">
         <button type="button" class="admin-btn" data-ebay-search>Buscar en eBay</button>
       </div>

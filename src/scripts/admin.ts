@@ -635,6 +635,7 @@ function setupEbayImport() {
   const queryInput = root.querySelector<HTMLInputElement>('[data-ebay-query]');
   const marginInput = root.querySelector<HTMLInputElement>('[data-ebay-margin]');
   const categorySelect = root.querySelector<HTMLSelectElement>('[data-ebay-category]');
+  const activateInput = root.querySelector<HTMLInputElement>('[data-ebay-activate]');
   const searchButton = root.querySelector<HTMLButtonElement>('[data-ebay-search]');
   const messageNode = root.querySelector<HTMLElement>('[data-ebay-message]');
   const resultsNode = root.querySelector<HTMLElement>('[data-ebay-results]');
@@ -708,11 +709,18 @@ function setupEbayImport() {
 
     const marginPercent = Math.round(Math.max(0, Math.min(100, Number(marginInput.value) || 0)));
     const categoryId = categorySelect?.value ? Number(categorySelect.value) : null;
+    const activate = activateInput ? activateInput.checked : true;
     const summary = itemCache.get(itemId);
 
     button.disabled = true;
     button.textContent = 'Importando…';
-    setEbayMessage(messageNode, 'Importando imágenes y creando el producto…', 'ok');
+    setEbayMessage(
+      messageNode,
+      activate
+        ? 'Importando imágenes y publicando el producto en el catálogo…'
+        : 'Importando imágenes y creando el producto como borrador…',
+      'ok',
+    );
 
     try {
       const response = await fetch('/api/admin/ebay/import', {
@@ -723,7 +731,7 @@ function setupEbayImport() {
           itemId,
           marginPercent,
           categoryId,
-          activate: false,
+          activate,
           fallback: summary
             ? {
                 title: summary.title,
@@ -740,6 +748,7 @@ function setupEbayImport() {
         productId?: number;
         priceCents?: number;
         images?: number;
+        isActive?: boolean;
         warnings?: string[];
         error?: string;
       };
@@ -752,14 +761,19 @@ function setupEbayImport() {
       if (!response.ok) throw new Error(data.error ?? 'No se pudo importar el producto.');
 
       const warnings = (data.warnings ?? []).filter(Boolean);
+      const published = data.isActive ?? activate;
       const parts = [
-        `Producto #${data.productId} creado como borrador.`,
+        `Producto #${data.productId} ${published ? 'publicado en el catálogo' : 'creado como borrador'}.`,
         data.priceCents != null ? `Precio de venta: USD ${(data.priceCents / 100).toFixed(2)}.` : '',
         data.images != null ? `Imágenes importadas: ${data.images}.` : '',
         ...warnings,
       ].filter(Boolean);
       setEbayMessage(messageNode, parts.join(' '), warnings.length > 0 ? 'error' : 'ok');
-      if (data.productId) button.replaceWith(ebayEditLink(data.productId, 'Editar producto'));
+      if (data.productId) {
+        button.replaceWith(
+          ebayEditLink(data.productId, published ? 'Ver producto' : 'Editar borrador'),
+        );
+      }
     } catch (error) {
       button.disabled = false;
       button.textContent = 'Importar';
