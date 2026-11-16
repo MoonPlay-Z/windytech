@@ -1,7 +1,11 @@
 /** Acceso centralizado a variables de entorno del servidor. */
 
 function read(name: string): string {
-  return (process.env[name] ?? '').trim();
+  // En Render las variables llegan por process.env. En `astro dev` Astro las
+  // carga en import.meta.env, así que se usa como respaldo para probar local.
+  const fromAstro = (import.meta as unknown as { env?: Record<string, unknown> }).env;
+  const value = process.env[name] ?? fromAstro?.[name];
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 export const serverEnv = {

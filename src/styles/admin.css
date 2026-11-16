@@ -1129,3 +1129,81 @@ html.admin-page {
   background: #fdeef8;
   color: #a4407a;
 }
+
+/* Importación de productos desde eBay */
+.ebay-results {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ebay-results:empty {
+  display: none;
+}
+
+.ebay-card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fbfdfe;
+}
+
+.ebay-card-media {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eef4f6;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.ebay-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ebay-card-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ebay-card-title {
+  color: var(--navy);
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.ebay-card-price {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.ebay-card-price--sale {
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+
+.ebay-card .admin-actions {
+  margin-top: 6px;
+}
+
+@media (max-width: 560px) {
+  .ebay-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .ebay-card-media {
+    width: 72px;
+    height: 72px;
+  }
+}

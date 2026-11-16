@@ -2,7 +2,7 @@
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { availabilityLabel } from '../../../lib/admin-labels';
-import { listProductsAdmin } from '../../../lib/db/queries';
+import { listCategoriesAdmin, listProductsAdmin } from '../../../lib/db/queries';
 
 export const prerender = false;
 
@@ -10,9 +10,48 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const products = await listProductsAdmin();
+const categories = await listCategoriesAdmin();
 ---
 
 <AdminLayout title="Productos" admin={admin} active="products">
+  <section class="admin-card" data-ebay-import>
+    <header class="admin-card-heading">
+      <div>
+        <span class="admin-overline">eBay</span>
+        <h2>Importar productos desde eBay</h2>
+      </div>
+      <span class="admin-hint">Se crean como borrador con el precio de reventa.</span>
+    </header>
+    <div class="admin-form">
+      <div class="admin-form-row">
+        <label>
+          <span>Buscar en eBay</span>
+          <input type="search" data-ebay-query placeholder="Ej. drone, iPhone 13, RTX 3060" />
+        </label>
+        <label>
+          <span>% Ganancia</span>
+          <input type="number" data-ebay-margin value="30" min="0" max="100" step="1" />
+        </label>
+        <label>
+          <span>Categoría</span>
+          <select data-ebay-category>
+            <option value="">Sin categoría</option>
+            {categories.map((category) => (
+              <option value={String(category.id)}>
+                {category.name || `Categoría ${category.id}`}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="admin-actions">
+        <button type="button" class="admin-btn" data-ebay-search>Buscar en eBay</button>
+      </div>
+    </div>
+    <p class="admin-message" data-ebay-message hidden></p>
+    <div class="ebay-results" data-ebay-results></div>
+  </section>
+
   <section class="admin-card">
     <header class="admin-actions">
       <a class="admin-btn" href="nuevo/">Añadir producto</a>

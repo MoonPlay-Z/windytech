@@ -137,11 +137,36 @@ export type EbayItemSummary = {
   priceValueCents: number;
   currency: string;
   condition?: string | null;
+  imageUrl?: string | null;
+  itemWebUrl?: string | null;
 };
+
+export type EbayItemDetail = {
+  itemId: string;
+  title: string;
+  priceValueCents: number;
+  currency: string;
+  condition: string | null;
+  conditionId: string | null;
+  images: string[];
+  itemWebUrl: string;
+  brand: string;
+  aspects: Record<string, string>;
+  description: string;
+  shippingCostCents: number;
+  seller: string;
+};
+
+type EbayImage = { imageUrl?: string };
+
+function parsePriceCents(price?: { value?: string; currency?: string } | null): number {
+  const value = Number(price?.value ?? 0);
+  return Number.isFinite(value) ? Math.round(value * 100) : 0;
+}
 
 /**
  * Busca items en el catálogo de eBay (Browse API /item_summary/search).
- * Se usa para descubrir productos comparables antes de publicar en reventa.
+ * Se usa para descubrir productos que luego se importan al catálogo propio.
  */
 export async function searchEbayItems(query: string, limit = 10): Promise<EbayItemSummary[]> {
   const accessToken = await getAccessToken();
@@ -165,15 +190,97 @@ export async function searchEbayItems(query: string, limit = 10): Promise<EbayIt
       title?: string;
       condition?: string;
       price?: { value?: string; currency?: string };
+      image?: EbayImage;
+      itemWebUrl?: string;
     }>;
   };
   return (data.itemSummaries ?? []).map((item) => ({
     itemId: String(item.itemId ?? ''),
     title: String(item.title ?? ''),
-    priceValueCents: Number(item.price?.value ?? 0) * 100,
+    priceValueCents: parsePriceCents(item.price),
     currency: String(item.price?.currency ?? 'USD'),
     condition: item.condition ?? null,
+    imageUrl: item.image?.imageUrl ?? null,
+    itemWebUrl: item.itemWebUrl ?? null,
   }));
+}
+
+/**
+ * Obtiene el detalle completo de un item de eBay (Browse API /item/{itemId}).
+ * Devuelve imágenes, envío, marca, aspectos y descripción para importarlo
+ * al catálogo propio.
+ */
+export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
+  const accessToken = await getAccessToken();
+  const response = await fetch(
+    `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Content-Language': 'en-US',
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+      },
+    },
+  );
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`eBay respondió ${response.status} al consultar el item ${itemId}: ${detail.slice(0, 300)}`);
+  }
+
+  const data = (await response.json()) as {
+    itemId?: string;
+    title?: string;
+    price?: { value?: string; currency?: string };
+    condition?: string;
+    conditionId?: string;
+    image?: EbayImage;
+    additionalImages?: EbayImage[];
+    itemWebUrl?: string;
+    brand?: string;
+    description?: string;
+    localizedAspects?: Array<{ name?: string; value?: string }>;
+    shippingOptions?: Array<{
+      shippingCost?: { value?: string; currency?: string };
+      shippingCostType?: string;
+    }>;
+    seller?: { username?: string };
+  };
+
+  const images: string[] = [];
+  for (const image of [data.image, ...(data.additionalImages ?? [])]) {
+    const url = image?.imageUrl;
+    if (url && !images.includes(url)) images.push(url);
+  }
+
+  const aspects: Record<string, string> = {};
+  for (const aspect of data.localizedAspects ?? []) {
+    const name = aspect.name?.trim();
+    const value = aspect.value?.trim();
+    if (name && value && !(name in aspects)) aspects[name] = value;
+  }
+
+  const shippingCosts = (data.shippingOptions ?? [])
+    .map((option) => parsePriceCents(option.shippingCost))
+    .filter((cents) => Number.isFinite(cents));
+  const shippingCostCents = shippingCosts.length > 0 ? Math.min(...shippingCosts) : 0;
+
+  return {
+    itemId: String(data.itemId ?? itemId),
+    title: String(data.title ?? '').trim(),
+    priceValueCents: parsePriceCents(data.price),
+    currency: String(data.price?.currency ?? 'USD'),
+    condition: data.condition ?? null,
+    conditionId: data.conditionId ?? null,
+    images,
+    itemWebUrl: data.itemWebUrl ?? '',
+    brand: String(data.brand ?? aspects.Brand ?? '').trim(),
+    aspects,
+    description: data.description ?? '',
+    shippingCostCents,
+    seller: data.seller?.username ?? '',
+  };
 }
 
 /**

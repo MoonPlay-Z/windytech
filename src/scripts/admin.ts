@@ -506,6 +506,246 @@ function setupEbayActions() {
   });
 }
 
+type EbaySearchItem = {
+  itemId: string;
+  title: string;
+  priceValueCents: number;
+  currency: string;
+  condition?: string | null;
+  imageUrl?: string | null;
+  itemWebUrl?: string | null;
+};
+
+function ebayMoney(cents: number, currency: string): string {
+  return `${currency} ${(Math.max(0, cents) / 100).toFixed(2)}`;
+}
+
+function ebayConditionLabel(condition: string | null | undefined): string {
+  if (!condition) return 'Sin condición';
+  const value = condition.toLowerCase();
+  if (value.includes('refurb')) return 'Reacondicionado';
+  if (value.includes('used') || value.includes('pre-owned')) return 'Usado';
+  if (value.includes('new')) return 'Nuevo';
+  return condition;
+}
+
+function setEbayMessage(node: HTMLElement, text: string, kind: 'ok' | 'error') {
+  node.hidden = false;
+  node.textContent = text;
+  node.dataset.kind = kind;
+}
+
+function ebayEditLink(productId: number, label: string): HTMLAnchorElement {
+  const link = document.createElement('a');
+  link.className = 'admin-btn admin-btn--ghost admin-btn--sm';
+  link.href = `/admin/productos/${productId}/`;
+  link.textContent = label;
+  return link;
+}
+
+function ebayCard(item: EbaySearchItem, marginPercent: number): HTMLElement {
+  const card = document.createElement('article');
+  card.className = 'ebay-card';
+
+  const media = document.createElement('div');
+  media.className = 'ebay-card-media';
+  if (item.imageUrl) {
+    const img = document.createElement('img');
+    img.src = item.imageUrl;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.referrerPolicy = 'no-referrer';
+    media.append(img);
+  } else {
+    media.textContent = 'Sin imagen';
+  }
+
+  const body = document.createElement('div');
+  body.className = 'ebay-card-body';
+
+  const title = document.createElement('strong');
+  title.className = 'ebay-card-title';
+  title.textContent = item.title;
+
+  const meta = document.createElement('span');
+  meta.className = 'admin-hint';
+  meta.textContent = `${ebayConditionLabel(item.condition)} · ${item.itemId}`;
+
+  const cost = document.createElement('span');
+  cost.className = 'ebay-card-price';
+  cost.textContent = `Costo: ${ebayMoney(item.priceValueCents, item.currency)}`;
+
+  const estimate = Math.round(item.priceValueCents * (1 + marginPercent / 100));
+  const resale = document.createElement('span');
+  resale.className = 'ebay-card-price ebay-card-price--sale';
+  resale.textContent = `Venta aprox.: ${ebayMoney(estimate, item.currency)} (sin envío)`;
+
+  const actions = document.createElement('div');
+  actions.className = 'admin-actions';
+
+  const importButton = document.createElement('button');
+  importButton.type = 'button';
+  importButton.className = 'admin-btn admin-btn--sm';
+  importButton.textContent = 'Importar';
+  importButton.dataset.ebayImportId = item.itemId;
+
+  actions.append(importButton);
+  if (item.itemWebUrl) {
+    const link = document.createElement('a');
+    link.className = 'admin-btn admin-btn--ghost admin-btn--sm';
+    link.href = item.itemWebUrl;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'Ver en eBay';
+    actions.append(link);
+  }
+
+  body.append(title, meta, cost, resale, actions);
+  card.append(media, body);
+  return card;
+}
+
+function setupEbayImport() {
+  const root = document.querySelector<HTMLElement>('[data-ebay-import]');
+  if (!root || root.dataset.wtBound === 'true') return;
+  root.dataset.wtBound = 'true';
+
+  const queryInput = root.querySelector<HTMLInputElement>('[data-ebay-query]');
+  const marginInput = root.querySelector<HTMLInputElement>('[data-ebay-margin]');
+  const categorySelect = root.querySelector<HTMLSelectElement>('[data-ebay-category]');
+  const searchButton = root.querySelector<HTMLButtonElement>('[data-ebay-search]');
+  const messageNode = root.querySelector<HTMLElement>('[data-ebay-message]');
+  const resultsNode = root.querySelector<HTMLElement>('[data-ebay-results]');
+  if (!queryInput || !marginInput || !searchButton || !messageNode || !resultsNode) return;
+
+  const itemCache = new Map<string, EbaySearchItem>();
+
+  const runSearch = async () => {
+    const query = queryInput.value.trim();
+    if (query.length < 2) {
+      setEbayMessage(messageNode, 'Escribe al menos 2 caracteres para buscar.', 'error');
+      queryInput.focus();
+      return;
+    }
+
+    searchButton.disabled = true;
+    searchButton.textContent = 'Buscando…';
+    resultsNode.replaceChildren();
+    setEbayMessage(messageNode, 'Consultando eBay…', 'ok');
+
+    try {
+      const response = await fetch('/api/admin/ebay/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ query, limit: 12 }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        items?: EbaySearchItem[];
+        error?: string;
+      };
+      if (!response.ok) throw new Error(data.error ?? 'No se pudo buscar en eBay.');
+
+      const items = Array.isArray(data.items) ? data.items : [];
+      if (items.length === 0) {
+        setEbayMessage(messageNode, `Sin resultados para “${query}”. Prueba otras palabras.`, 'error');
+        return;
+      }
+
+      const marginPercent = Math.max(0, Number(marginInput.value) || 0);
+      itemCache.clear();
+      for (const item of items) {
+        itemCache.set(item.itemId, item);
+        resultsNode.append(ebayCard(item, marginPercent));
+      }
+      setEbayMessage(messageNode, `${items.length} resultado(s). Elige uno y pulsa “Importar”.`, 'ok');
+    } catch (error) {
+      setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al buscar en eBay.', 'error');
+    } finally {
+      searchButton.disabled = false;
+      searchButton.textContent = 'Buscar en eBay';
+    }
+  };
+
+  searchButton.addEventListener('click', () => void runSearch());
+  queryInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      void runSearch();
+    }
+  });
+
+  resultsNode.addEventListener('click', async (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const button = target.closest<HTMLButtonElement>('[data-ebay-import-id]');
+    if (!button || !resultsNode.contains(button) || button.disabled) return;
+
+    const itemId = button.dataset.ebayImportId ?? '';
+    if (!itemId) return;
+
+    const marginPercent = Math.round(Math.max(0, Math.min(100, Number(marginInput.value) || 0)));
+    const categoryId = categorySelect?.value ? Number(categorySelect.value) : null;
+    const summary = itemCache.get(itemId);
+
+    button.disabled = true;
+    button.textContent = 'Importando…';
+    setEbayMessage(messageNode, 'Importando imágenes y creando el producto…', 'ok');
+
+    try {
+      const response = await fetch('/api/admin/ebay/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          itemId,
+          marginPercent,
+          categoryId,
+          activate: false,
+          fallback: summary
+            ? {
+                title: summary.title,
+                priceValueCents: summary.priceValueCents,
+                currency: summary.currency,
+                condition: summary.condition ?? null,
+                imageUrl: summary.imageUrl ?? null,
+                itemWebUrl: summary.itemWebUrl ?? null,
+              }
+            : undefined,
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        productId?: number;
+        priceCents?: number;
+        images?: number;
+        warnings?: string[];
+        error?: string;
+      };
+
+      if (response.status === 409 && data.productId) {
+        button.replaceWith(ebayEditLink(data.productId, 'Ya importado'));
+        setEbayMessage(messageNode, data.error ?? 'Este producto ya estaba en tu catálogo.', 'error');
+        return;
+      }
+      if (!response.ok) throw new Error(data.error ?? 'No se pudo importar el producto.');
+
+      const warnings = (data.warnings ?? []).filter(Boolean);
+      const parts = [
+        `Producto #${data.productId} creado como borrador.`,
+        data.priceCents != null ? `Precio de venta: USD ${(data.priceCents / 100).toFixed(2)}.` : '',
+        data.images != null ? `Imágenes importadas: ${data.images}.` : '',
+        ...warnings,
+      ].filter(Boolean);
+      setEbayMessage(messageNode, parts.join(' '), warnings.length > 0 ? 'error' : 'ok');
+      if (data.productId) button.replaceWith(ebayEditLink(data.productId, 'Editar producto'));
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = 'Importar';
+      setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al importar.', 'error');
+    }
+  });
+}
+
 function setupActiveNavScroll() {
   document.querySelector<HTMLElement>('.admin-nav-link.is-active')?.scrollIntoView({
     inline: 'center',
@@ -521,6 +761,7 @@ function initAdmin() {
   setupUploaders();
   setupQuoteStatus();
   setupEbayActions();
+  setupEbayImport();
   setupActiveNavScroll();
 }
 

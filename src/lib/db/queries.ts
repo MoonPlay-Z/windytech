@@ -768,6 +768,14 @@ export async function productSlugInUse(
   return Boolean(row?.exists);
 }
 
+/** Id del producto vinculado a un item de eBay (para no importarlo dos veces). */
+export async function productIdByEbayItemId(ebayItemId: string): Promise<number | null> {
+  const row = await one<{ id: number }>(
+    sql`SELECT id FROM products WHERE ebay_item_id = ${ebayItemId} LIMIT 1`,
+  );
+  return row?.id ?? null;
+}
+
 /** Igual que `productSlugInUse`, pero para publicaciones. */
 export async function postSlugInUse(
   locale: string,

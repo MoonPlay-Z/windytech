@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { serverEnv } from './env';
 
 /**
  * Construcción de URLs de Cloudinary sin SDK en runtime.
@@ -7,6 +8,7 @@ import { createHash } from 'node:crypto';
  */
 
 const BASE = 'https://res.cloudinary.com';
+const API_BASE = 'https://api.cloudinary.com/v1_1';
 
 /**
  * El nombre del cloud es público (aparece en cada URL de imagen), así que
@@ -17,7 +19,7 @@ const BASE = 'https://res.cloudinary.com';
 const DEFAULT_CLOUD_NAME = 'cxy5wtgr';
 
 export function cloudName(): string {
-  return (process.env.PUBLIC_CLOUDINARY_CLOUD_NAME ?? '').trim() || DEFAULT_CLOUD_NAME;
+  return serverEnv.cloudName || DEFAULT_CLOUD_NAME;
 }
 
 export type ImageOptions = {
@@ -76,8 +78,8 @@ export type UploadSignature = {
 
 /** Firma parámetros de subida para el widget/API de Cloudinary. */
 export function signUpload(folder: string): UploadSignature | null {
-  const secret = (process.env.CLOUDINARY_API_SECRET ?? '').trim();
-  const apiKey = (process.env.CLOUDINARY_API_KEY ?? '').trim();
+  const secret = serverEnv.cloudinarySecret;
+  const apiKey = serverEnv.cloudinaryKey;
   const name = cloudName();
   if (!secret || !apiKey || !name) return null;
 
@@ -89,8 +91,8 @@ export function signUpload(folder: string): UploadSignature | null {
 
 /** Borra un asset con la Admin API. Silencioso si faltan credenciales. */
 export async function destroyAsset(publicId: string): Promise<boolean> {
-  const secret = (process.env.CLOUDINARY_API_SECRET ?? '').trim();
-  const apiKey = (process.env.CLOUDINARY_API_KEY ?? '').trim();
+  const secret = serverEnv.cloudinarySecret;
+  const apiKey = serverEnv.cloudinaryKey;
   const name = cloudName();
   if (!secret || !apiKey || !name || !publicId) return false;
 
@@ -107,7 +109,7 @@ export async function destroyAsset(publicId: string): Promise<boolean> {
   });
 
   try {
-    const response = await fetch(`${BASE}/${name}/image/destroy`, { method: 'POST', body });
+    const response = await fetch(`${API_BASE}/${name}/image/destroy`, { method: 'POST', body });
     return response.ok;
   } catch {
     return false;
@@ -115,5 +117,69 @@ export async function destroyAsset(publicId: string): Promise<boolean> {
 }
 
 export function cloudinaryConfigured(): boolean {
-  return Boolean(cloudName() && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+  return Boolean(cloudName() && serverEnv.cloudinaryKey && serverEnv.cloudinarySecret);
+}
+
+export type RemoteUploadResult = {
+  publicId: string;
+  secureUrl: string;
+  width?: number;
+  height?: number;
+};
+
+/**
+ * Importa una imagen desde una URL remota (por ejemplo, eBay) al cloud.
+ * Cloudinary descarga el archivo y lo guarda con un public_id propio.
+ * Devuelve null si faltan credenciales o si la descarga falla.
+ */
+export async function uploadRemoteImage(
+  sourceUrl: string,
+  folder: string,
+): Promise<RemoteUploadResult | null> {
+  const secret = serverEnv.cloudinarySecret;
+  const apiKey = serverEnv.cloudinaryKey;
+  const name = cloudName();
+  if (!secret || !apiKey || !name || !sourceUrl) return null;
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = createHash('sha1')
+    .update(`folder=${folder}&timestamp=${timestamp}${secret}`)
+    .digest('hex');
+
+  const body = new URLSearchParams({
+    file: sourceUrl,
+    folder,
+    timestamp: String(timestamp),
+    api_key: apiKey,
+    signature,
+  });
+
+  try {
+    const response = await fetch(`${API_BASE}/${name}/image/upload`, { method: 'POST', body });
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error(
+        '[cloudinary] no se pudo importar la imagen:',
+        response.status,
+        detail.slice(0, 300),
+      );
+      return null;
+    }
+    const data = (await response.json()) as {
+      public_id?: string;
+      secure_url?: string;
+      width?: number;
+      height?: number;
+    };
+    if (!data.public_id) return null;
+    return {
+      publicId: data.public_id,
+      secureUrl: data.secure_url ?? '',
+      width: data.width,
+      height: data.height,
+    };
+  } catch (error) {
+    console.error('[cloudinary] error importando una imagen remota:', error);
+    return null;
+  }
 }
