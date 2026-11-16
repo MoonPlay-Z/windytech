@@ -95,6 +95,12 @@ export const productSchema = z.object({
   condition: z.enum(['NEW', 'REFURBISHED_A', 'USED']).default('NEW'),
   price: z.coerce.number().min(0).max(1_000_000),
   compareAt: z.coerce.number().min(0).max(1_000_000).nullable().optional(),
+  cost: z.coerce.number().min(0).max(1_000_000).optional(),
+  resaleMarginPercent: z.coerce.number().int().min(0).max(100).optional(),
+  shipping: z.coerce.number().min(0).max(1_000_000).optional(),
+  deliveryEstimateDays: z.coerce.number().int().min(1).max(120).optional(),
+  ebayItemId: z.string().trim().max(64).nullable().optional(),
+  ebayStatus: z.enum(['draft', 'listed', 'ended']).optional(),
   sku: z.string().trim().max(80).default(''),
   availability: z.enum(['IN_STOCK', 'OUT_OF_STOCK', 'PREORDER']).default('IN_STOCK'),
   isActive: z.coerce.boolean().default(true),
@@ -201,6 +207,7 @@ export const postSchema = z.object({
   tags: z.array(z.string().trim().max(60)).default([]),
   publishedAt: z.string().trim().optional(),
   isPublished: z.coerce.boolean().default(false),
+  linkedinEmbedUrl: z.string().trim().max(2000).nullable().optional(),
   translations: z.array(
     z.object({
       locale: z.literal('es').default('es'),

@@ -42,6 +42,30 @@ export const serverEnv = {
   get isProduction() {
     return read('NODE_ENV') === 'production';
   },
+  /** eBay: credenciales del desarrollador y token de refresco del usuario. */
+  get ebayClientId() {
+    return read('EBAY_CLIENT_ID');
+  },
+  get ebayClientSecret() {
+    return read('EBAY_CLIENT_SECRET');
+  },
+  /** true = Sandbox de eBay, false = Producción. */
+  get ebaySandbox() {
+    return read('EBAY_SANDBOX') !== 'false';
+  },
+  get ebayRedirectUri() {
+    return read('EBAY_REDIRECT_URI');
+  },
+  get ebayRefreshToken() {
+    return read('EBAY_REFRESH_TOKEN');
+  },
+  get ebayDevId() {
+    return read('EBAY_DEV_ID');
+  },
+  /** Scope OAuth requerido para publicar en eBay (ej: https://api.ebay.com/oauth/api_scope/sell.item). */
+  get ebayOAuthScope() {
+    return read('EBAY_OAUTH_SCOPE') || 'https://api.ebay.com/oauth/api_scope/sell.item';
+  },
 };
 
 export const SESSION_COOKIE = 'wt_admin';

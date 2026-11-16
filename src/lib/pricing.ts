@@ -131,3 +131,42 @@ export function computeTotals(lines: TotalsLine[], taxRate = 0) {
 
   return { subtotalCents, discountCents, taxCents, totalCents };
 }
+
+/* ------------------------------------------------------------------ */
+/* Precios para reventa en eBay (costo + envío + margen)              */
+/* ------------------------------------------------------------------ */
+
+export type ResalePriceInput = {
+  /** Costo de adquisición del producto (en centavos). */
+  costCents: number;
+  /** Costo del envío (en centavos) que se incluye en el precio final. */
+  shippingCostCents: number;
+  /** Margen de ganancia en porcentaje (editable por producto). */
+  marginPercent: number;
+};
+
+export type ResalePrice = {
+  /** Precio final (en centavos) con margen de ganancia e envío incluidos. */
+  finalPriceCents: number;
+  shippingCostCents: number;
+  marginPercent: number;
+};
+
+/**
+ * Precio final de reventa para eBay: (costo + envío) × (1 + margen%).
+ * El resultado ya incluye el envío dentro del precio final.
+ */
+export function computeResaleFinalPriceCents(input: ResalePriceInput): number {
+  const baseCents = Math.max(0, input.costCents ?? 0) + Math.max(0, input.shippingCostCents ?? 0);
+  const finalPriceCents = baseCents * (1 + (input.marginPercent ?? 0) / 100);
+  return Math.max(0, Math.round(finalPriceCents));
+}
+
+export function computeResalePrice(input: ResalePriceInput): ResalePrice {
+  const shippingCostCents = Math.max(0, input.shippingCostCents ?? 0);
+  const finalPriceCents = computeResaleFinalPriceCents({
+    ...input,
+    shippingCostCents,
+  });
+  return { finalPriceCents, shippingCostCents, marginPercent: input.marginPercent ?? 0 };
+}

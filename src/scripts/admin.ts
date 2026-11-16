@@ -477,6 +477,35 @@ function setupQuoteStatus() {
   });
 }
 
+function setupEbayActions() {
+  document.querySelectorAll<HTMLButtonElement>('[data-ebay-action]').forEach((button) => {
+    if (button.dataset.wtEbayBound === 'true') return;
+    button.dataset.wtEbayBound = 'true';
+    button.addEventListener('click', async () => {
+      const form = button.closest<HTMLFormElement>('[data-admin-form]');
+      const productId = Number(button.dataset.ebayProductId ?? '0');
+      const action = (button.dataset.ebayAction ?? 'create') as string;
+      if (!form || !Number.isInteger(productId) || productId <= 0) return;
+      try {
+        const response = await fetch('/api/admin/ebay/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ productId, action }),
+        });
+        const data = (await response.json().catch(() => ({}))) as { itemId?: string; error?: string };
+        if (response.ok) {
+          message(form, data.itemId ? `Publicado en eBay. Item: ${data.itemId}` : 'Publicación guardada en eBay.', 'ok');
+        } else {
+          message(form, data.error ?? 'No se pudo publicar en eBay.', 'error');
+        }
+      } catch {
+        message(form, 'Error al publicar en eBay.');
+      }
+    });
+  });
+}
+
 function setupActiveNavScroll() {
   document.querySelector<HTMLElement>('.admin-nav-link.is-active')?.scrollIntoView({
     inline: 'center',
@@ -491,6 +520,7 @@ function initAdmin() {
   setupDelete();
   setupUploaders();
   setupQuoteStatus();
+  setupEbayActions();
   setupActiveNavScroll();
 }
 

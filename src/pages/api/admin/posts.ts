@@ -54,6 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
       tags: data.tags,
       publishedAt: publishedAt && Number.isFinite(publishedAt.getTime()) ? publishedAt : null,
       isPublished: data.isPublished,
+      linkedinEmbedUrl: data.linkedinEmbedUrl ?? null,
       translations: data.translations,
     });
   } catch (error) {

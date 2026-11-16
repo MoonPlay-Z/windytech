@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareBar from '../ShareBar.astro';
+import LinkedInEmbed from '../LinkedInEmbed.astro';
 import { site } from '../../data/site';
 import { blogPath, type PostSummary } from '../../lib/catalog';
 import { imageUrl } from '../../lib/cloudinary';
@@ -85,6 +86,7 @@ const articleMeta = [
         <img class="article-cover" src={cover} alt={post.title} width="1600" height="900" loading="eager" />
       )}
       <div class="prose" set:html={renderMarkdown(post.bodyMd)} />
+      {post.linkedinEmbedUrl && <LinkedInEmbed src={post.linkedinEmbedUrl} />}
       {post.tags.length > 0 && (
         <div class="article-tags">
           {post.tags.map((tag) => <span>{tag}</span>)}

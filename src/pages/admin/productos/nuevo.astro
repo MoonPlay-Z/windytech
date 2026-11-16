@@ -53,6 +53,38 @@ const categories = await listCategoriesAdmin();
       </div>
       <div class="admin-form-row">
         <label>
+          <span>Costo de adquisición USD</span>
+          <input type="number" name="cost" data-field="cost" data-type="number" min="0" step="0.01" />
+        </label>
+        <label>
+          <span>% Ganancia reventa</span>
+          <input type="number" name="resaleMarginPercent" data-field="resaleMarginPercent" data-type="number" min="0" max="100" step="0.01" />
+        </label>
+        <label>
+          <span>Costo envío USD</span>
+          <input type="number" name="shipping" data-field="shipping" data-type="number" min="0" step="0.01" />
+        </label>
+        <label>
+          <span>Días entrega estimados</span>
+          <input type="number" name="deliveryEstimateDays" data-field="deliveryEstimateDays" data-type="number" min="1" max="120" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Estado eBay</span>
+          <select name="ebayStatus" data-field="ebayStatus">
+            <option value="draft">Borrador</option>
+            <option value="listed">Publicado</option>
+            <option value="ended">Retirado</option>
+          </select>
+        </label>
+        <label>
+          <span>Item ID eBay</span>
+          <input name="ebayItemId" data-field="ebayItemId" type="text" />
+        </label>
+      </div>
+      <div class="admin-form-row">
+        <label>
           <span>Condición</span>
           <select name="condition" data-field="condition">
             <option value="NEW">Nuevo</option>

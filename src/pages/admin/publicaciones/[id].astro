@@ -106,6 +106,19 @@ const publishedAtValue = toLocalInput(post.publishedAt);
         </div>
       </fieldset>
 
+      <label>
+        <span>Publicación de LinkedIn (URL del embed)</span>
+        <input
+          name="linkedinEmbedUrl"
+          data-field="linkedinEmbedUrl"
+          type="text"
+          maxlength="2000"
+          inputmode="url"
+          placeholder="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7527374078513676288"
+          value={post.linkedinEmbedUrl ?? ''}
+        />
+      </label>
+
       <ImageUploader
         mode="single"
         folder={`windytech/publicaciones/${postId}`}

@@ -1,0 +1,25 @@
+---
+interface Props {
+  /** URL del embed de LinkedIn, p.ej. https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:... */
+  src: string;
+  /** Ancho declarado del iframe (el CSS escala proporcionalmente). */
+  width?: number;
+  /** Alto declarado del iframe (el CSS escala proporcionalmente). */
+  height?: number;
+  /** Texto alternativo del iframe. */
+  alt?: string;
+}
+
+const { src, width = 504, height = 846, alt = 'Publicación de LinkedIn' } = Astro.props;
+---
+
+<div class="linkedin-embed">
+  <iframe
+    src={src}
+    width={width}
+    height={height}
+    title={alt}
+    loading="lazy"
+    style="border: 0;"
+  ></iframe>
+</div>

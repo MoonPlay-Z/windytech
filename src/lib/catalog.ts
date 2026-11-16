@@ -37,6 +37,12 @@ export type CatalogProduct = {
   condition: Condition;
   priceCents: number;
   compareAtCents: number | null;
+  costCents?: number;
+  resaleMarginPercent?: number;
+  shippingCostCents?: number;
+  deliveryEstimateDays?: number;
+  ebayItemId?: string | null;
+  ebayStatus?: string;
   sku: string;
   availability: Availability;
   isFeatured: boolean;
@@ -84,6 +90,7 @@ export type PostSummary = {
   title: string;
   excerpt: string;
   bodyMd?: string;
+  linkedinEmbedUrl?: string | null;
 };
 
 /** Paquete de servicio: contenido, costo y tiempo de aplicación. */

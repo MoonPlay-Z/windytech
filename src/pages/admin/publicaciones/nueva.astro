@@ -66,6 +66,18 @@ if (!admin) return Astro.redirect('/admin/login/', 302);
         </div>
       </fieldset>
 
+      <label>
+        <span>Publicación de LinkedIn (URL del embed)</span>
+        <input
+          name="linkedinEmbedUrl"
+          data-field="linkedinEmbedUrl"
+          type="text"
+          maxlength="2000"
+          inputmode="url"
+          placeholder="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7527374078513676288"
+        />
+      </label>
+
       <ImageUploader mode="single" folder="windytech/publicaciones/nueva" field="coverPublicId" label="Imagen de portada" />
 
       <p class="admin-message" data-form-message hidden></p>

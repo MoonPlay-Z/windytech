@@ -192,6 +192,9 @@ export async function getProduct(slug: string): Promise<CatalogProduct | null> {
   const row = await one(
     sql`SELECT p.id, p.category_id AS "categoryId", p.brand, p.model, p.condition,
                p.price_cents AS "priceCents", p.compare_at_cents AS "compareAtCents",
+               p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
+               p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
+               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus",
                p.sku, p.availability, p.is_featured AS "isFeatured", p.specs,
                t.slug, t.name, t.short_description AS "shortDescription",
                t.description_md AS "descriptionMd", t.seo_title AS "seoTitle",
@@ -235,6 +238,9 @@ export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]>
   const rows = await safeRows(
     sql`SELECT p.id, p.category_id AS "categoryId", p.brand, p.model, p.condition,
                p.price_cents AS "priceCents", p.compare_at_cents AS "compareAtCents",
+               p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
+               p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
+               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus",
                p.sku, p.availability, p.is_featured AS "isFeatured", p.specs,
                COALESCE(t.slug, '') AS slug, COALESCE(t.name, p.model) AS name,
                COALESCE(t.short_description, '') AS "shortDescription"
@@ -315,7 +321,7 @@ export async function getProject(slug: string): Promise<ProjectSummary | null> {
 export async function getPosts(): Promise<PostSummary[]> {
   const rows = await safeRows(
     sql`SELECT p.id, p.cover_public_id AS "coverPublicId", p.author, p.tags,
-               p.published_at AS "publishedAt",
+               p.published_at AS "publishedAt", p.linkedin_embed_url AS "linkedinEmbedUrl",
                t.slug, t.title, t.excerpt
         FROM posts p
         JOIN post_translations t ON t.post_id = p.id AND t.locale = 'es'
@@ -622,11 +628,20 @@ export async function listProductsAdmin() {
     name: string;
     slug: string;
     images: number;
+    costCents: number;
+    resaleMarginPercent: number;
+    shippingCostCents: number;
+    deliveryEstimateDays: number;
+    ebayItemId: string | null;
+    ebayStatus: string;
   }>(
     sql`SELECT p.id, p.brand, p.model, p.condition, p.price_cents AS "priceCents",
                p.availability, p.is_active AS "isActive", p.is_featured AS "isFeatured", p.sku,
                COALESCE(t.name, p.model) AS name, COALESCE(t.slug, '') AS slug,
-               (SELECT COUNT(*)::int FROM product_images i WHERE i.product_id = p.id) AS images
+               (SELECT COUNT(*)::int FROM product_images i WHERE i.product_id = p.id) AS images,
+               p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
+               p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
+               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus"
         FROM products p
         LEFT JOIN product_translations t ON t.product_id = p.id AND t.locale = 'es'
         ORDER BY p.created_at DESC`,
@@ -641,6 +656,12 @@ export type ProductAdmin = {
   condition: string;
   priceCents: number;
   compareAtCents: number | null;
+  costCents: number;
+  resaleMarginPercent: number;
+  shippingCostCents: number;
+  deliveryEstimateDays: number;
+  ebayItemId: string | null;
+  ebayStatus: string;
   sku: string;
   availability: string;
   isActive: boolean;
@@ -654,7 +675,10 @@ export type ProductAdmin = {
 export async function getProductAdmin(id: number): Promise<ProductAdmin | null> {
   const product = await one<Row>(
     sql`SELECT id, category_id AS "categoryId", brand, model, condition,
-               price_cents AS "priceCents", compare_at_cents AS "compareAtCents", sku,
+               price_cents AS "priceCents", compare_at_cents AS "compareAtCents",
+               cost_cents AS "costCents", resale_margin_percent AS "resaleMarginPercent",
+               shipping_cost_cents AS "shippingCostCents", delivery_estimate_days AS "deliveryEstimateDays",
+               ebay_item_id AS "ebayItemId", ebay_status AS "ebayStatus", sku,
                availability, is_active AS "isActive", is_featured AS "isFeatured", specs
         FROM products WHERE id = ${id} LIMIT 1`,
   );
@@ -684,6 +708,12 @@ export type ProductInput = {
   condition: string;
   priceCents: number;
   compareAtCents: number | null;
+  costCents: number;
+  resaleMarginPercent: number;
+  shippingCostCents: number;
+  deliveryEstimateDays: number;
+  ebayItemId: string | null;
+  ebayStatus: string;
   sku: string;
   availability: string;
   isActive: boolean;
@@ -798,6 +828,9 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
         sql`UPDATE products SET category_id = ${input.categoryId}, brand = ${input.brand},
                 model = ${input.model}, condition = ${input.condition},
                 price_cents = ${input.priceCents}, compare_at_cents = ${input.compareAtCents},
+                cost_cents = ${input.costCents}, resale_margin_percent = ${input.resaleMarginPercent},
+                shipping_cost_cents = ${input.shippingCostCents}, delivery_estimate_days = ${input.deliveryEstimateDays},
+                ebay_item_id = ${input.ebayItemId}, ebay_status = ${input.ebayStatus},
                 sku = ${input.sku}, availability = ${input.availability},
                 is_active = ${input.isActive}, is_featured = ${input.isFeatured},
                 specs = ${JSON.stringify(input.specs)}::jsonb, updated_at = now()
@@ -806,10 +839,13 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
     } else {
       const result = await tx.execute(
         sql`INSERT INTO products (category_id, brand, model, condition, price_cents,
-                compare_at_cents, sku, availability, is_active, is_featured, specs)
+                compare_at_cents, cost_cents, resale_margin_percent, shipping_cost_cents,
+                delivery_estimate_days, ebay_item_id, ebay_status, sku, availability,
+                is_active, is_featured, specs)
             VALUES (${input.categoryId}, ${input.brand}, ${input.model}, ${input.condition},
-                ${input.priceCents}, ${input.compareAtCents}, ${input.sku},
-                ${input.availability}, ${input.isActive}, ${input.isFeatured},
+                ${input.priceCents}, ${input.compareAtCents}, ${input.costCents}, ${input.resaleMarginPercent},
+                ${input.shippingCostCents}, ${input.deliveryEstimateDays}, ${input.ebayItemId}, ${input.ebayStatus},
+                ${input.sku}, ${input.availability}, ${input.isActive}, ${input.isFeatured},
                 ${JSON.stringify(input.specs)}::jsonb)
             RETURNING id`,
       );
@@ -1201,6 +1237,7 @@ export type PostAdmin = {
   tags: string[];
   publishedAt: Date | null;
   isPublished: boolean;
+  linkedinEmbedUrl: string | null;
   translations: {
     locale: string;
     slug: string;
@@ -1213,7 +1250,7 @@ export type PostAdmin = {
 export async function getPostAdmin(id: number): Promise<PostAdmin | null> {
   const post = await one<Row>(
     sql`SELECT id, cover_public_id AS "coverPublicId", author, tags, published_at AS "publishedAt",
-               is_published AS "isPublished" FROM posts WHERE id = ${id} LIMIT 1`,
+               is_published AS "isPublished", linkedin_embed_url AS "linkedinEmbedUrl" FROM posts WHERE id = ${id} LIMIT 1`,
   );
   if (!post) return null;
   const translations = await safeRows(
@@ -1229,6 +1266,7 @@ export async function savePost(input: {
   tags: string[];
   publishedAt: Date | null;
   isPublished: boolean;
+  linkedinEmbedUrl: string | null;
   translations: { locale: string; slug: string; title: string; excerpt: string; bodyMd: string }[];
 }): Promise<number | null> {
   const client = db();
@@ -1239,13 +1277,14 @@ export async function savePost(input: {
       await tx.execute(
         sql`UPDATE posts SET cover_public_id = ${input.coverPublicId}, author = ${input.author},
                 tags = ${textArrayLiteral(input.tags)}::text[], published_at = ${input.publishedAt},
-                is_published = ${input.isPublished}, updated_at = now() WHERE id = ${id}`,
+                is_published = ${input.isPublished}, linkedin_embed_url = ${input.linkedinEmbedUrl},
+                updated_at = now() WHERE id = ${id}`,
       );
     } else {
       const result = await tx.execute(
-        sql`INSERT INTO posts (cover_public_id, author, tags, published_at, is_published)
+        sql`INSERT INTO posts (cover_public_id, author, tags, published_at, is_published, linkedin_embed_url)
             VALUES (${input.coverPublicId}, ${input.author}, ${textArrayLiteral(input.tags)}::text[], ${input.publishedAt},
-                ${input.isPublished}) RETURNING id`,
+                ${input.isPublished}, ${input.linkedinEmbedUrl}) RETURNING id`,
       );
       id = Number((result.rows[0] as { id: number }).id);
     }

@@ -62,6 +62,12 @@ export const products = pgTable(
     condition: conditionEnum('condition').notNull().default('NEW'),
     priceCents: integer('price_cents').notNull(),
     compareAtCents: integer('compare_at_cents'),
+    costCents: integer('cost_cents').notNull().default(0),
+    resaleMarginPercent: integer('resale_margin_percent').notNull().default(0),
+    shippingCostCents: integer('shipping_cost_cents').notNull().default(0),
+    deliveryEstimateDays: integer('delivery_estimate_days').notNull().default(21),
+    ebayItemId: text('ebay_item_id'),
+    ebayStatus: text('ebay_status').notNull().default('draft'),
     sku: text('sku').notNull().default(''),
     availability: availabilityEnum('availability').notNull().default('IN_STOCK'),
     isActive: boolean('is_active').notNull().default(true),
@@ -269,6 +275,8 @@ export const posts = pgTable('posts', {
   isPublished: boolean('is_published').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  /** URL del embed de LinkedIn a integrar en la publicación (feed/update/...). */
+  linkedinEmbedUrl: text('linkedin_embed_url'),
 });
 
 export const postTranslations = pgTable(

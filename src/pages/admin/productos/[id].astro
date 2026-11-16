@@ -30,6 +30,11 @@ const isUsed = product.condition === 'USED';
 const inStock = product.availability === 'IN_STOCK';
 const outOfStock = product.availability === 'OUT_OF_STOCK';
 const preorder = product.availability === 'PREORDER';
+const costUsd = (product.costCents / 100).toFixed(2);
+const shippingUsd = (product.shippingCostCents / 100).toFixed(2);
+const deliveryEstimateDaysValue = String(product.deliveryEstimateDays ?? 21);
+const ebayStatusValue = product.ebayStatus ?? 'draft';
+const ebayItemIdValue = product.ebayItemId ?? '';
 const activeChecked = product.isActive ? 'checked' : '';
 const featuredChecked = product.isFeatured ? 'checked' : '';
 ---
@@ -57,6 +62,26 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
         <label><span>Precio USD</span><input type="number" name="price" data-field="price" data-type="number" min="0" step="0.01" value={priceUsd} /></label>
         <label><span>Precio tachado</span><input type="number" name="compareAt" data-field="compareAt" data-type="number" min="0" step="0.01" value={compareAtUsd} /></label>
         <label><span>SKU</span><input name="sku" data-field="sku" type="text" value={product.sku} /></label>
+      </div>
+      <div class="admin-form-row">
+        <label><span>Costo de adquisición USD</span><input type="number" name="cost" data-field="cost" data-type="number" min="0" step="0.01" value={costUsd} /></label>
+        <label><span>% Ganancia reventa</span><input type="number" name="resaleMarginPercent" data-field="resaleMarginPercent" data-type="number" min="0" max="100" step="0.01" value={String(product.resaleMarginPercent ?? 0)} /></label>
+        <label><span>Costo envío USD</span><input type="number" name="shipping" data-field="shipping" data-type="number" min="0" step="0.01" value={shippingUsd} /></label>
+        <label><span>Días entrega estimados</span><input type="number" name="deliveryEstimateDays" data-field="deliveryEstimateDays" data-type="number" min="1" max="120" value={deliveryEstimateDaysValue} /></label>
+      </div>
+      <div class="admin-form-row">
+        <label>
+          <span>Estado eBay</span>
+          <select name="ebayStatus" data-field="ebayStatus">
+            <option value="draft">Borrador</option>
+            <option value="listed">Publicado</option>
+            <option value="ended">Retirado</option>
+          </select>
+        </label>
+        <label>
+          <span>Item ID eBay</span>
+          <input name="ebayItemId" data-field="ebayItemId" type="text" value={ebayItemIdValue} />
+        </label>
       </div>
       <div class="admin-form-row">
         <label><span>Condición</span><select name="condition" data-field="condition"><option value="NEW" selected={isNew}>Nuevo</option><option value="REFURBISHED_A" selected={isRefurbished}>Reacondicionado Clase A</option><option value="USED" selected={isUsed}>Usado</option></select></label>
@@ -94,7 +119,12 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
         max={4}
       />
       <p class="admin-message" data-form-message hidden></p>
-      <div class="admin-actions"><button class="admin-btn" type="submit">Guardar cambios</button></div>
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit">Guardar cambios</button>
+        <button class="admin-btn" type="button" data-ebay-action="create" data-ebay-product-id={String(productId)}>Publicar en eBay (nuevo)</button>
+        <button class="admin-btn" type="button" data-ebay-action="relist" data-ebay-product-id={String(productId)}>Republicar en eBay</button>
+        <button class="admin-btn" type="button" data-ebay-action="end" data-ebay-product-id={String(productId)}>Retirar de eBay</button>
+      </div>
     </form>
   </section>
 </AdminLayout>

@@ -34,6 +34,22 @@ services:
         sync: false
       - key: ADMIN_NOTIFICACION_EMAIL
         sync: false
+      # eBay (Browse API + Selling API). Pega los valores en el panel de Render;
+      # EBAY_REFRESH_TOKEN se obtiene con /api/ebay/callback.
+      - key: EBAY_CLIENT_ID
+        sync: false
+      - key: EBAY_CLIENT_SECRET
+        sync: false
+      - key: EBAY_DEV_ID
+        sync: false
+      - key: EBAY_REFRESH_TOKEN
+        sync: false
+      - key: EBAY_SANDBOX
+        value: "true"
+      - key: EBAY_REDIRECT_URI
+        sync: false
+      - key: EBAY_OAUTH_SCOPE
+        value: https://api.ebay.com/oauth/api_scope/sell.item
 
   # Actualiza la tasa BCV cada día (12:00 UTC). Sin esto, el catálogo y el
   # carrito muestran una tasa vieja.
