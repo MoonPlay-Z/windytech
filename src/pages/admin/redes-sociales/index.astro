@@ -1,0 +1,146 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import SocialShareEditor from '../../../components/admin/SocialShareEditor.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listProductsAdmin } from '../../../lib/db/queries';
+import { getGlobalSocialShare, listSocialShareEntityIds } from '../../../lib/social-share';
+import { services } from '../../../data/services';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const global = await getGlobalSocialShare();
+const [products, productOverrides, serviceOverrides] = await Promise.all([
+  listProductsAdmin(),
+  listSocialShareEntityIds('product'),
+  listSocialShareEntityIds('service'),
+]);
+---
+
+<AdminLayout title="Redes sociales" admin={admin} active="social">
+  <SocialShareEditor
+    entityType="global"
+    title="Tarjeta global para compartir"
+    description="Se usa en la portada, servicios, catálogo, contacto y el resto de páginas generales. Los productos con foto y las publicaciones conservan su propia imagen."
+    config={global.config}
+    hasOverride={global.exists}
+    pageLabel="windytech.studio"
+  />
+
+  <section class="admin-card">
+    <div class="admin-card-heading">
+      <div>
+        <span class="admin-overline">PRODUCTOS</span>
+        <h2>Tarjetas por producto</h2>
+        <p class="admin-hint">
+          Si no personalizas un producto, al compartirlo se mantiene la foto de su ficha.
+        </p>
+      </div>
+      <input
+        class="admin-filter"
+        type="search"
+        placeholder="Buscar producto…"
+        data-share-filter="[data-share-products]"
+        aria-label="Buscar producto"
+      />
+    </div>
+
+    {
+      products.length === 0 ? (
+        <p class="admin-hint">Todavía no hay productos en el catálogo.</p>
+      ) : (
+        <div class="admin-table-wrap">
+          <table class="admin-table" data-share-products>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Ruta</th>
+                <th>Tarjeta</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr data-search={`${product.name} ${product.brand} ${product.model} ${product.sku}`.toLowerCase()}>
+                  <td>
+                    <strong>{product.name || product.model}</strong>
+                    <br />
+                    <small class="admin-hint">
+                      {product.brand} {product.model}
+                    </small>
+                  </td>
+                  <td>
+                    <small class="admin-hint">/catalogo/{product.slug}/</small>
+                  </td>
+                  <td>
+                    {productOverrides.has(String(product.id)) ? (
+                      <span class="admin-badge">Personalizada</span>
+                    ) : (
+                      <span class="admin-hint">Foto del producto</span>
+                    )}
+                  </td>
+                  <td>
+                    <a href={`/admin/redes-sociales/producto/${product.id}/`}>
+                      Personalizar <span aria-hidden="true">→</span>
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  </section>
+
+  <section class="admin-card">
+    <div class="admin-card-heading">
+      <div>
+        <span class="admin-overline">SERVICIOS</span>
+        <h2>Tarjetas por servicio</h2>
+        <p class="admin-hint">
+          Cada página de /servicios/... usa la tarjeta global hasta que le crees una propia.
+        </p>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Ruta</th>
+            <th>Tarjeta</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {services.map((service) => (
+            <tr>
+              <td>
+                <strong>{service.content.title}</strong>
+              </td>
+              <td>
+                <small class="admin-hint">{service.path}</small>
+              </td>
+              <td>
+                {serviceOverrides.has(service.content.slug) ? (
+                  <span class="admin-badge">Personalizada</span>
+                ) : (
+                  <span class="admin-hint">Global</span>
+                )}
+              </td>
+              <td>
+                <a href={`/admin/redes-sociales/servicio/${service.content.slug}/`}>
+                  Personalizar <span aria-hidden="true">→</span>
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>

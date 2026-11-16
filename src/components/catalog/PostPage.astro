@@ -57,6 +57,7 @@ const articleMeta = [
   ogImage={cover ?? '/assets/og.webp'}
   ogImageAlt={post.title}
   ogType="article"
+  socialShare={cover ? null : undefined}
   extraSchema={[schema]}
   extraMeta={articleMeta}
   dateModified={published ? published.toISOString().slice(0, 10) : site.contentUpdated}

@@ -5,7 +5,7 @@ import { sameOrigin } from '../../../../lib/security';
 
 export const prerender = false;
 
-const ALLOWED = /^windytech\/(productos|proyectos|publicaciones|media)\//;
+const ALLOWED = /^windytech\/(productos|proyectos|publicaciones|media|redes)\//;
 
 export const POST: APIRoute = async ({ request }) => {
   if (!sameOrigin(request)) return json({ error: 'Origen no permitido.' }, 403);

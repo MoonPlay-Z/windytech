@@ -1207,3 +1207,108 @@ html.admin-page {
     height: 72px;
   }
 }
+
+/* Tarjetas para compartir en redes sociales */
+
+.admin-card-heading {
+  flex-wrap: wrap;
+}
+
+.admin-filter {
+  max-width: 240px;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-filter:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.social-share-back {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 16px;
+}
+
+.social-share-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.social-share-preview {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f6fafb;
+}
+
+.social-share-preview canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #0e2234;
+  box-shadow: 0 12px 30px rgba(14, 34, 52, 0.16);
+}
+
+.social-share-copy {
+  max-width: 68ch;
+  margin: 6px 0 0;
+}
+
+.social-share-editor textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.social-share-editor input[type='color'] {
+  height: 42px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.social-share-editor input[type='range'] {
+  padding: 0;
+  accent-color: var(--teal-dark);
+}
+
+.social-share-editor .uploader {
+  margin-top: 2px;
+}
+
+@media (max-width: 980px) {
+  .social-share-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .social-share-preview {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .social-share-editor .admin-card-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-filter {
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -16,6 +16,7 @@ import {
 import { productImage, productSrcSet, ogImage } from '../../lib/cloudinary';
 import { renderMarkdown } from '../../lib/markdown';
 import type { RateResult } from '../../lib/rate';
+import { getSocialShareForPage } from '../../lib/social-share';
 import '../../styles/catalog.css';
 import '../../styles/detail.css';
 
@@ -76,6 +77,14 @@ const conditionSchema =
 const imageUrl = image ? ogImage(image.cloudinaryPublicId) : new URL(site.ogImage, site.url).toString();
 /** URL de la foto principal; vacía si Cloudinary no responde. */
 const mainImageSrc = image ? productImage(image.cloudinaryPublicId, 1200) : '';
+
+/*
+ * La tarjeta específica manda. Si no existe, el producto conserva su foto;
+ * solo cuando no tiene foto se usa la tarjeta global.
+ */
+const socialShare = await getSocialShareForPage('product', String(product.id), {
+  fallbackToGlobal: !image,
+});
 
 const offer = (variant: CatalogProduct['variants'][number] | null) => {
   const price = priceFor(product, variant?.id ?? null);
@@ -144,6 +153,7 @@ const productSchema: Record<string, unknown> = {
   ogImage={imageUrl}
   ogImageAlt={image?.alt || product.name}
   ogType="website"
+  socialShare={socialShare}
   currencyDefault={currencyDefault}
   extraSchema={[productSchema]}
   extraMeta={productMeta}

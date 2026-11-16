@@ -1,0 +1,49 @@
+---
+import AdminLayout from '../../../../components/admin/AdminLayout.astro';
+import SocialShareEditor from '../../../../components/admin/SocialShareEditor.astro';
+import { sessionFromRequest } from '../../../../lib/auth';
+import { serviceBySlug } from '../../../../data/services';
+import {
+  getGlobalSocialShare,
+  getSocialShareOverride,
+  inheritedSocialShareConfig,
+} from '../../../../lib/social-share';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const slug = Astro.params.slug ?? '';
+const service = serviceBySlug(slug);
+if (!service) return Astro.redirect('/admin/redes-sociales/', 302);
+
+const global = await getGlobalSocialShare();
+const own = await getSocialShareOverride('service', slug);
+const config = own.exists
+  ? own.config
+  : inheritedSocialShareConfig(global.config, {
+      message: service.content.title,
+      subtitle: service.content.metaDescription || global.config.subtitle,
+    });
+---
+
+<AdminLayout title={`Tarjeta social · ${service.content.title}`} admin={admin} active="social">
+  <p class="admin-hint social-share-back">
+    <a class="admin-text-link" href="/admin/redes-sociales/">← Redes sociales</a>
+    <span aria-hidden="true">·</span>
+    <a class="admin-text-link" href={service.path}>Ver servicio</a>
+  </p>
+
+  <SocialShareEditor
+    entityType="service"
+    entityId={slug}
+    title={`Tarjeta de ${service.content.title}`}
+    description="Esta tarjeta sustituye a la tarjeta global solo en esta página de servicio. Si la quitas, se vuelve a usar la global."
+    config={config}
+    hasOverride={own.exists}
+    pageLabel={service.path}
+    backHref="/admin/redes-sociales/"
+    backLabel="Volver a redes sociales"
+  />
+</AdminLayout>

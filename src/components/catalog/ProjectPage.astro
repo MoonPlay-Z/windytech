@@ -48,6 +48,7 @@ const schema = {
   ogImage={cover ?? '/assets/og.webp'}
   ogImageAlt={project.title}
   ogType="article"
+  socialShare={cover ? null : undefined}
   extraSchema={[schema]}
   breadcrumb={[
     { name: 'Inicio', path: '/' },

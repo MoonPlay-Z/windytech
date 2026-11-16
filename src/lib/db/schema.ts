@@ -7,6 +7,7 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
@@ -521,6 +522,22 @@ export const settings = pgTable('settings', {
   value: text('value').notNull().default(''),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Tarjetas para compartir en redes sociales.
+ * `entityType` puede ser global, product o service; `entityId` es el id del
+ * producto o el slug del servicio (vacío para la tarjeta global).
+ */
+export const socialShareCards = pgTable(
+  'social_share_cards',
+  {
+    entityType: text('entity_type').notNull(),
+    entityId: text('entity_id').notNull().default(''),
+    config: jsonb('config').$type<Record<string, unknown>>().notNull().default({}),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.entityType, table.entityId] })],
+);
 
 export const exchangeRates = pgTable(
   'exchange_rates',

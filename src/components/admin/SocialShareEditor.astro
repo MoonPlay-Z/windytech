@@ -1,0 +1,214 @@
+---
+import ImageUploader from './ImageUploader.astro';
+import {
+  SOCIAL_SHARE_FORMATS,
+  type SocialShareConfig,
+  type SocialShareEntityType,
+} from '../../lib/social-share';
+
+interface Props {
+  entityType: SocialShareEntityType;
+  entityId?: string;
+  title: string;
+  description?: string;
+  config: SocialShareConfig;
+  hasOverride?: boolean;
+  backHref?: string;
+  backLabel?: string;
+  /** Referencia visible de la página que usa la tarjeta. */
+  pageLabel?: string;
+}
+
+const {
+  entityType,
+  entityId = '',
+  title,
+  description = '',
+  config,
+  hasOverride = false,
+  backHref,
+  backLabel = 'Volver a redes sociales',
+  pageLabel = '',
+} = Astro.props;
+
+const size = SOCIAL_SHARE_FORMATS[config.format];
+const deleteLabel = entityType === 'global' ? 'Restablecer tarjeta' : 'Quitar personalización';
+const confirmText =
+  entityType === 'global'
+    ? '¿Restablecer la tarjeta global? El sitio volverá a usar la imagen actual.'
+    : '¿Quitar la personalización? Esta página volverá a usar la imagen que tenía antes.';
+---
+
+<section
+  class="admin-card social-share-editor"
+  data-social-share
+  data-entity-type={entityType}
+  data-entity-id={entityId}
+  data-has-override={hasOverride ? 'true' : 'false'}
+  data-initial-text-color={config.textColor}
+>
+  <div class="admin-card-heading">
+    <div>
+      <span class="admin-overline">REDES SOCIALES</span>
+      <h2>{title}</h2>
+      {description && <p class="admin-hint social-share-copy">{description}</p>}
+      {
+        pageLabel && (
+          <p class="admin-hint">
+            Se verá al compartir <strong>{pageLabel}</strong> en WhatsApp, Facebook, X,
+            LinkedIn o Telegram.
+          </p>
+        )
+      }
+    </div>
+    {
+      backHref && (
+        <a class="admin-text-link" href={backHref}>
+          {backLabel}
+        </a>
+      )
+    }
+  </div>
+
+  <div class="social-share-layout">
+    <div class="social-share-preview">
+      <canvas
+        data-share-canvas
+        width={size.width}
+        height={size.height}
+        aria-label="Vista previa de la tarjeta para redes sociales"
+      ></canvas>
+      <p class="admin-hint" data-share-size>
+        {size.width} × {size.height} px · se guarda como JPEG de calidad 0,9
+      </p>
+    </div>
+
+    <form class="admin-form" data-share-form>
+      <label class="admin-check">
+        <input type="checkbox" data-share-field="enabled" checked={config.enabled} />
+        Usar esta tarjeta al compartir
+      </label>
+
+      <div class="admin-form-row">
+        <label>
+          <span>Nombre de empresa</span>
+          <input
+            type="text"
+            data-share-field="companyName"
+            maxlength="60"
+            value={config.companyName}
+            required
+          />
+        </label>
+        <label>
+          <span>Formato</span>
+          <select data-share-field="format">
+            <option value="landscape" selected={config.format === 'landscape'}>
+              1200 × 630 (horizontal)
+            </option>
+            <option value="square" selected={config.format === 'square'}>
+              1080 × 1080 (cuadrado)
+            </option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        <span>Mensaje principal</span>
+        <textarea data-share-field="message" rows="2" maxlength="140" placeholder="Titular de la tarjeta"
+        >{config.message}</textarea>
+      </label>
+
+      <label>
+        <span>Mensaje personalizado</span>
+        <textarea
+          data-share-field="subtitle"
+          rows="2"
+          maxlength="220"
+          placeholder="Frase de apoyo para la empresa"
+        >{config.subtitle}</textarea>
+      </label>
+
+      <div class="admin-form-row">
+        <label>
+          <span>Color de fondo</span>
+          <input
+            type="color"
+            data-share-field="backgroundColor"
+            value={config.backgroundColor}
+          />
+        </label>
+        <label>
+          <span>Color del texto</span>
+          <input
+            type="color"
+            data-share-field="textColor"
+            value={config.textColor || '#ffffff'}
+          />
+        </label>
+        <label>
+          <span>Tamaño del logo (%)</span>
+          <input
+            type="range"
+            data-share-field="logoSize"
+            min="8"
+            max="60"
+            step="1"
+            value={config.logoSize}
+          />
+        </label>
+      </div>
+
+      <label class="admin-check">
+        <input type="checkbox" data-share-auto-text checked={!config.textColor} />
+        Elegir el color del texto automáticamente según el fondo
+      </label>
+
+      <ImageUploader
+        mode="single"
+        folder="windytech/redes"
+        field="logoPublicId"
+        publicId={config.logoPublicId}
+        label="Logo de la tarjeta"
+      />
+
+      <ImageUploader
+        mode="single"
+        folder="windytech/redes"
+        field="backgroundPublicId"
+        publicId={config.backgroundPublicId}
+        label="Imagen de fondo (opcional)"
+      />
+
+      <input
+        type="hidden"
+        data-share-field="imagePublicId"
+        value={config.imagePublicId ?? ''}
+      />
+
+      <p class="admin-hint">
+        La tarjeta se dibuja en tu navegador al guardar. El mensaje cambia solo la vista
+        previa en redes sociales: el título y la descripción de Google no se modifican.
+      </p>
+
+      <p class="admin-message" data-share-message hidden></p>
+
+      <div class="admin-actions">
+        <button class="admin-btn" type="submit" data-share-save>Guardar tarjeta</button>
+        <button
+          class="admin-btn admin-btn--danger"
+          type="button"
+          data-share-delete
+          data-confirm={confirmText}
+          hidden={!hasOverride}
+        >
+          {deleteLabel}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/social-share';
+</script>

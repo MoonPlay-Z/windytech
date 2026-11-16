@@ -1878,3 +1878,74 @@ export async function markNotificationsRead(customerId: number): Promise<boolean
   );
   return true;
 }
+
+/* Tarjetas para compartir en redes sociales */
+
+export type SocialShareCardRecord = {
+  entityType: string;
+  entityId: string;
+  config: Record<string, unknown>;
+  updatedAt: string;
+};
+
+/** Lee una tarjeta concreta. Devuelve null si no existe o si la tabla aún no se migró. */
+export async function getSocialShareCard(
+  entityType: string,
+  entityId = '',
+): Promise<SocialShareCardRecord | null> {
+  return one<SocialShareCardRecord>(
+    sql`SELECT entity_type AS "entityType", entity_id AS "entityId",
+               config, updated_at AS "updatedAt"
+        FROM social_share_cards
+        WHERE entity_type = ${entityType} AND entity_id = ${entityId}
+        LIMIT 1`,
+  );
+}
+
+export async function listSocialShareCards(): Promise<SocialShareCardRecord[]> {
+  return safeRows<SocialShareCardRecord>(
+    sql`SELECT entity_type AS "entityType", entity_id AS "entityId",
+               config, updated_at AS "updatedAt"
+        FROM social_share_cards
+        ORDER BY updated_at DESC`,
+  );
+}
+
+export async function saveSocialShareCard(
+  entityType: string,
+  entityId: string,
+  config: Record<string, unknown>,
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  try {
+    await client.execute(
+      sql`INSERT INTO social_share_cards (entity_type, entity_id, config, updated_at)
+          VALUES (${entityType}, ${entityId}, ${JSON.stringify(config)}::jsonb, NOW())
+          ON CONFLICT (entity_type, entity_id)
+          DO UPDATE SET config = EXCLUDED.config, updated_at = NOW()`,
+    );
+    return true;
+  } catch (error) {
+    console.error('[db] no se pudo guardar la tarjeta social:', (error as Error).message);
+    return false;
+  }
+}
+
+export async function deleteSocialShareCard(
+  entityType: string,
+  entityId: string,
+): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  try {
+    await client.execute(
+      sql`DELETE FROM social_share_cards
+          WHERE entity_type = ${entityType} AND entity_id = ${entityId}`,
+    );
+    return true;
+  } catch (error) {
+    console.error('[db] no se pudo borrar la tarjeta social:', (error as Error).message);
+    return false;
+  }
+}

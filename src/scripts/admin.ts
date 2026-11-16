@@ -316,6 +316,16 @@ function setupUploaders() {
       } catch {
         items = [];
       }
+    } else if (hidden.value.trim()) {
+      // En modo single el valor inicial es el public_id ya guardado.
+      items = [
+        {
+          cloudinaryPublicId: hidden.value.trim(),
+          alt: '',
+          isPrimary: true,
+          position: 0,
+        },
+      ];
     }
 
     const sync = () => {
@@ -324,6 +334,18 @@ function setupUploaders() {
       } else {
         hidden.value = JSON.stringify(items);
       }
+      // Permite que otros formularios (por ejemplo la tarjeta social)
+      // actualicen su vista previa cuando cambia la imagen.
+      hidden.dispatchEvent(
+        new CustomEvent('uploader:change', {
+          bubbles: true,
+          detail: {
+            field: hidden.dataset.field ?? '',
+            value: hidden.value,
+            publicId: items[0]?.cloudinaryPublicId ?? '',
+          },
+        }),
+      );
     };
 
     const render = () => {

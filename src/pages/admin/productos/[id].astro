@@ -127,4 +127,20 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
       </div>
     </form>
   </section>
+
+  <section class="admin-card">
+    <div class="admin-card-heading">
+      <div>
+        <span class="admin-overline">REDES SOCIALES</span>
+        <h2>Tarjeta al compartir el producto</h2>
+        <p class="admin-hint">
+          Por defecto se comparte la foto principal. Puedes crear una tarjeta con mensaje,
+          logo y color de fondo solo para este producto.
+        </p>
+      </div>
+      <a class="admin-btn admin-btn--ghost" href={`/admin/redes-sociales/producto/${productId}/`}>
+        Personalizar tarjeta <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
 </AdminLayout>

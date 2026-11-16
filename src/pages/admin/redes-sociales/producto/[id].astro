@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../../../components/admin/AdminLayout.astro';
+import SocialShareEditor from '../../../../components/admin/SocialShareEditor.astro';
+import { sessionFromRequest } from '../../../../lib/auth';
+import { getProductAdmin } from '../../../../lib/db/queries';
+import {
+  getGlobalSocialShare,
+  getSocialShareOverride,
+  inheritedSocialShareConfig,
+} from '../../../../lib/social-share';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const productId = Number(Astro.params.id);
+if (!Number.isInteger(productId) || productId <= 0) {
+  return Astro.redirect('/admin/redes-sociales/', 302);
+}
+
+const product = await getProductAdmin(productId);
+if (!product) return Astro.redirect('/admin/redes-sociales/', 302);
+
+const translations = (product.translations ?? []) as Array<Record<string, unknown>>;
+const translation = translations.find((item) => item.locale === 'es') ?? {};
+const name = String(translation.name ?? product.model ?? `Producto ${productId}`);
+const subtitle = String(
+  translation.shortDescription ?? translation.seoDescription ?? '',
+).trim();
+const slug = String(translation.slug ?? '');
+
+const global = await getGlobalSocialShare();
+const own = await getSocialShareOverride('product', String(productId));
+const config = own.exists
+  ? own.config
+  : inheritedSocialShareConfig(global.config, {
+      message: name,
+      subtitle: subtitle || global.config.subtitle,
+    });
+---
+
+<AdminLayout title={`Tarjeta social · ${name}`} admin={admin} active="social">
+  <p class="admin-hint social-share-back">
+    <a class="admin-text-link" href="/admin/redes-sociales/">← Redes sociales</a>
+    <span aria-hidden="true">·</span>
+    {slug && <a class="admin-text-link" href={`/catalogo/${slug}/`}>Ver producto</a>}
+    <span aria-hidden="true">·</span>
+    <a class="admin-text-link" href={`/admin/productos/${productId}/`}>Editar producto</a>
+  </p>
+
+  <SocialShareEditor
+    entityType="product"
+    entityId={String(productId)}
+    title={`Tarjeta de ${name}`}
+    description="Esta tarjeta sustituye a la foto del producto cuando se comparte su ficha. Si la quitas, se vuelve a usar la foto original."
+    config={config}
+    hasOverride={own.exists}
+    pageLabel={`/catalogo/${slug}/`}
+    backHref="/admin/redes-sociales/"
+    backLabel="Volver a redes sociales"
+  />
+</AdminLayout>

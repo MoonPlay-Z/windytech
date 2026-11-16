@@ -47,6 +47,17 @@ export function imageUrl(publicId: string | null | undefined, options: ImageOpti
   return `${BASE}/${name}/image/upload/${transformation(options)}/${publicId}`;
 }
 
+/**
+ * URL sin transformaciones: el archivo tal como se subió.
+ * Se usa para las tarjetas sociales porque el formato declarado en
+ * `og:image:type` debe coincidir con el que entrega Cloudinary.
+ */
+export function rawImageUrl(publicId: string | null | undefined): string {
+  const name = cloudName();
+  if (!name || !publicId) return '';
+  return `${BASE}/${name}/image/upload/${publicId}`;
+}
+
 export const PRODUCT_WIDTHS = [400, 800, 1200, 1600] as const;
 
 export function productSrcSet(publicId: string | null | undefined): string {

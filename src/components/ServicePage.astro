@@ -8,6 +8,7 @@ import ShareBar from './ShareBar.astro';
 import { site, whatsappLink } from '../data/site';
 import { servicePath, services, type Service } from '../data/services';
 import { listServicePlans } from '../lib/db/queries';
+import { getSocialShareForPage } from '../lib/social-share';
 
 interface Props {
   service: Service;
@@ -37,6 +38,7 @@ const related = s.related
   .filter((item): item is Service => Boolean(item));
 
 const plans = await listServicePlans(service.id);
+const socialShare = await getSocialShareForPage('service', s.slug);
 
 /*
  * Precio de entrada del servicio: el paquete más barato que lo incluye.
@@ -136,6 +138,7 @@ const serviceSchema = {
   path={path}
   ogImage='/assets/og.webp'
   ogImageAlt={`${s.title} — ${site.name}`}
+  socialShare={socialShare}
   pageType="WebPage"
   dateModified={site.contentUpdated}
   faq={s.faqs}

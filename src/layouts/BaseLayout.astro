@@ -8,6 +8,8 @@ import Icon from '../components/Icon.astro';
 import { content, site, whatsappLink } from '../data/site';
 import { company } from '../data/empresa';
 import { customerSessionFromRequest } from '../lib/customer-auth';
+import { rawImageUrl } from '../lib/cloudinary';
+import { getGlobalSocialShare, type SocialShareConfig } from '../lib/social-share';
 
 interface BreadcrumbItem {
   name: string;
@@ -44,6 +46,11 @@ interface Props {
   currencyDefault?: 'USD' | 'VES';
   /** Oculta el botón flotante de WhatsApp cuando estorba (carrito/panel). */
   hideWhatsappFloat?: boolean;
+  /**
+   * Tarjeta personalizada para redes sociales. `undefined` usa la global;
+   * `null` conserva la imagen propia de la página.
+   */
+  socialShare?: SocialShareConfig | null;
 }
 
 const {
@@ -62,6 +69,7 @@ const {
   extraMeta = [],
   currencyDefault = 'USD',
   hideWhatsappFloat = false,
+  socialShare,
 } = Astro.props;
 
 const t = content;
@@ -69,6 +77,29 @@ const canonical = new URL(path, site.url).toString();
 const ogImageUrl = new URL(ogImage, site.url).toString();
 const logoUrl = new URL(site.logo, site.url).toString();
 const skipLabel = 'Saltar al contenido';
+
+/*
+ * Tarjeta social: si la página no pasa una tarjeta explícita se usa la
+ * global. `socialShare={null}` conserva la imagen propia (productos con foto,
+ * publicaciones y proyectos con portada).
+ */
+const resolvedSocialShare =
+  socialShare === undefined ? (await getGlobalSocialShare()).config : socialShare;
+const activeShare = resolvedSocialShare?.enabled ? resolvedSocialShare : null;
+const shareImage = activeShare?.imagePublicId
+  ? rawImageUrl(activeShare.imagePublicId)
+  : '';
+const socialImageUrl = shareImage || ogImageUrl;
+const socialImageType = shareImage ? 'image/jpeg' : 'image/webp';
+const socialImageWidth = shareImage ? activeShare?.imageWidth || 1200 : 1200;
+const socialImageHeight = shareImage ? activeShare?.imageHeight || 630 : 630;
+const socialTitle = activeShare?.message?.trim() || title;
+const socialDescription = activeShare?.subtitle?.trim() || description;
+const socialSiteName = activeShare?.companyName?.trim() || site.name;
+const socialImageAlt = activeShare?.message?.trim()
+  ? `${activeShare.message.trim()} — ${socialSiteName}`
+  : ogImageAlt;
+
 const organisationId = `${site.url}/#organization`;
 const websiteId = `${site.url}/#website`;
 const logoId = `${site.url}/#logo`;
@@ -319,24 +350,24 @@ const schemaGraph = {
     <meta name="format-detection" content="telephone=no" />
 
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={socialSiteName} />
+    <meta property="og:title" content={socialTitle} />
+    <meta property="og:description" content={socialDescription} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:secure_url" content={ogImageUrl} />
-    <meta property="og:image:type" content="image/webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:secure_url" content={socialImageUrl} />
+    <meta property="og:image:type" content={socialImageType} />
+    <meta property="og:image:width" content={String(socialImageWidth)} />
+    <meta property="og:image:height" content={String(socialImageHeight)} />
+    <meta property="og:image:alt" content={socialImageAlt} />
     <meta property="og:locale" content="es_VE" />
 
     <meta name="twitter:card" content="summary_large_image" />
     {site.twitter && <meta name="twitter:site" content={site.twitter} />}
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
-    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <meta name="twitter:title" content={socialTitle} />
+    <meta name="twitter:description" content={socialDescription} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
     <meta name="twitter:url" content={canonical} />
 
     {extraMeta.map((meta) => (
