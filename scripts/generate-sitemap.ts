@@ -48,6 +48,8 @@ type Entry = {
   changefreq: 'daily' | 'weekly' | 'monthly' | 'yearly';
   priority: string;
   lastmod?: string;
+  /** Imágenes para el sitemap de imágenes de Google. */
+  images?: string[];
 };
 
 /** Rutas fijas del sitio (con su equivalente en inglés). */
@@ -90,7 +92,13 @@ function lastCommitDate(): string {
   }
 }
 
-type DbEntry = { path: string; lastmod?: string };
+type DbEntry = { path: string; lastmod?: string; images?: string[] };
+
+/** URL pública de una imagen de Cloudinary para el sitemap de imágenes. */
+function sitemapImage(publicId: string): string {
+  const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME?.trim() || 'cxy5wtgr';
+  return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/${publicId}`;
+}
 
 /** Productos, publicaciones y proyectos que existen ahora mismo en la base. */
 async function dynamicRoutes(): Promise<DbEntry[]> {
@@ -104,56 +112,89 @@ async function dynamicRoutes(): Promise<DbEntry[]> {
   const entries: DbEntry[] = [];
 
   try {
-    const products = await pool.query<{ locale: string; slug: string; updated_at: Date }>(
-      `SELECT t.locale, t.slug, p.updated_at
+    const products = await pool.query<{
+      locale: string;
+      slug: string;
+      updated_at: Date;
+      images: string[];
+    }>(
+      `SELECT t.locale, t.slug, p.updated_at,
+              COALESCE(
+                array_agg(i.cloudinary_public_id ORDER BY i.is_primary DESC, i.position)
+                  FILTER (WHERE i.cloudinary_public_id IS NOT NULL),
+                '{}'
+              ) AS images
          FROM product_translations t
          JOIN products p ON p.id = t.product_id
-        WHERE p.is_active = true`,
+         LEFT JOIN product_images i ON i.product_id = p.id
+        WHERE p.is_active = true
+        GROUP BY t.locale, t.slug, p.updated_at`,
     );
-    const byProduct = new Map<string, { path?: string; lastmod?: string }>();
+    const byProduct = new Map<string, { path?: string; lastmod?: string; images?: string[] }>();
     for (const row of products.rows) {
       const key = row.slug;
       const item = byProduct.get(key) ?? {};
-      if (row.locale === 'es') item.path = `/catalogo/${row.slug}/`;
+      if (row.locale === 'es') {
+        item.path = `/catalogo/${row.slug}/`;
+        item.images = (row.images ?? []).slice(0, 4).map(sitemapImage);
+      }
       item.lastmod = row.updated_at?.toISOString().slice(0, 10);
       byProduct.set(key, item);
     }
     for (const item of byProduct.values()) {
-      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod, images: item.images });
     }
 
-    const posts = await pool.query<{ locale: string; slug: string; updated_at: Date; published_at: Date | null }>(
-      `SELECT t.locale, t.slug, p.updated_at, p.published_at
+    const posts = await pool.query<{
+      locale: string;
+      slug: string;
+      updated_at: Date;
+      published_at: Date | null;
+      coverPublicId: string | null;
+    }>(
+      `SELECT t.locale, t.slug, p.updated_at, p.published_at,
+              p.cover_public_id AS "coverPublicId"
          FROM post_translations t
          JOIN posts p ON p.id = t.post_id
         WHERE p.is_published = true`,
     );
-    const byPost = new Map<string, { path?: string; lastmod?: string }>();
+    const byPost = new Map<string, { path?: string; lastmod?: string; images?: string[] }>();
     for (const row of posts.rows) {
       const item = byPost.get(row.slug) ?? {};
-      if (row.locale === 'es') item.path = `/blog/${row.slug}/`;
+      if (row.locale === 'es') {
+        item.path = `/blog/${row.slug}/`;
+        item.images = row.coverPublicId ? [sitemapImage(row.coverPublicId)] : [];
+      }
       item.lastmod = (row.published_at ?? row.updated_at)?.toISOString().slice(0, 10);
       byPost.set(row.slug, item);
     }
     for (const item of byPost.values()) {
-      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod, images: item.images });
     }
 
-    const projects = await pool.query<{ locale: string; slug: string; updated_at: Date }>(
-      `SELECT t.locale, t.slug, p.updated_at
+    const projects = await pool.query<{
+      locale: string;
+      slug: string;
+      updated_at: Date;
+      coverPublicId: string | null;
+    }>(
+      `SELECT t.locale, t.slug, p.updated_at, p.cover_public_id AS "coverPublicId"
          FROM project_translations t
          JOIN projects p ON p.id = t.project_id
         WHERE p.is_published = true`,
     );
-    const byProject = new Map<string, { path?: string; lastmod?: string }>();
+    const byProject = new Map<string, { path?: string; lastmod?: string; images?: string[] }>();
     for (const row of projects.rows) {
       const item = byProject.get(row.slug) ?? {};
-      if (row.locale === 'es') item.path = `/proyectos/${row.slug}/`;
+      if (row.locale === 'es') {
+        item.path = `/proyectos/${row.slug}/`;
+        item.images = row.coverPublicId ? [sitemapImage(row.coverPublicId)] : [];
+      }
       item.lastmod = row.updated_at?.toISOString().slice(0, 10);
       byProject.set(row.slug, item);
     }
     for (const item of byProject.values()) {
-      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod });
+      if (item.path) entries.push({ path: item.path, lastmod: item.lastmod, images: item.images });
     }
   } catch (error) {
     console.warn('[sitemap] No se pudieron leer las tablas:', (error as Error).message);
@@ -178,6 +219,7 @@ const entries: Entry[] = [
     changefreq: 'weekly' as const,
     priority: '0.7',
     lastmod: item.lastmod ?? fallbackLastmod,
+    images: item.images,
   })),
 ];
 
@@ -198,13 +240,21 @@ const body = unique
       `    <lastmod>${entry.lastmod ?? fallbackLastmod}</lastmod>`,
       `    <changefreq>${entry.changefreq}</changefreq>`,
       `    <priority>${entry.priority}</priority>`,
+      ...(entry.images ?? []).map((image) =>
+        [
+          '    <image:image>',
+          `      <image:loc>${escapeXml(image)}</image:loc>`,
+          '    </image:image>',
+        ].join('\n'),
+      ),
       '  </url>',
     ].join('\n');
   })
   .join('\n');
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${body}
 </urlset>
 `;

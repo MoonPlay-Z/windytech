@@ -1,11 +1,12 @@
 ---
 import PostPage from '../../components/catalog/PostPage.astro';
 import { getPost } from '../../lib/db/queries';
+import { notFoundResponse } from '../../lib/not-found';
 
 export const prerender = false;
 
 const post = await getPost(Astro.params.slug ?? '');
-if (!post) return Astro.redirect('/blog/', 302);
+if (!post) return notFoundResponse(Astro);
 ---
 
 <PostPage post={post} />

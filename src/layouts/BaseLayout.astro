@@ -10,6 +10,7 @@ import { company } from '../data/empresa';
 import { customerSessionFromRequest } from '../lib/customer-auth';
 import { rawImageUrl } from '../lib/cloudinary';
 import { getGlobalSocialShare, type SocialShareConfig } from '../lib/social-share';
+import { truncateText } from '../lib/text';
 
 interface BreadcrumbItem {
   name: string;
@@ -99,6 +100,11 @@ const socialSiteName = activeShare?.companyName?.trim() || site.name;
 const socialImageAlt = activeShare?.message?.trim()
   ? `${activeShare.message.trim()} — ${socialSiteName}`
   : ogImageAlt;
+
+// Los buscadores y las redes cortan las descripciones largas: se recortan aquí
+// para controlar el texto que se muestra (el JSON-LD conserva la completa).
+const metaDescription = truncateText(description);
+const socialDescriptionText = truncateText(socialDescription);
 
 const organisationId = `${site.url}/#organization`;
 const websiteId = `${site.url}/#website`;
@@ -309,7 +315,7 @@ const schemaGraph = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="author" content={site.name} />
     <meta name="theme-color" content="#0e2234" />
     <meta name="color-scheme" content="light" />
@@ -320,6 +326,14 @@ const schemaGraph = {
         : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
     />
     {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && (
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title={`Blog de ${site.name} (RSS)`}
+        href="/blog/rss.xml"
+      />
+    )}
     {!noindex && (
       <link
         rel="alternate"
@@ -352,7 +366,7 @@ const schemaGraph = {
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={socialSiteName} />
     <meta property="og:title" content={socialTitle} />
-    <meta property="og:description" content={socialDescription} />
+    <meta property="og:description" content={socialDescriptionText} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:image:secure_url" content={socialImageUrl} />
@@ -365,7 +379,7 @@ const schemaGraph = {
     <meta name="twitter:card" content="summary_large_image" />
     {site.twitter && <meta name="twitter:site" content={site.twitter} />}
     <meta name="twitter:title" content={socialTitle} />
-    <meta name="twitter:description" content={socialDescription} />
+    <meta name="twitter:description" content={socialDescriptionText} />
     <meta name="twitter:image" content={socialImageUrl} />
     <meta name="twitter:image:alt" content={socialImageAlt} />
     <meta name="twitter:url" content={canonical} />

@@ -1,6 +1,7 @@
 ---
 import ServicePage from '../../components/ServicePage.astro';
 import { services } from '../../data/services';
+import { notFoundResponse } from '../../lib/not-found';
 
 // El sitio se renderiza bajo demanda (output: 'server'), así que la página
 // busca el servicio por su slug en lugar de recibirlo en Astro.props.
@@ -8,7 +9,7 @@ export const prerender = false;
 
 const slug = Astro.params.slug ?? '';
 const service = services.find((item) => item.content.slug === slug);
-if (!service) return Astro.redirect('/404/', 302);
+if (!service) return notFoundResponse(Astro);
 ---
 
 <ServicePage

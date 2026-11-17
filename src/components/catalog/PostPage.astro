@@ -21,6 +21,14 @@ const cover = post.coverPublicId
   : null;
 const published = post.publishedAt ? new Date(post.publishedAt) : null;
 
+/** Hashtags derivados de las etiquetas para acompañar el enlace al compartir. */
+const hashtags = post.tags
+  .slice(0, 3)
+  .map((tag) => `#${tag.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '')}`)
+  .filter((tag) => tag.length > 1)
+  .join(' ');
+const shareText = [post.excerpt, hashtags].filter(Boolean).join(' ');
+
 const schema = {
   '@type': 'BlogPosting',
   '@id': `${new URL(href, site.url)}#article`,
@@ -28,7 +36,11 @@ const schema = {
   description: post.excerpt,
   url: new URL(href, site.url).toString(),
   inLanguage: 'es',
-  author: { '@type': 'Person', name: post.author || site.name },
+  author: {
+    '@type': 'Person',
+    name: post.author || site.name,
+    worksFor: { '@id': `${site.url}/#organization` },
+  },
   publisher: { '@id': `${site.url}/#organization` },
   ...(published ? { datePublished: published.toISOString(), dateModified: published.toISOString() } : {}),
   ...(cover ? { image: { '@type': 'ImageObject', url: cover } } : {}),
@@ -98,7 +110,7 @@ const articleMeta = [
       <ShareBar
         path={href}
         title={post.title}
-        text={post.excerpt}
+        text={shareText}
         label={'Comparte este artículo y consigue clientes'}
         campaign="post"
         variant="card"

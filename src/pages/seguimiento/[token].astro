@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.astro';
 import '../../styles/account.css';
 import { getTrackingByToken, listTrackingEvents } from '../../lib/db/queries';
 import { trackingMeta, trackingStatus } from '../../lib/trackings';
+import { notFoundResponse } from '../../lib/not-found';
 
 export const prerender = false;
 
@@ -11,7 +12,7 @@ const token = Astro.params.token ?? '';
 const tracking = await getTrackingByToken(token);
 
 if (!tracking) {
-  return Astro.redirect('/404/', 302);
+  return notFoundResponse(Astro);
 }
 
 const events = await listTrackingEvents(tracking.id);

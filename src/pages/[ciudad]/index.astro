@@ -5,15 +5,16 @@ import { site, whatsappLink } from '../../data/site';
 import { services } from '../../data/services';
 import { CITIES, cityBySlug } from '../../data/ciudades';
 import { getCatalog } from '../../lib/db/queries';
+import { notFoundResponse } from '../../lib/not-found';
 
 export const prerender = false;
 
 const slug = (Astro.params.ciudad ?? '').toLowerCase();
 const city = cityBySlug(slug);
 
-// Solo se indexan las ciudades con ficha real; el resto va al 404.
+// Solo se indexan las ciudades con ficha real; el resto devuelve 404.
 if (!city) {
-  return Astro.redirect('/404/', 302);
+  return notFoundResponse(Astro);
 }
 
 const products = await getCatalog({ limit: 3 });
