@@ -68,9 +68,8 @@ export const GET: APIRoute = async ({ url }) => {
     });
     const text = await response.text();
     if (!response.ok) {
-      const detail = await response.text();
-      const info = parseEbayApiError(response.status, detail);
-      console.error(`[ebay] error intercambiando el código (${info.code}):`, detail);
+      const info = parseEbayApiError(response.status, text);
+      console.error(`[ebay] error intercambiando el código (${info.code}):`, text);
       return page(
         'eBay · error de token',
         `<h1>No se pudo obtener el token</h1><p><strong>${info.code}</strong>: ${escapeHtml(info.message)}</p>`,
