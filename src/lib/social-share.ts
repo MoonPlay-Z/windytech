@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { company } from '../data/empresa';
 import { site } from '../data/site';
 import {
-  getSocialShareCard,
   listSocialShareCards,
   type SocialShareCardRecord,
 } from './db/queries';

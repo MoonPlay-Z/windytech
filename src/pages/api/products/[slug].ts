@@ -1,13 +1,12 @@
 import type { APIRoute } from 'astro';
 import { getProduct } from '../../../lib/db/queries';
 import { productJson } from '../../../lib/serialize';
-import type { Locale } from '../../../lib/catalog';
 import { currentRate } from '../../../lib/rate';
 import { json } from '../../../lib/api';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params }) => {
     const slug = params.slug ?? '';
   const product = await getProduct(slug);
   if (!product) return json({ error: 'Producto no encontrado.' }, 404);

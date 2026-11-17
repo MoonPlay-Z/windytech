@@ -412,7 +412,7 @@ const schemaGraph = {
       crossorigin
     />
 
-    <script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />
+    <script type="application/ld+json" set:html={JSON.stringify(schemaGraph).replace(/</g, '\\u003c')} />
     <ClientRouter />
   </head>
   <body data-currency-default={currencyDefault}>

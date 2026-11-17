@@ -8,6 +8,8 @@ services:
     startCommand: node dist/server/entry.mjs
     healthCheckPath: /api/health
     envVars:
+      - key: NODE_VERSION
+        value: "22.23.4"
       - key: NODE_ENV
         value: production
       - key: PUBLIC_SITE_URL
@@ -67,5 +69,7 @@ services:
     schedule: "0 12 * * *"
     startCommand: "tsx scripts/cron/update-rate.mjs"
     envVars:
+      - key: NODE_VERSION
+        value: "22.23.4"
       - key: DATABASE_URL
         sync: false

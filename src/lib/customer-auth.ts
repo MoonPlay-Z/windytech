@@ -3,6 +3,7 @@ import { sql, eq } from 'drizzle-orm';
 import { getDb, schema } from './db';
 import { readCookie } from './auth';
 import { randomToken, sha256 } from './security';
+import { deleteCustomerSessions } from './db/queries';
 
 const CUSTOMER_SESSION_COOKIE = 'wt_customer';
 const CUSTOMER_SESSION_DAYS = 30;
@@ -167,4 +168,6 @@ export async function changeCustomerPassword(
     .update(schema.customerAccounts)
     .set({ passwordHash })
     .where(eq(schema.customerAccounts.id, customerId));
+  // Las sesiones anteriores dejan de ser válidas tras el cambio de clave.
+  await deleteCustomerSessions(customerId);
 }

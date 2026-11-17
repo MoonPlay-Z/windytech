@@ -40,6 +40,31 @@ function harden(headers: Headers, pathname: string) {
     'camera=(), microphone=(), geolocation=(), payment=()',
   );
   headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+  headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+
+  // CSP y HSTS solo en el build de producción: en dev, Astro/Vite necesitan ws:// para HMR.
+  if (import.meta.env.PROD) {
+    headers.set(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+        "frame-ancestors 'none'",
+        "form-action 'self'",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' res.cloudinary.com data: blob:",
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        'frame-src https://www.linkedin.com',
+        "media-src 'self'",
+        "worker-src 'self'",
+      ].join('; '),
+    );
+    headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
 
   if (PRIVATE.test(pathname)) {
     headers.set('X-Robots-Tag', 'noindex, nofollow');

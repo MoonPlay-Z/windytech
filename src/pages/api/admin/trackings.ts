@@ -7,7 +7,7 @@ import {
   listTrackingsAdmin,
 } from '../../../lib/db/queries';
 import { randomToken } from '../../../lib/security';
-import { isValidTrackingStatus, trackingMeta, trackingStatus } from '../../../lib/trackings';
+import { isValidTrackingStatus } from '../../../lib/trackings';
 import { json, readJson, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
 

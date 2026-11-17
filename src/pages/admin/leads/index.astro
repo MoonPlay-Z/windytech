@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import Icon from '../../../components/Icon.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listLeads } from '../../../lib/db/queries';
 import { LEAD_STATUS_LIST } from '../../../lib/leads';
@@ -11,7 +10,6 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const leads = await listLeads();
-const porEstado = new Map(LEAD_STATUS_LIST.map((item) => [item.id, item]));
 
 const fecha = (value: string) =>
   new Intl.DateTimeFormat('es-VE', {
@@ -50,7 +48,6 @@ const wa = (lead: (typeof leads)[number]) => {
       <tbody>
         {
           leads.map((lead) => {
-            const estado = porEstado.get(lead.status);
             return (
               <tr data-lead-row={lead.id}>
                 <td>{lead.id}</td>

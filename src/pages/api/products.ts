@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCatalog } from '../../lib/db/queries';
 import { productJson } from '../../lib/serialize';
-import type { Locale } from '../../lib/catalog';
 import { currentRate } from '../../lib/rate';
 import { json } from '../../lib/api';
 

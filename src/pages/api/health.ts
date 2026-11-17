@@ -6,28 +6,29 @@ export const prerender = false;
 
 export const GET: APIRoute = async () => {
   const db = getDb();
-  let database = db ? 'ok' : 'unconfigured';
+  let healthy = true;
 
   if (db) {
     try {
       await db.execute(sql`SELECT 1`);
     } catch {
-      database = 'error';
+      healthy = false;
     }
   }
 
+  // Sin detalle de la base: solo estado para el health check de Render.
   return new Response(
     JSON.stringify({
-      status: database === 'error' ? 'degraded' : 'ok',
-      database,
+      status: healthy ? 'ok' : 'degraded',
       service: 'windytech-web',
       timestamp: new Date().toISOString(),
     }),
     {
-      status: 200,
+      status: healthy ? 200 : 503,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex, nofollow',
       },
     },
   );

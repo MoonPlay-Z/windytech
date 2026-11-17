@@ -557,6 +557,26 @@
   background: var(--bg);
 }
 
+.tracking-notice-list li.tracking-notice--payment {
+  border-left-color: var(--teal);
+  background: linear-gradient(110deg, #f1fbf8, #f7f9fc);
+}
+
+.tracking-notice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  margin-top: 5px;
+  color: var(--teal-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tracking-notice-link:hover {
+  color: var(--navy);
+}
+
 .tracking-notice-list strong {
   color: var(--navy);
   font-size: 15px;

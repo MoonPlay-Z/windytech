@@ -239,6 +239,46 @@
       gap: 2px;
     }
 
+    .product-info {
+      padding: 20px;
+    }
+
+    .product-highlight-grid,
+    .product-recommendation-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .product-highlight-card {
+      min-height: 136px;
+      padding: 14px;
+    }
+
+    .product-section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-more-link {
+      align-self: flex-start;
+    }
+
+    .product-specs .product-section-heading {
+      align-items: flex-start;
+    }
+
+    .product-specs__table th,
+    .product-specs__table td {
+      padding: 9px 7px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .product-faq-panel {
+      padding: 24px 18px;
+    }
+
     .quote-row {
       grid-template-columns: minmax(0, 1fr) 92px;
     }

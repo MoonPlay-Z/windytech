@@ -26,9 +26,10 @@ interface Props {
   currencyDefault: 'USD' | 'VES';
   categoryName?: string;
   altSlug?: string;
+  recommendedProducts?: CatalogProduct[];
 }
 
-const { product, rate, currencyDefault, categoryName } = Astro.props;
+const { product, rate, currencyDefault, categoryName, recommendedProducts = [] } = Astro.props;
 const t = catalogCopy;
 const basePrice = priceFor(product, null);
 const image = primaryImage(product);
@@ -40,6 +41,12 @@ const vesPrice = rate ? Math.round(basePrice.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(Math.max(basePrice.compareAtCents, basePrice.listCents) * rate.rate) : 0;
 const description = product.seoDescription || product.shortDescription;
 const specs = Object.entries(product.specs ?? {});
+const highlights = specs.slice(0, 6);
+const sameCategory =
+  product.categoryId === null
+    ? []
+    : recommendedProducts.filter((item) => item.categoryId === product.categoryId);
+const recommendations = (sameCategory.length > 0 ? sameCategory : recommendedProducts).slice(0, 3);
 const consultMessage = `Hola Windytech, quiero consultar disponibilidad de ${product.name}.`;
 
 const availabilitySchema =
@@ -201,6 +208,7 @@ const productSchema: Record<string, unknown> = {
                   data-thumb
                   data-full={productImage(item.cloudinaryPublicId, 1200)}
                   data-srcset={productSrcSet(item.cloudinaryPublicId)}
+                  aria-pressed={image?.id === item.id ? 'true' : 'false'}
                   aria-label={item.alt || product.name}
                 >
                   <img
@@ -238,6 +246,11 @@ const productSchema: Record<string, unknown> = {
             {Math.max(basePrice.compareAtCents, basePrice.listCents) > basePrice.unitCents && (
               <span class="product-price-old" data-price-old data-usd={Math.max(basePrice.compareAtCents, basePrice.listCents)} data-ves={vesCompare}>
                 ${(Math.max(basePrice.compareAtCents, basePrice.listCents) / 100).toFixed(2)}
+              </span>
+            )}
+            {Math.max(basePrice.compareAtCents, basePrice.listCents) > basePrice.unitCents && (
+              <span class="product-price-savings">
+                Ahorras ${((Math.max(basePrice.compareAtCents, basePrice.listCents) - basePrice.unitCents) / 100).toFixed(2)}
               </span>
             )}
           </div>
@@ -299,22 +312,6 @@ const productSchema: Record<string, unknown> = {
             </div>
           )}
 
-          {specs.length > 0 && (
-            <div class="product-specs">
-              <h2>{t.specifications}</h2>
-              <table class="product-specs__table">
-                <tbody>
-                  {specs.map(([key, value]) => (
-                    <tr>
-                      <th scope="row">{attributeLabels[key] ?? key}</th>
-                      <td>{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
           <div class="product-actions">
             <ShareMenu
               path={href}
@@ -373,14 +370,155 @@ const productSchema: Record<string, unknown> = {
     </div>
   </section>
 
-  {product.descriptionMd && (
-    <section class="section section--white">
-      <div class="container product-description">
-        <h2>{t.description}</h2>
-        <div class="prose" set:html={renderMarkdown(product.descriptionMd)} />
+  {highlights.length > 0 && (
+    <section class="section section--white product-highlights" aria-labelledby="product-highlights-title">
+      <div class="container">
+        <div class="product-section-heading">
+          <div>
+            <span class="product-section-kicker">Ingeniería que impulsa tu trabajo</span>
+            <h2 id="product-highlights-title">Lo más importante de {product.model || product.name}</h2>
+          </div>
+          <span class="product-section-aside">{highlights.length} características destacadas</span>
+        </div>
+        <div class="product-highlight-grid">
+          {highlights.map(([key, value], index) => (
+            <article class:list={['product-highlight-card', `product-highlight-card--${index % 4}`]}>
+              <span class="product-highlight-mark" aria-hidden="true">{['◇', '↗', '▤', '⌘'][index % 4]}</span>
+              <h3>{attributeLabels[key] ?? key}</h3>
+              <p>{value}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )}
+
+  {specs.length > 0 && (
+    <section class="section product-specifications-section" aria-labelledby="product-specifications-title">
+      <div class="container">
+        <div class="product-specs">
+          <div class="product-section-heading">
+            <div>
+              <span class="product-section-kicker">Auditoría técnica</span>
+              <h2 id="product-specifications-title">Especificaciones</h2>
+            </div>
+            {product.sku && <span class="product-specs-sku">SKU: {product.sku}</span>}
+          </div>
+          <table class="product-specs__table">
+            <tbody>
+              {specs.map(([key, value]) => (
+                <tr>
+                  <th scope="row">{attributeLabels[key] ?? key}</th>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {product.descriptionMd && (
+    <section class="section section--white">
+      <div class="container product-description">
+        <details class="product-description-disclosure">
+          <summary>
+            <span class="product-section-kicker">Detalles del equipo</span>
+            <span class="product-description-title">{t.description}</span>
+            {product.shortDescription && (
+              <span class="product-description-preview">{product.shortDescription}</span>
+            )}
+            <span class="product-description-more">
+              <span class="product-description-more-label">Ver más</span>
+              <span class="product-description-less-label">Ver menos</span>
+            </span>
+          </summary>
+          <div class="prose product-description-full" set:html={renderMarkdown(product.descriptionMd)} />
+        </details>
+      </div>
+    </section>
+  )}
+
+  {recommendations.length > 0 && (
+    <section class="section product-recommendations" aria-labelledby="product-recommendations-title">
+      <div class="container">
+        <div class="product-section-heading">
+          <div>
+            <span class="product-section-kicker">Ecosistema profesional</span>
+            <h2 id="product-recommendations-title">También te puede interesar</h2>
+          </div>
+          <a class="product-more-link" href={catalogHref}>Ver catálogo completo <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="product-recommendation-grid">
+          {recommendations.map((item) => {
+            const itemImage = primaryImage(item);
+            const itemPrice = priceFor(item, null);
+            const itemHref = `${catalogHref}${item.slug}/`;
+            return (
+              <a class="product-recommendation-card" href={itemHref}>
+                <span class="product-recommendation-media">
+                  {itemImage ? (
+                    <img
+                      src={productImage(itemImage.cloudinaryPublicId, 600)}
+                      srcset={productSrcSet(itemImage.cloudinaryPublicId)}
+                      sizes="(max-width: 720px) 100vw, 33vw"
+                      alt={itemImage.alt || item.name}
+                      width="600"
+                      height="450"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span class="product-recommendation-placeholder" aria-hidden="true">◇</span>
+                  )}
+                </span>
+                <span class="product-recommendation-copy">
+                  <small>{item.brand || conditionLabels[item.condition]}</small>
+                  <strong>{item.name}</strong>
+                  <span>${(itemPrice.unitCents / 100).toFixed(2)}</span>
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section--white product-faq" aria-labelledby="product-faq-title">
+    <div class="container">
+      <div class="product-faq-panel">
+        <span class="product-section-kicker">Ayuda para tu compra</span>
+        <h2 id="product-faq-title">Preguntas frecuentes</h2>
+        <p>Resuelve tus dudas sobre este equipo antes de realizar tu pedido.</p>
+        <div class="product-faq-list">
+          <details>
+            <summary>¿Cómo elijo una configuración?</summary>
+            <p>
+              {product.variants.length > 0
+                ? 'Revisa las opciones disponibles en la ficha. Al seleccionar una configuración se actualizan el precio y, cuando corresponda, la imagen.'
+                : 'La ficha muestra la configuración disponible para este equipo. Escríbenos si necesitas validar otra opción.'}
+            </p>
+          </details>
+          <details>
+            <summary>¿Cómo confirmo disponibilidad y entrega?</summary>
+            <p>
+              La disponibilidad mostrada corresponde al estado registrado del producto. Para coordinar entrega o confirmar detalles,
+              <a href={whatsappLink(consultMessage)} target="_blank" rel="noopener noreferrer"> contáctanos por WhatsApp</a>.
+            </p>
+          </details>
+          <details>
+            <summary>¿Cómo realizo mi pedido?</summary>
+            <p>
+              Añade el equipo al carrito para revisar tu pedido y continuar con la solicitud. También puedes
+              <a href={whatsappLink(consultMessage)} target="_blank" rel="noopener noreferrer"> consultarnos directamente</a>.
+            </p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <script>
@@ -452,6 +590,9 @@ const productSchema: Record<string, unknown> = {
         if (!mainImage) return;
         mainImage.src = thumb.dataset.full ?? mainImage.src;
         mainImage.srcset = thumb.dataset.srcset ?? mainImage.srcset;
+        document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((item) => {
+          item.setAttribute('aria-pressed', String(item === thumb));
+        });
       });
     });
   }

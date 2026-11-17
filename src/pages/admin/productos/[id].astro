@@ -33,7 +33,6 @@ const preorder = product.availability === 'PREORDER';
 const costUsd = (product.costCents / 100).toFixed(2);
 const shippingUsd = (product.shippingCostCents / 100).toFixed(2);
 const deliveryEstimateDaysValue = String(product.deliveryEstimateDays ?? 21);
-const ebayStatusValue = product.ebayStatus ?? 'draft';
 const ebayItemIdValue = product.ebayItemId ?? '';
 const activeChecked = product.isActive ? 'checked' : '';
 const featuredChecked = product.isFeatured ? 'checked' : '';

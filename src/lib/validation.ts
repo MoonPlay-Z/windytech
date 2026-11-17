@@ -69,7 +69,7 @@ export const quoteSchema = z.object({
     .min(6)
     .max(40)
     .regex(/^[+\d\s().-]+$/, 'Teléfono inválido.'),
-  email: z.union([z.string().trim().email(), z.literal('')]).default(''),
+  email: z.union([z.string().trim().check(z.email()), z.literal('')]).default(''),
   notes: z.string().trim().max(1500).default(''),
   locale: z.literal('es').default('es'),
   currency: z.enum(['USD', 'VES']).default('USD'),
@@ -244,7 +244,7 @@ export const servicePlanSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
   password: z.string().min(8).max(200),
 });
 
@@ -255,19 +255,19 @@ const customerPasswordSchema = z
   .refine((value) => new TextEncoder().encode(value).length <= 72);
 
 export const customerLoginSchema = z.object({
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
   password: customerPasswordSchema,
 });
 
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(120),
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
   password: customerPasswordSchema,
 });
 
 export const customerProfileSchema = z.object({
   name: z.string().trim().min(2).max(120),
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
 });
 
 export const customerChangePasswordSchema = z.object({
@@ -283,7 +283,7 @@ export function dollarsToCents(value: number): number {
 export const trackingSchema = z.object({
   id: z.coerce.number().int().positive().optional(),
   customerId: z.coerce.number().int().positive().optional(),
-  customerEmail: z.string().trim().email().max(200).optional(),
+  customerEmail: z.string().trim().check(z.email()).max(200).optional(),
   kind: z.enum(['service', 'subscription', 'project', 'quote', 'equipment']),
   title: z.string().trim().min(2).max(180),
   reference: z.string().trim().max(80).default(''),
@@ -298,7 +298,7 @@ export const leadSchema = z.object({
   name: z.string().trim().min(2).max(120),
   business: z.string().trim().max(120).default(''),
   phone: z.string().trim().max(40).default(''),
-  email: z.union([z.string().trim().email().max(200), z.literal('')]).default(''),
+  email: z.union([z.string().trim().check(z.email()).max(200), z.literal('')]).default(''),
   service: z.string().trim().max(120).default(''),
   message: z.string().trim().max(1500).default(''),
   channel: z.string().trim().max(40).default('web'),

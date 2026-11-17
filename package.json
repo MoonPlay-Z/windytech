@@ -3,6 +3,10 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22.23.4",
+    "npm": ">=9.6.5"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && tsx scripts/generate-sitemap.ts",
@@ -20,11 +24,11 @@
     "test:pricing": "tsx --test src/lib/pricing.test.ts"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.5",
+    "@astrojs/node": "^11.1.13",
     "@iconify-json/lucide": "^1.2.151",
     "@iconify-json/simple-icons": "^1.2.101",
-    "astro": "^5.18.2",
-    "astro-icon": "^1.1.5",
+    "astro": "^7.4.12",
+    "astro-icon": "^1.2.0",
     "bcryptjs": "^3.0.3",
     "decimal.js": "^10.6.0",
     "dotenv": "^18.0.10",

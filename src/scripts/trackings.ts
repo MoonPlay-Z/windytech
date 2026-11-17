@@ -3,7 +3,7 @@
  * y ajusta las opciones de estado al tipo elegido en el alta.
  */
 
-import { TRACKING_KIND_LIST, trackingMeta } from '../lib/trackings';
+import { trackingMeta } from '../lib/trackings';
 
 function fillStatuses(select: HTMLSelectElement, kind: string, current?: string) {
   const meta = trackingMeta(kind);

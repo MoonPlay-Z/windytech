@@ -6,7 +6,6 @@
  * Variables requeridas: DATABASE_URL
  * Opcionales: PUBLIC_CLOUDINARY_* (no usadas aquí)
  */
-import { saveRate } from '../../src/lib/db/queries';
 import { currentRate, fetchBcvRate } from '../../src/lib/rate';
 
 (async () => {

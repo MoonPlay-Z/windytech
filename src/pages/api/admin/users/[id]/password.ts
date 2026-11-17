@@ -9,6 +9,7 @@ import { z } from 'zod';
 import {
   findAdminById,
   updateAdminPassword,
+  deleteSessionsByAdmin,
   writeAudit,
 } from '../../../../../lib/db/queries';
 
@@ -44,6 +45,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
   const passwordHash = await hash(newPassword, 12);
   await updateAdminPassword(id, passwordHash);
+  await deleteSessionsByAdmin(id);
   await writeAudit(admin.id, 'RESET_PASSWORD', 'admin_users', String(id), {});
 
   return json({ success: true, temporaryPassword: newPassword }, 200);

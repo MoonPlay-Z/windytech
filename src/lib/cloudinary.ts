@@ -28,10 +28,11 @@ export type ImageOptions = {
   aspectRatio?: string;
   crop?: 'fill' | 'limit' | 'fit';
   gravity?: 'auto' | 'center';
+  quality?: 'auto' | 'auto:best';
 };
 
 function transformation(options: ImageOptions): string {
-  const parts = ['f_auto', 'q_auto'];
+  const parts = ['f_auto', options.quality ? `q_${options.quality}` : 'q_auto'];
   if (options.crop) parts.push(`c_${options.crop}`);
   if (options.gravity) parts.push(`g_${options.gravity}`);
   if (options.width) parts.push(`w_${Math.round(options.width)}`);
@@ -58,17 +59,24 @@ export function rawImageUrl(publicId: string | null | undefined): string {
   return `${BASE}/${name}/image/upload/${publicId}`;
 }
 
-export const PRODUCT_WIDTHS = [400, 800, 1200, 1600] as const;
+export const PRODUCT_WIDTHS = [400, 800, 1200, 1600, 2400] as const;
 
 export function productSrcSet(publicId: string | null | undefined): string {
   if (!publicId) return '';
   return PRODUCT_WIDTHS.map(
-    (width) => `${imageUrl(publicId, { width, crop: 'fill', aspectRatio: '4:3', gravity: 'auto' })} ${width}w`,
+    (width) =>
+      `${imageUrl(publicId, { width, crop: 'fill', aspectRatio: '4:3', gravity: 'auto', quality: 'auto:best' })} ${width}w`,
   ).join(', ');
 }
 
 export function productImage(publicId: string | null | undefined, width = 800): string {
-  return imageUrl(publicId, { width, crop: 'fill', aspectRatio: '4:3', gravity: 'auto' });
+  return imageUrl(publicId, {
+    width,
+    crop: 'fill',
+    aspectRatio: '4:3',
+    gravity: 'auto',
+    quality: 'auto:best',
+  });
 }
 
 export function projectImage(publicId: string | null | undefined, width = 1200): string {

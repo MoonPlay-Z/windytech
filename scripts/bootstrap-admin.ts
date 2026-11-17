@@ -5,7 +5,7 @@
  */
 import { hash } from 'bcryptjs';
 import { sql } from 'drizzle-orm';
-import { getDb, schema } from '../src/lib/db';
+import { getDb } from '../src/lib/db';
 
 const EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL ?? '';
 const PASSWORD = process.env.ADMIN_BOOTSTRAP_PASSWORD ?? '';

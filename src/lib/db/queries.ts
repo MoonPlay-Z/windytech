@@ -601,6 +601,22 @@ export async function deleteSession(tokenHash: string) {
   return true;
 }
 
+/** Cierra todas las sesiones de un administrador (cambio de clave o baja). */
+export async function deleteSessionsByAdmin(adminId: number) {
+  const client = db();
+  if (!client) return false;
+  await client.execute(sql`DELETE FROM sessions WHERE admin_id = ${adminId}`);
+  return true;
+}
+
+/** Cierra todas las sesiones de un cliente (cambio de clave). */
+export async function deleteCustomerSessions(customerId: number) {
+  const client = db();
+  if (!client) return false;
+  await client.execute(sql`DELETE FROM customer_sessions WHERE customer_id = ${customerId}`);
+  return true;
+}
+
 export async function purgeExpiredSessions() {
   const client = db();
   if (!client) return false;
@@ -763,7 +779,7 @@ export async function categoryExists(id: number): Promise<boolean> {
  * `excludeProductId` permite reutilizar el slug del propio producto al editar.
  */
 export async function productSlugInUse(
-  locale: string,
+  _locale: string,
   slug: string,
   excludeProductId: number | null = null,
 ): Promise<boolean> {
@@ -787,7 +803,7 @@ export async function productIdByEbayItemId(ebayItemId: string): Promise<number 
 
 /** Igual que `productSlugInUse`, pero para publicaciones. */
 export async function postSlugInUse(
-  locale: string,
+  _locale: string,
   slug: string,
   excludePostId: number | null = null,
 ): Promise<boolean> {
@@ -803,7 +819,7 @@ export async function postSlugInUse(
 
 /** Igual que `productSlugInUse`, pero para categorías. */
 export async function categorySlugInUse(
-  locale: string,
+  _locale: string,
   slug: string,
   excludeCategoryId: number | null = null,
 ): Promise<boolean> {
@@ -819,7 +835,7 @@ export async function categorySlugInUse(
 
 /** Igual que `productSlugInUse`, pero para proyectos. */
 export async function projectSlugInUse(
-  locale: string,
+  _locale: string,
   slug: string,
   excludeProjectId: number | null = null,
 ): Promise<boolean> {
@@ -1429,7 +1445,7 @@ export async function getServicePlanAdmin(id: number): Promise<ServicePlanAdmin 
 
 /** Indica si un slug ya pertenece a otro paquete. */
 export async function servicePlanSlugInUse(
-  locale: string,
+  _locale: string,
   slug: string,
   excludePlanId: number | null = null,
 ): Promise<boolean> {

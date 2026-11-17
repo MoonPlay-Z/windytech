@@ -17,7 +17,12 @@ export const serverEnv = {
     return read('DATABASE_URL');
   },
   get sessionSecret() {
-    return read('SESSION_SECRET') || 'windytech-dev-session-secret-change-me';
+    const value = read('SESSION_SECRET');
+    if (value) return value;
+    if (read('NODE_ENV') === 'production') {
+      throw new Error('SESSION_SECRET no está configurada. Defínela en el entorno antes de arrancar en producción.');
+    }
+    return 'windytech-dev-session-secret-change-me';
   },
   get siteUrl() {
     return (read('PUBLIC_SITE_URL') || 'https://windytech.studio').replace(/\/$/, '');

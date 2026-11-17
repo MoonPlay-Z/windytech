@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
-import { deleteLead, listLeads, updateLeadStatus } from '../../../lib/db/queries';
-import { isLeadStatus } from '../../../lib/leads';
+import { deleteLead, listLeads } from '../../../lib/db/queries';
 import { json, requireAdmin } from '../../../lib/api';
 import { sameOrigin } from '../../../lib/security';
 

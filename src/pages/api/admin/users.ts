@@ -6,6 +6,7 @@ import {
   listAdmins,
   updateAdmin,
   updateAdminPassword,
+  deleteSessionsByAdmin,
   writeAudit,
 } from '../../../lib/db/queries';
 import { hashPassword } from '../../../lib/auth';
@@ -24,7 +25,7 @@ const updateSchema = z.object({
 });
 
 const createSchema = z.object({
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
   password: z.string().min(8).max(72),
   role: roleSchema.default('EDITOR'),
 });
@@ -82,7 +83,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     await updateAdmin(id, { role, isActive });
-    if (password) await updateAdminPassword(id, await hashPassword(password));
+    if (password) {
+      await updateAdminPassword(id, await hashPassword(password));
+      await deleteSessionsByAdmin(id);
+    }
+    if (isActive === false) await deleteSessionsByAdmin(id);
     await writeAudit(admin.id, 'UPDATE', 'admin_users', String(id), {
       role: next.role,
       isActive: next.isActive,

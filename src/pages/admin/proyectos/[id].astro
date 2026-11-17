@@ -13,13 +13,6 @@ const projectId = Number(Astro.params.id);
 const project = await getProjectAdmin(projectId);
 if (!project) return Astro.redirect('/admin/proyectos/', 302);
 
-const aFecha = (value?: string | null) => {
-  if (!value) return '';
-  const date = new Date(value);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
-
 const esTranslation = project.translations?.find((item: { locale?: string }) => item.locale === 'es') ?? project.translations?.[0] ?? {};
 ---
 

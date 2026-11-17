@@ -9,10 +9,11 @@ import {
   findAdminByEmailExcludingSelf,
   updateAdminEmail,
   updateAdminPassword,
+  deleteSessionsByAdmin,
 } from '../../../lib/db/queries';
 
 const profileSchema = z.object({
-  email: z.string().trim().email().max(200),
+  email: z.string().trim().check(z.email()).max(200),
   currentPassword: z.string().min(1).max(200).optional(),
   newPassword: z.string().min(8).max(72).optional(),
 });
@@ -45,6 +46,7 @@ export const PUT: APIRoute = async ({ request }) => {
     if (!valid) return json({ error: 'La contraseña actual es incorrecta.' }, 401);
     const passwordHash = await hash(newPassword, 12);
     await updateAdminPassword(admin.id, passwordHash);
+    await deleteSessionsByAdmin(admin.id);
   }
 
   if (email && email.toLowerCase() !== admin.email) {

@@ -6,8 +6,8 @@ webs, marketing, redes y equipos. El catálogo de equipos queda para una fase po
 
 ## Requisitos
 
-- Node.js 20.3 o superior
-- npm 9.6 o superior
+- Node.js 22.23.4 o superior (Astro 7)
+- npm 9.6.5 o superior
 
 ## Comandos
 

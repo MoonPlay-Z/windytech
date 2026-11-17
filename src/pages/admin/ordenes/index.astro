@@ -9,78 +9,371 @@ const admin = await sessionFromRequest(Astro.request);
 if (!admin) return Astro.redirect('/admin/login/', 302);
 
 const orders = await listPurchaseOrders();
-
-const money = (cents: number) => `$${(Math.max(0, cents) / 100).toFixed(2)}`;
-const shortText = (text: string, max = 220) =>
-  text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+const statuses = [...new Set(orders.map((order) => order.status))];
+const money = (cents: number, currency: string) =>
+  new Intl.NumberFormat('es-VE', { style: 'currency', currency }).format(Math.max(0, cents) / 100);
+const dateParts = (value: string) => {
+  const date = new Date(value);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Caracas',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? '';
+  return {
+    date,
+    filterDate: `${part('year')}-${part('month')}-${part('day')}`,
+  };
+};
+const statusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    NEW: 'Nueva',
+    PENDING: 'Pendiente',
+    PAID: 'Pagada',
+    PROCESSING: 'En proceso',
+    COMPLETED: 'Completada',
+    CANCELLED: 'Cancelada',
+  };
+  return labels[status.toUpperCase()] ?? status.replaceAll('_', ' ');
+};
+const statusTone = (status: string) => {
+  const value = status.toUpperCase();
+  if (['PAID', 'COMPLETED'].includes(value)) return 'success';
+  if (['PENDING', 'NEW', 'PROCESSING'].includes(value)) return 'pending';
+  if (['CANCELLED', 'FAILED'].includes(value)) return 'danger';
+  return 'neutral';
+};
 ---
 
 <AdminLayout title="Órdenes de compra" admin={admin} active="orders">
-  <section class="admin-card">
-    <header class="admin-card-heading">
+  <section class="orders-page" aria-label="Administración de órdenes de compra">
+    <header class="orders-heading">
       <div>
-        <span class="admin-overline">Ventas</span>
-        <h2>Órdenes de compra</h2>
+        <span class="admin-overline">Gestión comercial</span>
+        <p>Consulta los pedidos, datos de contacto y referencias de los productos.</p>
       </div>
-      <span class="admin-hint">
-        Se crean automáticamente cuando un cliente pide un producto. Incluyen sus datos, lo que
-        compró, la descripción y el item de eBay para buscarlo después.
-      </span>
+      <button class="admin-btn orders-export" type="button" data-export-orders>
+        Exportar CSV
+      </button>
     </header>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th style="width:120px" scope="col">Orden</th>
-          <th scope="col">Cliente</th>
-          <th scope="col">Productos</th>
-          <th scope="col">Descripción</th>
-          <th style="width:160px" scope="col">Item eBay</th>
-          <th style="width:90px" scope="col">Total</th>
-          <th style="width:110px" scope="col">Fecha</th>
-          <th style="width:90px" scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
+
+    <div class="orders-filters" aria-label="Filtros de órdenes">
+      <label class="orders-search">
+        <span class="orders-visually-hidden">Buscar órdenes</span>
+        <input
+          type="search"
+          placeholder="Buscar por orden, cliente, teléfono, correo o producto..."
+          data-orders-search
+        />
+      </label>
+      <label class="orders-status-filter">
+        <span class="orders-visually-hidden">Filtrar por estado</span>
+        <select data-orders-status>
+          <option value="">Todos los estados</option>
+          {statuses.map((status) => <option value={status}>{statusLabel(status)}</option>)}
+        </select>
+      </label>
+      <label class="orders-date-filter">
+        <span class="orders-visually-hidden">Filtrar por fecha</span>
+        <input type="date" aria-label="Filtrar por fecha" data-orders-date />
+      </label>
+      <p class="orders-result" data-orders-result>
+        Mostrando <strong>{orders.length}</strong> de {orders.length} órdenes
+      </p>
+    </div>
+
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead>
           <tr>
-            <td>{order.number}</td>
-            <td>
-              <strong>{order.customerName}</strong>
-              <div class="admin-hint">
-                {order.phone}{order.email ? ` · ${order.email}` : ''}
-              </div>
-            </td>
-            <td>
-              {order.items.map((item) => (
-                <div>{item.quantity} × {item.name}</div>
-              ))}
-            </td>
-            <td title={order.description}>{shortText(order.description) || '—'}</td>
-            <td>
-              {order.ebayItemId ? (
-                <code title="Búscalo en eBay con este id">{order.ebayItemId}</code>
-              ) : (
-                '—'
-              )}
-            </td>
-            <td>{money(order.totalCents)} {order.currency}</td>
-            <td>{new Date(order.createdAt).toLocaleDateString('es-VE')}</td>
-            <td>
-              <button
-                class="admin-btn admin-btn--danger admin-btn--sm"
-                data-delete={`/api/admin/purchase-orders?id=${order.id}`}
-                data-confirm={`¿Eliminar la orden ${order.number}?`}
-                data-delete-title="Eliminar orden"
-              >
-                Eliminar
-              </button>
-            </td>
+            <th scope="col">Orden</th>
+            <th scope="col">Cliente y envío</th>
+            <th scope="col">Productos y referencia</th>
+            <th scope="col">Total</th>
+            <th scope="col">Fecha</th>
+            <th scope="col"><span class="orders-visually-hidden">Acciones</span></th>
           </tr>
-        ))}
-        {orders.length === 0 && (
-          <tr><td colspan="8">Sin órdenes de compra.</td></tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {orders.map((order) => {
+            const { date, filterDate } = dateParts(order.createdAt);
+            const searchText = [
+              order.number,
+              order.customerName,
+              order.phone,
+              order.email,
+              order.items.map((item) => `${item.name} ${item.ebayItemId ?? ''}`).join(' '),
+            ].join(' ').toLocaleLowerCase();
+            return (
+              <tr
+                data-order-row
+                data-status={order.status}
+                data-date={filterDate}
+                data-search={searchText}
+                data-export-number={order.number}
+                data-export-status={statusLabel(order.status)}
+                data-export-customer={order.customerName}
+                data-export-phone={order.phone}
+                data-export-email={order.email}
+                data-export-products={order.items.map((item) => `${item.quantity} x ${item.name}`).join('; ')}
+                data-export-description={order.description}
+                data-export-total={(Math.max(0, order.totalCents) / 100).toFixed(2)}
+                data-export-currency={order.currency}
+                data-export-date={date.toLocaleString('es-VE', { timeZone: 'America/Caracas' })}
+                data-export-ebay={
+                  order.items.map((item) => item.ebayItemId).filter(Boolean).join('; ') || order.ebayItemId || ''
+                }
+              >
+                <td class="orders-number-cell">
+                  <strong>{order.number}</strong>
+                  <span class:list={['orders-status', `orders-status--${statusTone(order.status)}`]}>
+                    {statusLabel(order.status)}
+                  </span>
+                  <small>{order.items.length} {order.items.length === 1 ? 'artículo' : 'artículos'}</small>
+                </td>
+                <td class="orders-customer-cell">
+                  <strong>{order.customerName}</strong>
+                  {order.email && <a href={`mailto:${order.email}`}>{order.email}</a>}
+                  {order.phone && <span>{order.phone}</span>}
+                </td>
+                <td class="orders-products-cell">
+                  <div class="orders-items">
+                    {order.items.map((item) => {
+                      const ebayId = item.ebayItemId ?? (order.items.length === 1 ? order.ebayItemId : null);
+                      const ebayUrl = ebayId
+                        ? `https://www.ebay.com/itm/${encodeURIComponent(ebayId)}`
+                        : order.items.length === 1 ? order.ebayItemUrl : null;
+                      return (
+                        <article class="orders-item">
+                          <span class="orders-item-mark" aria-hidden="true">▦</span>
+                          <div class="orders-item-info">
+                            <strong>{item.name}</strong>
+                            <span>{item.quantity} × {money(item.unitPriceCents, order.currency)}</span>
+                            {Object.keys(item.attributes ?? {}).length > 0 && (
+                              <small>
+                                {Object.entries(item.attributes).map(([key, value]) => `${key}: ${value}`).join(' · ')}
+                              </small>
+                            )}
+                          </div>
+                          <div class="orders-item-ebay">
+                            {ebayUrl ? (
+                              <a href={ebayUrl} target="_blank" rel="noopener noreferrer">
+                                Ver en eBay <span aria-hidden="true">↗</span>
+                              </a>
+                            ) : (
+                              <span>Sin referencia eBay</span>
+                            )}
+                            {ebayId && <code title="Identificador del artículo">Item: {ebayId}</code>}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                  {order.description && (
+                    <details class="orders-description">
+                      <summary>Ver descripción del pedido</summary>
+                      <p>{order.description}</p>
+                    </details>
+                  )}
+                </td>
+                <td class="orders-total-cell">
+                  <strong>{money(order.totalCents, order.currency)}</strong>
+                  <small>{order.currency}</small>
+                </td>
+                <td class="orders-date-cell">
+                  <time datetime={date.toISOString()}>
+                    {date.toLocaleDateString('es-VE', { timeZone: 'America/Caracas' })}
+                  </time>
+                  <small>
+                    {date.toLocaleTimeString('es-VE', {
+                      timeZone: 'America/Caracas',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </small>
+                </td>
+                <td class="orders-actions-cell">
+                  <div class="orders-row-actions">
+                    <button
+                      class="admin-btn admin-btn--sm orders-payment-trigger"
+                      type="button"
+                      data-payment-order
+                      data-order-id={order.id}
+                      data-order-number={order.number}
+                      data-order-customer={order.customerName}
+                      data-order-phone={order.phone}
+                      data-order-total={(Math.max(0, order.totalCents) / 100).toFixed(2)}
+                      data-order-currency={order.currency}
+                      data-order-has-account={order.customerId ? 'true' : 'false'}
+                    >
+                      Enviar pago
+                    </button>
+                    <button
+                      class="admin-btn admin-btn--danger admin-btn--sm"
+                      type="button"
+                      data-delete={`/api/admin/purchase-orders?id=${order.id}`}
+                      data-confirm={`¿Eliminar la orden ${order.number}?`}
+                      data-delete-title="Eliminar orden"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+          <tr data-orders-empty hidden>
+            <td colspan="6">No hay órdenes que coincidan con los filtros.</td>
+          </tr>
+          {orders.length === 0 && (
+            <tr><td colspan="6" class="orders-no-orders">Aún no hay órdenes de compra.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    <dialog class="order-payment-dialog" data-payment-dialog>
+      <form method="dialog" class="order-payment-form">
+        <header class="order-payment-heading">
+          <div>
+            <span class="admin-overline">Pago del pedido</span>
+            <h2>Compartir método de pago</h2>
+          </div>
+          <button class="order-payment-close" type="submit" value="close" aria-label="Cerrar">×</button>
+        </header>
+        <p class="order-payment-summary" data-payment-summary></p>
+
+        <label class="order-payment-field">
+          <span>Método de pago</span>
+          <select data-payment-method>
+            <option value="binance">Binance Pay</option>
+            <option value="paypal">PayPal</option>
+          </select>
+        </label>
+
+        <label class="order-payment-field" data-binance-field>
+          <span>ID, wallet o instrucciones de Binance Pay</span>
+          <textarea
+            rows="3"
+            maxlength="1000"
+            placeholder="Ingresa los datos que recibirá el cliente"
+            data-binance-details
+          ></textarea>
+        </label>
+
+        <label class="order-payment-field" data-paypal-field hidden>
+          <span>Enlace de pago de PayPal</span>
+          <input
+            type="url"
+            maxlength="2048"
+            placeholder="https://www.paypal.com/..."
+            data-paypal-url
+            disabled
+          />
+        </label>
+
+        <p class="order-payment-hint" data-payment-account-message hidden>
+          El cliente no tiene una cuenta vinculada. Solo podrás enviar las instrucciones por WhatsApp si la orden tiene teléfono.
+        </p>
+        <p class="order-payment-hint" data-payment-phone-message hidden>
+          Esta orden no tiene un teléfono válido para abrir WhatsApp.
+        </p>
+        <p class="order-payment-feedback" data-payment-feedback role="status" aria-live="polite" hidden></p>
+
+        <footer class="order-payment-actions">
+          <button class="admin-btn orders-payment-trigger" type="button" data-payment-whatsapp>
+            Preparar WhatsApp
+          </button>
+          <button class="admin-btn" type="button" data-payment-panel>
+            Enviar al panel
+          </button>
+        </footer>
+      </form>
+    </dialog>
   </section>
 </AdminLayout>
+
+<script>
+  import '../../../scripts/order-payment';
+
+  function normalize(value: string) {
+    return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase();
+  }
+
+  function initOrdersPage() {
+    const search = document.querySelector<HTMLInputElement>('[data-orders-search]');
+    const status = document.querySelector<HTMLSelectElement>('[data-orders-status]');
+    const date = document.querySelector<HTMLInputElement>('[data-orders-date]');
+    const result = document.querySelector<HTMLElement>('[data-orders-result]');
+    const empty = document.querySelector<HTMLElement>('[data-orders-empty]');
+    const rows = [...document.querySelectorAll<HTMLTableRowElement>('[data-order-row]')];
+    const exportButton = document.querySelector<HTMLButtonElement>('[data-export-orders]');
+    if (!search || !status || !date || !result || !empty || !exportButton) return;
+
+    const visibleRows = () => rows.filter((row) => !row.hidden);
+    const filterRows = () => {
+      const query = normalize(search.value.trim());
+      let shown = 0;
+      rows.forEach((row) => {
+        const matches =
+          (!query || normalize(row.dataset.search ?? '').includes(query)) &&
+          (!status.value || row.dataset.status === status.value) &&
+          (!date.value || row.dataset.date === date.value);
+        row.hidden = !matches;
+        if (matches) shown += 1;
+      });
+      empty.hidden = shown > 0 || rows.length === 0;
+      result.innerHTML = `Mostrando <strong>${shown}</strong> de ${rows.length} órdenes`;
+    };
+
+    search.addEventListener('input', filterRows);
+    status.addEventListener('change', filterRows);
+    date.addEventListener('change', filterRows);
+    exportButton.addEventListener('click', () => {
+      const columns = [
+        ['Orden', 'number'],
+        ['Estado', 'status'],
+        ['Cliente', 'customer'],
+        ['Teléfono', 'phone'],
+        ['Correo', 'email'],
+        ['Productos', 'products'],
+        ['Descripción', 'description'],
+        ['Total', 'total'],
+        ['Moneda', 'currency'],
+        ['Fecha', 'date'],
+        ['Item eBay', 'ebay'],
+      ] as const;
+      const escapeCell = (value: string) => {
+        const safeValue = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+        return `"${safeValue.replaceAll('"', '""')}"`;
+      };
+      const csv = [
+        columns.map(([label]) => escapeCell(label)).join(','),
+        ...visibleRows().map((row) =>
+          columns
+            .map(([, key]) => escapeCell(row.dataset[`export${key[0].toUpperCase()}${key.slice(1)}`] ?? ''))
+            .join(','),
+        ),
+      ].join('\r\n');
+      const file = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ordenes-de-compra.csv';
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  }
+
+  function bootOrdersPage() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initOrdersPage, { once: true });
+    } else {
+      initOrdersPage();
+    }
+    document.addEventListener('astro:page-load', initOrdersPage);
+  }
+
+  bootOrdersPage();
+</script>
