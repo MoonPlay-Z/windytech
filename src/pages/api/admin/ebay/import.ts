@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { fetchEbayItem, stripEbayMentions, type EbayItemDetail } from '../../../../lib/ebay';
+import { translateEbaySpecs, translateEbayText, translateEbayTitle } from '../../../../lib/ebay-translate';
 import { cloudinaryConfigured, uploadRemoteImage } from '../../../../lib/cloudinary';
 import { computeResaleFinalPriceCents } from '../../../../lib/pricing';
 import {
@@ -244,12 +245,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
   }
 
-  const name = detail.title.slice(0, 180);
+  const name = await translateEbayTitle(detail.title);
   const plainDescription = htmlToText(detail.description);
+  const translatedDescription = await translateEbayText(plainDescription);
+  const sourceText = translatedDescription || name;
   // La descripción pública no menciona eBay: el origen queda solo en la ficha
   // interna del producto (ebay_item_id).
-  const descriptionMd = stripEbayMentions(plainDescription || name).slice(0, 20_000);
-  const shortDescription = stripEbayMentions(plainDescription || name)
+  const descriptionMd = stripEbayMentions(sourceText).slice(0, 20_000);
+  const shortDescription = stripEbayMentions(sourceText)
     .replace(/\s+/g, ' ')
     .slice(0, 280);
   const slug = await uniqueSlug(slugify(name));
@@ -274,7 +277,7 @@ export const POST: APIRoute = async ({ request }) => {
       availability: 'IN_STOCK',
       isActive: Boolean(body?.activate),
       isFeatured: false,
-      specs: buildSpecs(detail),
+      specs: await translateEbaySpecs(buildSpecs(detail)),
       translations: [
         {
           locale: 'es',
