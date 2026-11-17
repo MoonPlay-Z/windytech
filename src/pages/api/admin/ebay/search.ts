@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { searchEbayItems, searchEbayItemsByUrl, type EbayItemSummary } from '../../../../lib/ebay';
 import { json, readJson, requireAdmin } from '../../../../lib/api';
 import { sameOrigin } from '../../../../lib/security';
+import { ebayErrorMessage } from '../../../../lib/ebay-errors';
 
 export const prerender = false;
 
@@ -41,16 +42,9 @@ export const POST: APIRoute = async ({ request }) => {
       200,
     );
   } catch (error) {
-    console.error('[admin] no se pudo buscar en eBay:', error);
-    const message = error instanceof Error ? error.message : '';
-    return json(
-      {
-        error:
-          message.startsWith('El enlace') || message.startsWith('Usa un enlace')
-            ? message
-            : 'No se pudo buscar en eBay. Revisa la configuración de la cuenta y los datos de la búsqueda.',
-      },
-      502,
-    );
+    const info = ebayErrorMessage(error);
+    console.error(`[admin] error de eBay (${info.code}):`, error);
+    const status = info.code.startsWith('EBAY_LINK') || info.code === 'EBAY_NOT_CONFIGURED' ? 400 : 502;
+    return json({ error: info.message, code: info.code }, status);
   }
 };

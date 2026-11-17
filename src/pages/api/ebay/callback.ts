@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { serverEnv } from '../../../lib/env';
+import { ebayErrorMessage, parseEbayApiError } from '../../../lib/ebay-errors';
 
 export const prerender = false;
 
@@ -67,10 +68,12 @@ export const GET: APIRoute = async ({ url }) => {
     });
     const text = await response.text();
     if (!response.ok) {
-      console.error('[ebay] error intercambiando el código:', response.status, text);
+      const detail = await response.text();
+      const info = parseEbayApiError(response.status, detail);
+      console.error(`[ebay] error intercambiando el código (${info.code}):`, detail);
       return page(
         'eBay · error de token',
-        `<h1>No se pudo obtener el token</h1><p>eBay respondió <strong>${response.status}</strong>.</p><pre>${escapeHtml(text)}</pre>`,
+        `<h1>No se pudo obtener el token</h1><p><strong>${info.code}</strong>: ${escapeHtml(info.message)}</p>`,
       );
     }
     const data = JSON.parse(text) as {
@@ -94,10 +97,11 @@ export const GET: APIRoute = async ({ url }) => {
        </div>`,
     );
   } catch (error) {
-    console.error('[ebay] error en /api/ebay/callback:', error);
+    const info = ebayErrorMessage(error);
+    console.error(`[ebay] error en /api/ebay/callback (${info.code}):`, error);
     return page(
-      'eBay · error inesperado',
-      '<h1>Error inesperado</h1><p>No se pudo contactar con eBay. Revisa los logs del servidor.</p>',
+      'eBay · error',
+      `<h1>Error con eBay</h1><p><strong>${info.code}</strong>: ${escapeHtml(info.message)}</p>`,
     );
   }
 };

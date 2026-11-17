@@ -1,5 +1,6 @@
 import { serverEnv } from './env';
 import { computeResaleFinalPriceCents } from './pricing';
+import { EbayError, parseEbayApiError } from './ebay-errors';
 
 /**
  * Servicio de eBay (Selling API) para publicar/republicar productos con el
@@ -67,22 +68,26 @@ const APP_SCOPE = 'https://api.ebay.com/oauth/api_scope';
 
 async function requestToken(params: URLSearchParams): Promise<string> {
   const env = serverEnv;
-  const response = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(`${env.ebayClientId}:${env.ebayClientSecret}`)}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params.toString(),
-  });
+  let response: Response;
+  try {
+    response = await fetch(TOKEN_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`${env.ebayClientId}:${env.ebayClientSecret}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+  } catch {
+    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay para obtener el token. Comprueba la conexión y vuelve a intentarlo.');
+  }
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(
-      `No se pudo obtener el token de eBay (${response.status}): ${detail.slice(0, 200)}`,
-    );
+    throw parseEbayApiError(response.status, await response.text());
   }
   const data = (await response.json()) as { access_token?: string; expires_in?: number };
-  if (!data.access_token) throw new Error('eBay no devolvió access_token.');
+  if (!data.access_token) {
+    throw new EbayError('EBAY_INVALID_RESPONSE', 'eBay no devolvió un token de acceso. Revisa las credenciales configuradas.');
+  }
   tokenCache = {
     accessToken: data.access_token,
     expiresAt: Date.now() + Number(data.expires_in ?? 3600) * 1000,
@@ -95,8 +100,9 @@ async function getAccessToken(): Promise<string> {
   // Token manual para pruebas: evita cualquier flujo (caduca en ~2 h).
   if (env.ebayAccessToken) return env.ebayAccessToken;
   if (!env.ebayClientId || !env.ebayClientSecret) {
-    throw new Error(
-      'eBay no está configurado: faltan EBAY_CLIENT_ID o EBAY_CLIENT_SECRET.',
+    throw new EbayError(
+      'EBAY_NOT_CONFIGURED',
+      'eBay no está configurado: faltan EBAY_CLIENT_ID o EBAY_CLIENT_SECRET. Añádelos en el entorno (Render → Environment).',
     );
   }
   const cached = tokenCache;
@@ -115,7 +121,10 @@ async function getAccessToken(): Promise<string> {
         }),
       );
     } catch (error) {
-      console.error('[ebay] el refresh token falló; se usa un token de aplicación:', error);
+      console.error(
+        '[ebay] el refresh token falló; se usa un token de aplicación:',
+        error instanceof EbayError ? `${error.code}: ${error.message}` : error,
+      );
     }
   }
 
@@ -127,18 +136,22 @@ async function getAccessToken(): Promise<string> {
 
 async function ebayRequest<T = unknown>(path: string, init: { method: string; body?: unknown }): Promise<T> {
   const accessToken = await getAccessToken();
-  const response = await fetch(`${SELL_BASE}${path}`, {
-    method: init.method,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'Content-Language': 'en-US',
-    },
-    body: init.body === undefined ? undefined : JSON.stringify(init.body),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${SELL_BASE}${path}`, {
+      method: init.method,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Content-Language': 'en-US',
+      },
+      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+    });
+  } catch {
+    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay. Comprueba la conexión y vuelve a intentarlo.');
+  }
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`eBay respondió ${response.status}: ${detail}`);
+    throw parseEbayApiError(response.status, await response.text());
   }
   return (await response.json()) as T;
 }
@@ -160,7 +173,9 @@ async function createEbayItem(input: {
     },
   });
   const itemId = item?.itemId;
-  if (!itemId) throw new Error('eBay no devolvió itemId al crear el listing.');
+  if (!itemId) {
+    throw new EbayError('EBAY_INVALID_RESPONSE', 'eBay no devolvió el identificador del anuncio al crear el listing. Inténtalo de nuevo.');
+  }
   // Algunas respuestas no traen itemWebUrl: se construye con el dominio del entorno.
   const itemWebUrl =
     String(item?.itemWebUrl ?? '').trim() ||
@@ -257,16 +272,21 @@ export async function searchEbayItems(query: string, limit = 10, offset = 0): Pr
   url.searchParams.set('q', query);
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('offset', String(offset));
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'Content-Language': 'en-US',
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Content-Language': 'en-US',
+      },
+    });
+  } catch {
+    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay para buscar productos. Vuelve a intentarlo.');
+  }
   if (!response.ok) {
-    throw new Error(`eBay respondió ${response.status} al buscar items (${query}).`);
+    throw parseEbayApiError(response.status, await response.text());
   }
   const data = (await response.json()) as {
     itemSummaries?: Array<{
@@ -297,21 +317,25 @@ export async function searchEbayItems(query: string, limit = 10, offset = 0): Pr
  */
 export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
   const accessToken = await getAccessToken();
-  const response = await fetch(
-    `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Content-Language': 'en-US',
-        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+  let response: Response;
+  try {
+    response = await fetch(
+      `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'Content-Language': 'en-US',
+          'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+        },
       },
-    },
-  );
+    );
+  } catch {
+    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay para consultar el producto. Vuelve a intentarlo.');
+  }
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`eBay respondió ${response.status} al consultar el item ${itemId}: ${detail.slice(0, 300)}`);
+    throw parseEbayApiError(response.status, await response.text());
   }
 
   const data = (await response.json()) as {
@@ -441,13 +465,13 @@ export async function searchEbayItemsByUrl(
   try {
     url = new URL(rawUrl.trim());
   } catch {
-    throw new Error('El enlace no es válido.');
+    throw new EbayError('EBAY_LINK_INVALID', 'El enlace no es válido. Pega una URL completa de eBay, por ejemplo https://ebay.io/m/Fd5FrL.');
   }
   if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-    throw new Error('El enlace debe ser http o https.');
+    throw new EbayError('EBAY_LINK_INVALID', 'El enlace debe empezar por http:// o https://.');
   }
   if (!isEbayHost(url.hostname)) {
-    throw new Error('Usa un enlace de eBay (ebay.com, ebay.io o un dominio local de eBay).');
+    throw new EbayError('EBAY_LINK_DOMAIN', `El dominio «${url.hostname}» no es de eBay. Usa un enlace de ebay.com, ebay.io o un dominio local de eBay.`);
   }
 
   let finalUrl = url;
@@ -467,12 +491,12 @@ export async function searchEbayItemsByUrl(
       });
       finalUrl = new URL(response.url);
     } catch {
-      throw new Error('No se pudo abrir el enlace de eBay. Comprueba que sea válido.');
+      throw new EbayError('EBAY_LINK_UNRESOLVABLE', `No se pudo abrir el enlace «${rawUrl.trim()}». Comprueba que sea válido y que el producto siga publicado.`);
     } finally {
       clearTimeout(timer);
     }
     if (!isEbayHost(finalUrl.hostname)) {
-      throw new Error('El enlace redirige fuera de eBay.');
+      throw new EbayError('EBAY_LINK_REDIRECT', `El enlace redirige fuera de eBay (${finalUrl.hostname}). No se puede importar desde ese destino.`);
     }
   }
 
@@ -495,5 +519,8 @@ export async function searchEbayItemsByUrl(
   const term = finalUrl.searchParams.get('_nkw')?.trim();
   if (term && term.length >= 2) return searchEbayItems(term, limit, offset);
 
-  throw new Error('El enlace no corresponde a un producto ni a una búsqueda de eBay.');
+  throw new EbayError(
+    'EBAY_LINK_INVALID',
+    'El enlace no corresponde a un producto ni a una búsqueda de eBay. Pega el enlace de un anuncio (por ejemplo https://ebay.io/m/Fd5FrL) o busca por palabras clave.',
+  );
 }

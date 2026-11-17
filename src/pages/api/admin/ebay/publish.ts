@@ -4,6 +4,7 @@ import { getDb } from '../../../../lib/db';
 import { publishProduct, EBAY_PUBLISH_ACTIONS, type EbayPublishAction } from '../../../../lib/ebay';
 import { json, readJson, requireAdmin } from '../../../../lib/api';
 import { sameOrigin } from '../../../../lib/security';
+import { ebayErrorMessage } from '../../../../lib/ebay-errors';
 import { sql } from 'drizzle-orm';
 
 export const prerender = false;
@@ -61,10 +62,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     return json({ ok: true, ...result }, 200);
   } catch (error) {
-    console.error('[admin] no se pudo publicar el producto en eBay:', error);
-    return json(
-      { error: 'No se pudo publicar en eBay. Revisa la configuración de la cuenta y los datos del producto.' },
-      502,
-    );
+    const info = ebayErrorMessage(error);
+    console.error(`[admin] no se pudo publicar en eBay (${info.code}):`, error);
+    return json({ error: info.message, code: info.code }, 502);
   }
 };

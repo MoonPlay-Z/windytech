@@ -78,6 +78,12 @@ function message(form: HTMLFormElement, text: string, kind: 'ok' | 'error' = 'er
   node.dataset.kind = kind;
 }
 
+/** Las rutas de eBay devuelven `{ error, code }`; mostramos ambos en el panel. */
+function ebayErrorText(data: { error?: string; code?: string }, fallback: string): string {
+  const message = data.error ?? fallback;
+  return data.code ? `${message} (${data.code})` : message;
+}
+
 async function submitJson(url: string, method: string, body?: unknown) {
   const response = await fetch(url, {
     method,
@@ -515,11 +521,11 @@ function setupEbayActions() {
           credentials: 'same-origin',
           body: JSON.stringify({ productId, action }),
         });
-        const data = (await response.json().catch(() => ({}))) as { itemId?: string; error?: string };
+        const data = (await response.json().catch(() => ({}))) as { itemId?: string; error?: string; code?: string };
         if (response.ok) {
           message(form, data.itemId ? `Publicado en eBay. Item: ${data.itemId}` : 'Publicación guardada en eBay.', 'ok');
         } else {
-          message(form, data.error ?? 'No se pudo publicar en eBay.', 'error');
+          message(form, ebayErrorText(data, 'No se pudo publicar en eBay.'), 'error');
         }
       } catch {
         message(form, 'Error al publicar en eBay.');
@@ -685,9 +691,10 @@ function setupEbayImport() {
       const data = (await response.json().catch(() => ({}))) as {
         items?: EbaySearchItem[];
         error?: string;
+        code?: string;
         hasMore?: boolean;
       };
-      if (!response.ok) throw new Error(data.error ?? 'No se pudo buscar en eBay.');
+      if (!response.ok) throw new Error(ebayErrorText(data, 'No se pudo buscar en eBay.'));
 
       const items = Array.isArray(data.items) ? data.items : [];
       if (items.length === 0) {
@@ -730,9 +737,10 @@ function setupEbayImport() {
       const data = (await response.json().catch(() => ({}))) as {
         items?: EbaySearchItem[];
         error?: string;
+        code?: string;
         hasMore?: boolean;
       };
-      if (!response.ok) throw new Error(data.error ?? 'No se pudo buscar en eBay.');
+      if (!response.ok) throw new Error(ebayErrorText(data, 'No se pudo buscar en eBay.'));
 
       const items = Array.isArray(data.items) ? data.items : [];
       const marginPercent = Math.max(0, Number(marginInput.value) || 0);
@@ -814,14 +822,15 @@ function setupEbayImport() {
         isActive?: boolean;
         warnings?: string[];
         error?: string;
+        code?: string;
       };
 
       if (response.status === 409 && data.productId) {
         button.replaceWith(ebayEditLink(data.productId, 'Ya importado'));
-        setEbayMessage(messageNode, data.error ?? 'Este producto ya estaba en tu catálogo.', 'error');
+        setEbayMessage(messageNode, ebayErrorText(data, 'Este producto ya estaba en tu catálogo.'), 'error');
         return;
       }
-      if (!response.ok) throw new Error(data.error ?? 'No se pudo importar el producto.');
+      if (!response.ok) throw new Error(ebayErrorText(data, 'No se pudo importar el producto.'));
 
       const warnings = (data.warnings ?? []).filter(Boolean);
       const published = data.isActive ?? activate;

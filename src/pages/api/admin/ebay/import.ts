@@ -12,6 +12,7 @@ import {
 } from '../../../../lib/db/queries';
 import { json, readJson, requireAdmin } from '../../../../lib/api';
 import { sameOrigin } from '../../../../lib/security';
+import { ebayErrorMessage } from '../../../../lib/ebay-errors';
 
 export const prerender = false;
 
@@ -176,16 +177,13 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     detail = await fetchEbayItem(itemId);
   } catch (error) {
-    console.error('[admin] no se pudo consultar el item de eBay:', error);
+    const info = ebayErrorMessage(error);
+    console.error(`[admin] no se pudo consultar el item de eBay (${info.code}):`, error);
     // La sandbox devuelve 404 en algunos items que sí aparecen en la búsqueda:
     // en ese caso se importa con los datos del resumen que envió el panel.
-    const notFound = error instanceof Error && /404|not found/i.test(error.message);
-    const fallback = notFound ? fallbackDetail(itemId, body?.fallback) : null;
+    const fallback = info.code === 'EBAY_ITEM_NOT_FOUND' ? fallbackDetail(itemId, body?.fallback) : null;
     if (!fallback) {
-      return json(
-        { error: 'No se pudo consultar el item en eBay. Revisa la configuración y el enlace.' },
-        502,
-      );
+      return json({ error: info.message, code: info.code }, 502);
     }
     detail = fallback;
     warnings.push(
