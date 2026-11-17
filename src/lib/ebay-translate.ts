@@ -85,6 +85,22 @@ async function translateChunk(chunk: string): Promise<string> {
   return translated;
 }
 
+/** Traducción con reintento simple: el endpoint público puede ratear (429). */
+async function translateChunkWithRetry(chunk: string, attempts = 2): Promise<string> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await translateChunk(chunk);
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  }
+  throw lastError;
+}
+
 /** Traduce un texto del inglés al español usando Google Translate. */
 export async function translateToSpanish(text: string): Promise<string> {
   const clean = (text ?? '').trim();
@@ -92,7 +108,7 @@ export async function translateToSpanish(text: string): Promise<string> {
   const chunks = chunkText(clean);
   const translatedChunks: string[] = [];
   for (const chunk of chunks) {
-    translatedChunks.push(await translateChunk(chunk));
+    translatedChunks.push(await translateChunkWithRetry(chunk));
   }
   return translatedChunks.join('\n');
 }
