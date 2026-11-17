@@ -410,3 +410,90 @@ export async function publishProduct(input: EbayPublishInput): Promise<EbayPubli
     action: input.action,
   };
 }
+
+/** Dominios de eBay aceptados en enlaces (evita SSRF con URLs arbitrarias). */
+function isEbayHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^www\./, '');
+  return (
+    host === 'ebay.io' ||
+    host.endsWith('.ebay.io') ||
+    /^(ebay\.[a-z.]+|[a-z0-9-]+\.ebay\.[a-z.]+)$/.test(host)
+  );
+}
+
+function itemIdFromUrl(url: URL): string | null {
+  const match = /(?:^|\/)itm\/(\d+)/.exec(url.pathname);
+  if (match?.[1]) return match[1];
+  return url.searchParams.get('itemId') ?? url.searchParams.get('itemid') ?? null;
+}
+
+/**
+ * Busca un producto a partir de un enlace de eBay (p. ej. https://ebay.io/m/Fd5FrL).
+ * Sigue la redirección, extrae el itemId y consulta el detalle con Browse API.
+ * Si el enlace apunta a una búsqueda, usa su término (`_nkw`).
+ */
+export async function searchEbayItemsByUrl(
+  rawUrl: string,
+  limit = 10,
+  offset = 0,
+): Promise<EbayItemSummary[]> {
+  let url: URL;
+  try {
+    url = new URL(rawUrl.trim());
+  } catch {
+    throw new Error('El enlace no es válido.');
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error('El enlace debe ser http o https.');
+  }
+  if (!isEbayHost(url.hostname)) {
+    throw new Error('Usa un enlace de eBay (ebay.com, ebay.io o un dominio local de eBay).');
+  }
+
+  let finalUrl = url;
+  const directId = itemIdFromUrl(url);
+  if (!directId) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: {
+          'user-agent': 'Mozilla/5.0 (compatible; Windytech/1.0; +https://windytech.studio)',
+          accept: 'text/html',
+        },
+      });
+      finalUrl = new URL(response.url);
+    } catch {
+      throw new Error('No se pudo abrir el enlace de eBay. Comprueba que sea válido.');
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!isEbayHost(finalUrl.hostname)) {
+      throw new Error('El enlace redirige fuera de eBay.');
+    }
+  }
+
+  const itemId = directId ?? itemIdFromUrl(finalUrl);
+  if (itemId) {
+    const detail = await fetchEbayItem(itemId);
+    return [
+      {
+        itemId: detail.itemId || itemId,
+        title: detail.title,
+        priceValueCents: detail.priceValueCents,
+        currency: detail.currency,
+        condition: detail.condition,
+        imageUrl: detail.images[0] ?? null,
+        itemWebUrl: detail.itemWebUrl || finalUrl.toString(),
+      },
+    ];
+  }
+
+  const term = finalUrl.searchParams.get('_nkw')?.trim();
+  if (term && term.length >= 2) return searchEbayItems(term, limit, offset);
+
+  throw new Error('El enlace no corresponde a un producto ni a una búsqueda de eBay.');
+}

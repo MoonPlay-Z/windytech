@@ -657,9 +657,10 @@ function setupEbayImport() {
   renderLoadMore();
 
   const runSearch = async () => {
-    const query = queryInput.value.trim();
-    if (query.length < 2) {
-      setEbayMessage(messageNode, 'Escribe al menos 2 caracteres para buscar.', 'error');
+    const term = queryInput.value.trim();
+    const isLink = /^(https?:\/\/|ebay\.io\/|www\.ebay\.)/i.test(term);
+    if (!isLink && term.length < 2) {
+      setEbayMessage(messageNode, 'Escribe al menos 2 caracteres o pega un enlace de eBay.', 'error');
       queryInput.focus();
       return;
     }
@@ -668,7 +669,7 @@ function setupEbayImport() {
     searchButton.textContent = 'Buscando…';
     resultsNode.replaceChildren();
     itemCache.clear();
-    state.query = query;
+    state.query = term;
     state.loaded = 0;
     state.hasMore = true;
     renderLoadMore();
@@ -679,7 +680,7 @@ function setupEbayImport() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ query, limit: pageSize }),
+        body: JSON.stringify(isLink ? { url: term, limit: pageSize } : { query: term, limit: pageSize }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         items?: EbaySearchItem[];
@@ -692,7 +693,7 @@ function setupEbayImport() {
       if (items.length === 0) {
         state.hasMore = false;
         renderLoadMore();
-        setEbayMessage(messageNode, `Sin resultados para “${query}”. Prueba otras palabras.`, 'error');
+        setEbayMessage(messageNode, `Sin resultados para “${term}”. Prueba otras palabras.`, 'error');
         return;
       }
 
