@@ -139,9 +139,8 @@ function buildSpecs(detail: EbayItemDetail): Record<string, string> {
     specs[name] = aspectValue;
     count += 1;
   }
-  specs.Fuente = 'eBay';
-  if (detail.seller) specs['Vendedor eBay'] = detail.seller.slice(0, 120);
-  specs['Item eBay'] = detail.itemId.slice(0, 120);
+  // El origen eBay se guarda en products.ebay_item_id (uso interno del panel);
+  // no se expone en las especificaciones públicas.
   return specs;
 }
 
@@ -248,10 +247,9 @@ export const POST: APIRoute = async ({ request }) => {
 
   const name = detail.title.slice(0, 180);
   const plainDescription = htmlToText(detail.description);
-  const footer = detail.itemWebUrl
-    ? `\n\n---\n\nImportado desde eBay: ${detail.itemWebUrl}`
-    : `\n\n---\n\nImportado desde eBay (item ${detail.itemId}).`;
-  const descriptionMd = `${plainDescription || name}${footer}`.slice(0, 20_000);
+  // La descripción pública no menciona eBay: el origen queda solo en la ficha
+  // interna del producto (ebay_item_id).
+  const descriptionMd = (plainDescription || name).slice(0, 20_000);
   const shortDescription = (plainDescription || name)
     .replace(/\s+/g, ' ')
     .slice(0, 280);

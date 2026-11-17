@@ -1,0 +1,86 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { sessionFromRequest } from '../../../lib/auth';
+import { listPurchaseOrders } from '../../../lib/db/queries';
+
+export const prerender = false;
+
+const admin = await sessionFromRequest(Astro.request);
+if (!admin) return Astro.redirect('/admin/login/', 302);
+
+const orders = await listPurchaseOrders();
+
+const money = (cents: number) => `$${(Math.max(0, cents) / 100).toFixed(2)}`;
+const shortText = (text: string, max = 220) =>
+  text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+---
+
+<AdminLayout title="Órdenes de compra" admin={admin} active="orders">
+  <section class="admin-card">
+    <header class="admin-card-heading">
+      <div>
+        <span class="admin-overline">Ventas</span>
+        <h2>Órdenes de compra</h2>
+      </div>
+      <span class="admin-hint">
+        Se crean automáticamente cuando un cliente pide un producto. Incluyen sus datos, lo que
+        compró, la descripción y el item de eBay para buscarlo después.
+      </span>
+    </header>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:120px" scope="col">Orden</th>
+          <th scope="col">Cliente</th>
+          <th scope="col">Productos</th>
+          <th scope="col">Descripción</th>
+          <th style="width:160px" scope="col">Item eBay</th>
+          <th style="width:90px" scope="col">Total</th>
+          <th style="width:110px" scope="col">Fecha</th>
+          <th style="width:90px" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {orders.map((order) => (
+          <tr>
+            <td>{order.number}</td>
+            <td>
+              <strong>{order.customerName}</strong>
+              <div class="admin-hint">
+                {order.phone}{order.email ? ` · ${order.email}` : ''}
+              </div>
+            </td>
+            <td>
+              {order.items.map((item) => (
+                <div>{item.quantity} × {item.name}</div>
+              ))}
+            </td>
+            <td title={order.description}>{shortText(order.description) || '—'}</td>
+            <td>
+              {order.ebayItemId ? (
+                <code title="Búscalo en eBay con este id">{order.ebayItemId}</code>
+              ) : (
+                '—'
+              )}
+            </td>
+            <td>{money(order.totalCents)} {order.currency}</td>
+            <td>{new Date(order.createdAt).toLocaleDateString('es-VE')}</td>
+            <td>
+              <button
+                class="admin-btn admin-btn--danger admin-btn--sm"
+                data-delete={`/api/admin/purchase-orders?id=${order.id}`}
+                data-confirm={`¿Eliminar la orden ${order.number}?`}
+                data-delete-title="Eliminar orden"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        ))}
+        {orders.length === 0 && (
+          <tr><td colspan="8">Sin órdenes de compra.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

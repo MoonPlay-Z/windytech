@@ -181,6 +181,32 @@ export type EbayItemDetail = {
 
 type EbayImage = { imageUrl?: string };
 
+/** Claves de especificaciones que son solo de uso interno (origen eBay). */
+const EBAY_INTERNAL_SPEC_KEYS = ['fuente', 'vendedor ebay', 'item ebay', 'ebay'];
+
+/** Pie de origen que se añadía al importar: "Importado desde eBay: ...". */
+const EBAY_SOURCE_PATTERN = /\n[ \t]*\n[ \t]*---[ \t\r\n]*Importado desde eBay[\s\S]*$/i;
+
+/**
+ * Quita el pie de origen de eBay de una descripción. El cliente final no debe
+ * saber que el producto se importó desde eBay.
+ */
+export function stripEbaySource(text: string | null | undefined): string {
+  if (!text) return '';
+  return text.replace(EBAY_SOURCE_PATTERN, '').trim();
+}
+
+/** Quita las claves internas de eBay de las especificaciones públicas. */
+export function stripEbaySpecs(specs?: Record<string, string> | null): Record<string, string> {
+  if (!specs) return {};
+  const cleaned: Record<string, string> = {};
+  for (const [key, value] of Object.entries(specs)) {
+    if (EBAY_INTERNAL_SPEC_KEYS.includes(key.trim().toLowerCase())) continue;
+    cleaned[key] = value;
+  }
+  return cleaned;
+}
+
 function parsePriceCents(price?: { value?: string; currency?: string } | null): number {
   const value = Number(price?.value ?? 0);
   return Number.isFinite(value) ? Math.round(value * 100) : 0;

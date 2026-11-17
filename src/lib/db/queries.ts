@@ -10,6 +10,8 @@ import type {
   ServicePlan,
 } from '../catalog';
 import type { PromotionRule } from '../pricing';
+import { stripEbaySource, stripEbaySpecs } from '../ebay';
+import type { PurchaseOrderItem } from './schema';
 
 type Row = Record<string, unknown>;
 
@@ -229,6 +231,9 @@ export async function getProduct(slug: string): Promise<CatalogProduct | null> {
     images,
     variants,
     rules,
+    // El catálogo público no revela el origen eBay (descripción ni specs).
+    descriptionMd: stripEbaySource(String(row.descriptionMd ?? '')),
+    specs: stripEbaySpecs(row.specs as Record<string, string> | null),
   } as CatalogProduct;
 }
 
@@ -265,6 +270,7 @@ export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]>
     images: [],
     variants: variantRows.filter((variant) => Number(variant.productId) === Number(row.id)),
     rules,
+    specs: stripEbaySpecs(row.specs as Record<string, string> | null),
   })) as unknown as CatalogProduct[];
 }
 
@@ -404,7 +410,7 @@ export async function createQuote(data: {
     quantity: number;
     lineTotalCents: number;
   }[];
-}): Promise<{ number: string; token: string } | null> {
+}): Promise<{ id: number; number: string; token: string } | null> {
   const client = db();
   if (!client) return null;
 
@@ -438,7 +444,7 @@ export async function createQuote(data: {
       );
     }
 
-    return { number, token: data.publicToken };
+    return { id: quote.id, number, token: data.publicToken };
   });
 }
 
@@ -1546,6 +1552,104 @@ export async function countQuotesByStatus() {
     sql`SELECT status, COUNT(*)::int AS total FROM quotes GROUP BY status`,
   );
   return Object.fromEntries(rows.map((row) => [row.status, Number(row.total)]));
+}
+
+/* Órdenes de compra (panel) */
+
+export type PurchaseOrderRow = {
+  id: number;
+  number: string;
+  quoteId: number | null;
+  customerName: string;
+  phone: string;
+  email: string;
+  customerId: number | null;
+  items: PurchaseOrderItem[];
+  description: string;
+  ebayItemId: string | null;
+  ebayItemUrl: string | null;
+  status: string;
+  totalCents: number;
+  currency: string;
+  createdAt: string;
+};
+
+const PURCHASE_ORDER_SELECT = `
+  SELECT id, number, quote_id AS "quoteId", customer_name AS "customerName", phone, email,
+         customer_id AS "customerId", items, description, ebay_item_id AS "ebayItemId",
+         ebay_item_url AS "ebayItemUrl", status, total_cents AS "totalCents", currency,
+         created_at::text AS "createdAt"
+    FROM purchase_orders`;
+
+/**
+ * Crea la orden de compra de un cliente. Se llama cuando el cliente pide un
+ * producto: la orden reúne sus datos, lo que compró (con descripción) y el item
+ * de eBay para poder buscarlo después.
+ */
+export async function createPurchaseOrder(data: {
+  quoteId?: number | null;
+  customerName: string;
+  phone: string;
+  email: string;
+  customerId?: number | null;
+  items: PurchaseOrderItem[];
+  description: string;
+  ebayItemId: string | null;
+  ebayItemUrl: string | null;
+  totalCents: number;
+  currency: 'USD' | 'VES';
+}): Promise<{ id: number; number: string } | null> {
+  const client = db();
+  if (!client) return null;
+
+  try {
+    return await client.transaction(async (tx) => {
+      const inserted = await tx.execute(
+        sql`INSERT INTO purchase_orders (quote_id, customer_name, phone, email, customer_id,
+                items, description, ebay_item_id, ebay_item_url, total_cents, currency)
+            VALUES (${data.quoteId ?? null}, ${data.customerName}, ${data.phone}, ${data.email},
+                ${data.customerId ?? null}, ${JSON.stringify(data.items)}::jsonb,
+                ${data.description}, ${data.ebayItemId}, ${data.ebayItemUrl}, ${data.totalCents},
+                ${data.currency})
+            RETURNING id, number`,
+      );
+      const order = inserted.rows[0] as { id: number; number: string | null };
+
+      let number = order.number;
+      if (!number) {
+        const year = new Date().getFullYear();
+        number = `WO-${year}-${String(order.id).padStart(4, '0')}`;
+        await tx.execute(sql`UPDATE purchase_orders SET number = ${number} WHERE id = ${order.id}`);
+      }
+
+      return { id: order.id, number };
+    });
+  } catch (error) {
+    console.error('[db] no se pudo crear la orden de compra:', (error as Error).message);
+    return null;
+  }
+}
+
+export async function listPurchaseOrders(limit = 100): Promise<PurchaseOrderRow[]> {
+  return safeRows<PurchaseOrderRow>(
+    sql`${sql.raw(PURCHASE_ORDER_SELECT)} ORDER BY created_at DESC LIMIT ${limit}`,
+  );
+}
+
+export async function getPurchaseOrder(id: number): Promise<PurchaseOrderRow | null> {
+  return one<PurchaseOrderRow>(sql`${sql.raw(PURCHASE_ORDER_SELECT)} WHERE id = ${id} LIMIT 1`);
+}
+
+export async function deletePurchaseOrder(id: number): Promise<boolean> {
+  const client = db();
+  if (!client) return false;
+  try {
+    await client.execute(sql`DELETE FROM purchase_orders WHERE id = ${id}`);
+    return true;
+  } catch (error) {
+    console.error('[db] no se pudo eliminar la orden de compra:', (error as Error).message);
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */

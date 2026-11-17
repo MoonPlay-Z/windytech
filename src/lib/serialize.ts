@@ -1,5 +1,6 @@
 import { productImage, productSrcSet } from './cloudinary';
 import { priceFor, primaryImage, type CatalogProduct } from './catalog';
+import { stripEbaySpecs } from './ebay';
 import type { RateResult } from './rate';
 
 /** Representación pública de un producto: solo lo que necesita la web. */
@@ -16,7 +17,7 @@ export function productJson(product: CatalogProduct, rate: RateResult | null) {
     model: product.model,
     condition: product.condition,
     availability: product.availability,
-    specs: product.specs,
+    specs: stripEbaySpecs(product.specs),
     shortDescription: product.shortDescription,
     badge: base.badge,
     image: image

@@ -410,6 +410,50 @@ export const customerSessions = pgTable(
   (table) => [index('customer_sessions_customer_idx').on(table.customerId)],
 );
 
+export type PurchaseOrderItem = {
+  productId: number | null;
+  variantId: number | null;
+  name: string;
+  attributes: Record<string, string>;
+  quantity: number;
+  unitPriceCents: number;
+  lineTotalCents: number;
+  description: string;
+  ebayItemId: string | null;
+};
+
+/**
+ * Orden de compra que se genera cuando un cliente pide un producto. Guarda los
+ * datos del cliente, lo que compró (con descripción) y el item de eBay para
+ * poder buscarlo/reponerlo después desde el panel.
+ */
+export const purchaseOrders = pgTable(
+  'purchase_orders',
+  {
+    id: serial('id').primaryKey(),
+    number: text('number').unique(),
+    quoteId: integer('quote_id').references(() => quotes.id, { onDelete: 'set null' }),
+    customerName: text('customer_name').notNull(),
+    phone: text('phone').notNull().default(''),
+    email: text('email').notNull().default(''),
+    customerId: integer('customer_id').references(() => customerAccounts.id, {
+      onDelete: 'set null',
+    }),
+    items: jsonb('items').$type<PurchaseOrderItem[]>().notNull().default([]),
+    description: text('description').notNull().default(''),
+    ebayItemId: text('ebay_item_id'),
+    ebayItemUrl: text('ebay_item_url'),
+    status: text('status').notNull().default('NEW'),
+    totalCents: integer('total_cents').notNull().default(0),
+    currency: text('currency').notNull().default('USD'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('purchase_orders_created_idx').on(table.createdAt),
+    index('purchase_orders_quote_idx').on(table.quoteId),
+  ],
+);
+
 /* Seguimiento que ve el cliente: servicios, suscripciones, proyectos,
    cotizaciones y equipos comprados. */
 export const serviceTrackings = pgTable(

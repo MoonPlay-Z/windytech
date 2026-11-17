@@ -1,7 +1,14 @@
 import { randomToken } from './security';
 import { notifyCustomer, whatsappMessage } from './notifier';
 import { computeTotals, resolvePrice } from './pricing';
-import { createQuote, createTracking, findCustomerByEmail, getProductsByIds } from './db/queries';
+import {
+  createPurchaseOrder,
+  createQuote,
+  createTracking,
+  findCustomerByEmail,
+  getProductsByIds,
+  writeAudit,
+} from './db/queries';
 import { currentRate } from './rate';
 import { quotePath } from './catalog';
 import { site } from '../data/site';
@@ -58,6 +65,8 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
     unitPriceCents: number;
     quantity: number;
     lineTotalCents: number;
+    description: string;
+    ebayItemId: string | null;
   }[] = [];
 
   for (const item of input.items) {
@@ -90,6 +99,8 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
       unitPriceCents: price.unitCents,
       quantity,
       lineTotalCents: price.unitCents * quantity,
+      description: (product.shortDescription || product.name).slice(0, 1000),
+      ebayItemId: product.ebayItemId ?? null,
     });
   }
 
@@ -130,6 +141,51 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
     validUntil,
     items,
   });
+
+  // Orden de compra para el administrador: datos del cliente, lo que compró
+  // (con descripción) y el item de eBay para poder buscarlo después.
+  if (created) {
+    const firstEbay = items.find((item) => item.ebayItemId);
+    const order = await createPurchaseOrder({
+      quoteId: created.id,
+      customerName: input.customerName,
+      phone: input.phone,
+      email: input.email,
+      customerId: customer?.id ?? null,
+      items: items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        name: item.nameSnapshot,
+        attributes: item.attributesSnapshot,
+        quantity: item.quantity,
+        unitPriceCents: item.unitPriceCents,
+        lineTotalCents: item.lineTotalCents,
+        description: item.description,
+        ebayItemId: item.ebayItemId,
+      })),
+      description: items
+        .map((item) => `${item.nameSnapshot}: ${item.description}`)
+        .join('\n\n')
+        .slice(0, 4000),
+      ebayItemId: firstEbay?.ebayItemId ?? null,
+      ebayItemUrl: null,
+      totalCents: totals.totalCents,
+      currency: input.currency,
+    });
+
+    if (order) {
+      await writeAudit(null, 'CREATE', 'purchase_orders', String(order.id), {
+        number: order.number,
+        quoteNumber: created.number,
+        customerName: input.customerName,
+        phone: input.phone,
+        email: input.email,
+        items: items.length,
+        ebayItemId: firstEbay?.ebayItemId ?? null,
+        totalCents: totals.totalCents,
+      });
+    }
+  }
 
   if (customer && created?.number) {
     const trackingId = await createTracking({
