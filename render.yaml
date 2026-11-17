@@ -36,6 +36,8 @@ services:
         sync: false
       # eBay (Browse API + Selling API). Pega los valores en el panel de Render;
       # EBAY_REFRESH_TOKEN se obtiene con /api/ebay/callback.
+      # Producción: EBAY_SANDBOX=false y credenciales del developer PRD
+      # (el prefijo suele ser JuanAlfo-windytec-PRD-...; el sandbox usa SBX-...).
       - key: EBAY_CLIENT_ID
         sync: false
       - key: EBAY_CLIENT_SECRET
@@ -48,7 +50,7 @@ services:
       - key: EBAY_ACCESS_TOKEN
         sync: false
       - key: EBAY_SANDBOX
-        value: "true"
+        value: "false"
       - key: EBAY_REDIRECT_URI
         sync: false
       - key: EBAY_OAUTH_SCOPE
