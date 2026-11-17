@@ -575,4 +575,5 @@
 .product-card.has-open-share,
 .product-card:has(.share-menu.is-open) {
   z-index: 40;
+  overflow: visible;
 }
