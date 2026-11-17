@@ -363,31 +363,33 @@
   font-size: 18px;
 }
 
-.product-specs dl {
-  display: grid;
-  gap: 0;
+.product-specs__table {
+  width: 100%;
+  border-collapse: collapse;
   margin: 0;
 }
 
-.product-specs dl > div {
-  display: grid;
-  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
-  gap: 12px;
-  padding: 9px 0;
+.product-specs__table th,
+.product-specs__table td {
+  padding: 10px 14px;
   border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
 }
 
-.product-specs dl > div:last-child {
+.product-specs__table tbody tr:last-child th,
+.product-specs__table tbody tr:last-child td {
   border-bottom: 0;
 }
 
-.product-specs dt {
+.product-specs__table th {
+  width: 38%;
   color: var(--muted);
   font-size: 14px;
+  font-weight: 600;
 }
 
-.product-specs dd {
-  margin: 0;
+.product-specs__table td {
   color: var(--navy);
   font-size: 14.5px;
   font-weight: 600;

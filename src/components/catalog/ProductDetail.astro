@@ -302,14 +302,16 @@ const productSchema: Record<string, unknown> = {
           {specs.length > 0 && (
             <div class="product-specs">
               <h2>{t.specifications}</h2>
-              <dl>
-                {specs.map(([key, value]) => (
-                  <div>
-                    <dt>{attributeLabels[key] ?? key}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
+              <table class="product-specs__table">
+                <tbody>
+                  {specs.map(([key, value]) => (
+                    <tr>
+                      <th scope="row">{attributeLabels[key] ?? key}</th>
+                      <td>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
