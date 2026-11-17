@@ -63,6 +63,25 @@ export type EbayPublishResult = {
 
 let tokenCache: { accessToken: string; expiresAt: number } | null = null;
 
+/** Detalle consultado recientemente: evita llamar dos veces a eBay (fotos + importación). */
+const detailCache = new Map<string, { at: number; detail: EbayItemDetail }>();
+const DETAIL_CACHE_MS = 10 * 60 * 1000;
+
+export function cacheEbayDetail(detail: EbayItemDetail): void {
+  if (!detail.itemId) return;
+  detailCache.set(detail.itemId, { at: Date.now(), detail });
+  if (detailCache.size > 100) {
+    const oldest = [...detailCache.entries()].sort((a, b) => a[1].at - b[1].at)[0];
+    if (oldest) detailCache.delete(oldest[0]);
+  }
+}
+
+export function getCachedEbayDetail(itemId: string): EbayItemDetail | null {
+  const hit = detailCache.get(itemId);
+  if (!hit || Date.now() - hit.at > DETAIL_CACHE_MS) return null;
+  return hit.detail;
+}
+
 /** Scope público para tokens de aplicación (Browse API, sin usuario). */
 const APP_SCOPE = 'https://api.ebay.com/oauth/api_scope';
 
@@ -375,7 +394,7 @@ export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
     .filter((cents) => Number.isFinite(cents));
   const shippingCostCents = shippingCosts.length > 0 ? Math.min(...shippingCosts) : 0;
 
-  return {
+  const detail: EbayItemDetail = {
     itemId: String(data.itemId ?? itemId),
     title: String(data.title ?? '').trim(),
     priceValueCents: parsePriceCents(data.price),
@@ -390,6 +409,8 @@ export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
     shippingCostCents,
     seller: data.seller?.username ?? '',
   };
+  cacheEbayDetail(detail);
+  return detail;
 }
 
 /**

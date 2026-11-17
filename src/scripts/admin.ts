@@ -571,7 +571,7 @@ function ebayEditLink(productId: number, label: string): HTMLAnchorElement {
   return link;
 }
 
-function ebayCard(item: EbaySearchItem, marginPercent: number): HTMLElement {
+function ebayCard(item: EbaySearchItem, marginPercent: number, index = 0): HTMLElement {
   const card = document.createElement('article');
   card.className = 'ebay-card';
 
@@ -581,7 +581,7 @@ function ebayCard(item: EbaySearchItem, marginPercent: number): HTMLElement {
     const img = document.createElement('img');
     img.src = item.imageUrl;
     img.alt = '';
-    img.loading = 'lazy';
+    img.loading = index < 4 ? 'eager' : 'lazy';
     img.referrerPolicy = 'no-referrer';
     media.append(img);
   } else {
@@ -617,7 +617,13 @@ function ebayCard(item: EbaySearchItem, marginPercent: number): HTMLElement {
   importButton.textContent = 'Importar';
   importButton.dataset.ebayImportId = item.itemId;
 
-  actions.append(importButton);
+  const photosButton = document.createElement('button');
+  photosButton.type = 'button';
+  photosButton.className = 'admin-btn admin-btn--ghost admin-btn--sm';
+  photosButton.textContent = 'Ver fotos';
+  photosButton.dataset.ebayPhotos = item.itemId;
+
+  actions.append(importButton, photosButton);
   if (item.itemWebUrl) {
     const link = document.createElement('a');
     link.className = 'admin-btn admin-btn--ghost admin-btn--sm';
@@ -650,6 +656,10 @@ function setupEbayImport() {
   if (!queryInput || !marginInput || !searchButton || !messageNode || !resultsNode || !loadMoreWrap || !loadMoreButton) return;
 
   const itemCache = new Map<string, EbaySearchItem>();
+  const photosCache = new Map<string, string[]>();
+  let searchController: AbortController | null = null;
+  let searchTimer: number | undefined;
+  let lastSearch = '';
   const pageSize = 12;
   const state = { query: '', loaded: 0, hasMore: false };
   let isLoadingMore = false;
@@ -662,8 +672,13 @@ function setupEbayImport() {
   };
   renderLoadMore();
 
-  const runSearch = async () => {
+  const runSearch = async (force = false) => {
     const term = queryInput.value.trim();
+    if (term === lastSearch && !force) return;
+    lastSearch = term;
+    searchController?.abort();
+    searchController = new AbortController();
+    const signal = searchController.signal;
     const isLink = /^(https?:\/\/|ebay\.io\/|www\.ebay\.)/i.test(term);
     if (!isLink && term.length < 2) {
       setEbayMessage(messageNode, 'Escribe al menos 2 caracteres o pega un enlace de eBay.', 'error');
@@ -687,7 +702,9 @@ function setupEbayImport() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify(isLink ? { url: term, limit: pageSize } : { query: term, limit: pageSize }),
+        signal,
       });
+      if (signal.aborted) return;
       const data = (await response.json().catch(() => ({}))) as {
         items?: EbaySearchItem[];
         error?: string;
@@ -707,17 +724,20 @@ function setupEbayImport() {
       const marginPercent = Math.max(0, Number(marginInput.value) || 0);
       for (const item of items) {
         itemCache.set(item.itemId, item);
-        resultsNode.append(ebayCard(item, marginPercent));
+        resultsNode.append(ebayCard(item, marginPercent, resultsNode.children.length));
       }
       state.loaded = items.length;
       state.hasMore = items.length >= pageSize && Boolean(data.hasMore);
       renderLoadMore();
       setEbayMessage(messageNode, `${items.length} resultado(s). Elige uno y pulsa “Importar”.`, 'ok');
     } catch (error) {
+      if (signal.aborted) return;
       setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al buscar en eBay.', 'error');
     } finally {
-      searchButton.disabled = false;
-      searchButton.textContent = 'Buscar en eBay';
+      if (!signal.aborted) {
+        searchButton.disabled = false;
+        searchButton.textContent = 'Buscar en eBay';
+      }
     }
   };
 
@@ -747,7 +767,7 @@ function setupEbayImport() {
       for (const item of items) {
         if (itemCache.has(item.itemId)) continue;
         itemCache.set(item.itemId, item);
-        resultsNode.append(ebayCard(item, marginPercent));
+        resultsNode.append(ebayCard(item, marginPercent, resultsNode.children.length));
       }
       state.loaded += items.length;
       state.hasMore = items.length >= pageSize && Boolean(data.hasMore);
@@ -760,36 +780,50 @@ function setupEbayImport() {
     }
   };
 
-  searchButton.addEventListener('click', () => void runSearch());
+  searchButton.addEventListener('click', () => {
+    window.clearTimeout(searchTimer);
+    void runSearch(true);
+  });
   loadMoreButton.addEventListener('click', () => void runLoadMore());
   queryInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      void runSearch();
+      window.clearTimeout(searchTimer);
+      void runSearch(true);
     }
   });
+  // Búsqueda en tiempo real: se cancela la petición anterior si el usuario sigue escribiendo.
+  queryInput.addEventListener('input', () => {
+    window.clearTimeout(searchTimer);
+    if (!queryInput.value.trim()) {
+      searchController?.abort();
+      resultsNode.replaceChildren();
+      lastSearch = '';
+      renderLoadMore();
+      return;
+    }
+    searchTimer = window.setTimeout(() => void runSearch(), 350);
+  });
 
-  resultsNode.addEventListener('click', async (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const button = target.closest<HTMLButtonElement>('[data-ebay-import-id]');
-    if (!button || !resultsNode.contains(button) || button.disabled) return;
-
-    const itemId = button.dataset.ebayImportId ?? '';
-    if (!itemId) return;
-
+  const importItem = async (
+    itemId: string,
+    summary: EbaySearchItem | undefined,
+    selectedImages: string[] | undefined,
+    button: HTMLButtonElement | null,
+  ): Promise<boolean> => {
     const marginPercent = Math.round(Math.max(0, Math.min(100, Number(marginInput.value) || 0)));
     const categoryId = categorySelect?.value ? Number(categorySelect.value) : null;
     const activate = activateInput ? activateInput.checked : true;
-    const summary = itemCache.get(itemId);
 
-    button.disabled = true;
-    button.textContent = 'Importando…';
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Importando…';
+    }
     setEbayMessage(
       messageNode,
       activate
-        ? 'Importando imágenes y publicando el producto en el catálogo…'
-        : 'Importando imágenes y creando el producto como borrador…',
+        ? 'Importando y publicando el producto en el catálogo…'
+        : 'Importando y creando el producto como borrador…',
       'ok',
     );
 
@@ -803,6 +837,7 @@ function setupEbayImport() {
           marginPercent,
           categoryId,
           activate,
+          selectedImages,
           fallback: summary
             ? {
                 title: summary.title,
@@ -826,9 +861,9 @@ function setupEbayImport() {
       };
 
       if (response.status === 409 && data.productId) {
-        button.replaceWith(ebayEditLink(data.productId, 'Ya importado'));
+        button?.replaceWith(ebayEditLink(data.productId, 'Ya importado'));
         setEbayMessage(messageNode, ebayErrorText(data, 'Este producto ya estaba en tu catálogo.'), 'error');
-        return;
+        return false;
       }
       if (!response.ok) throw new Error(ebayErrorText(data, 'No se pudo importar el producto.'));
 
@@ -841,16 +876,164 @@ function setupEbayImport() {
         ...warnings,
       ].filter(Boolean);
       setEbayMessage(messageNode, parts.join(' '), warnings.length > 0 ? 'error' : 'ok');
-      if (data.productId) {
-        button.replaceWith(
-          ebayEditLink(data.productId, published ? 'Ver producto' : 'Editar borrador'),
-        );
+      if (data.productId && button) {
+        button.replaceWith(ebayEditLink(data.productId, published ? 'Ver producto' : 'Editar borrador'));
       }
+      return true;
     } catch (error) {
-      button.disabled = false;
-      button.textContent = 'Importar';
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'Importar';
+      }
       setEbayMessage(messageNode, error instanceof Error ? error.message : 'Error al importar.', 'error');
+      return false;
     }
+  };
+
+  const MAX_PHOTO_SELECTION = 8;
+
+  const openPhotoPicker = (itemId: string, summary: EbaySearchItem | undefined) => {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'admin-dialog ebay-photos-dialog';
+    const card = document.createElement('div');
+    card.className = 'admin-dialog-card ebay-photos-card';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Elegir fotos';
+    const subtitle = document.createElement('p');
+    subtitle.textContent = summary?.title ?? itemId;
+    const grid = document.createElement('div');
+    grid.className = 'ebay-photo-grid';
+    const counter = document.createElement('p');
+    counter.className = 'admin-hint';
+    const errorNode = document.createElement('p');
+    errorNode.className = 'admin-dialog-error';
+    errorNode.hidden = true;
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+    const accept = document.createElement('button');
+    accept.type = 'button';
+    accept.className = 'admin-btn';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'admin-btn admin-btn--ghost';
+    cancel.textContent = 'Cancelar';
+    actions.append(accept, cancel);
+    card.append(heading, subtitle, grid, counter, errorNode, actions);
+    dialog.append(card);
+    document.body.append(dialog);
+
+    let photos = photosCache.get(itemId) ?? (summary?.imageUrl ? [summary.imageUrl] : []);
+    const selected = new Set<string>(photos.slice(0, MAX_PHOTO_SELECTION));
+
+    const render = () => {
+      grid.replaceChildren();
+      if (photos.length === 0) {
+        grid.textContent = 'Cargando fotos…';
+      } else {
+        photos.forEach((url, index) => {
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = `ebay-photo${selected.has(url) ? ' is-selected' : ''}`;
+          tile.setAttribute('aria-pressed', String(selected.has(url)));
+          tile.title = selected.has(url) ? 'Quitar foto' : 'Añadir foto';
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = `Foto ${index + 1}`;
+          img.loading = index < 4 ? 'eager' : 'lazy';
+          img.referrerPolicy = 'no-referrer';
+          const check = document.createElement('span');
+          check.className = 'ebay-photo-check';
+          check.textContent = selected.has(url) ? '✓' : '';
+          tile.append(img, check);
+          tile.addEventListener('click', () => {
+            if (selected.has(url)) {
+              selected.delete(url);
+            } else if (selected.size < MAX_PHOTO_SELECTION) {
+              selected.add(url);
+            } else {
+              errorNode.hidden = false;
+              errorNode.textContent = `Puedes elegir hasta ${MAX_PHOTO_SELECTION} fotos.`;
+              return;
+            }
+            errorNode.hidden = true;
+            render();
+          });
+          grid.append(tile);
+        });
+      }
+      counter.textContent = photos.length
+        ? `${selected.size} de ${photos.length} fotos seleccionadas (máx. ${MAX_PHOTO_SELECTION}). La primera elegida será la principal.`
+        : 'Consultando todas las fotos en eBay…';
+      accept.disabled = selected.size === 0;
+      accept.textContent = `Importar ${selected.size} foto(s)`;
+    };
+
+    accept.addEventListener('click', async () => {
+      accept.disabled = true;
+      accept.textContent = 'Importando…';
+      const ok = await importItem(itemId, summary, [...selected], accept);
+      if (ok) dialog.close();
+      else {
+        accept.disabled = false;
+        accept.textContent = `Importar ${selected.size} foto(s)`;
+      }
+    });
+    cancel.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => dialog.remove());
+
+    // Se muestra al instante la miniatura del resultado y se cargan el resto en segundo plano.
+    render();
+    dialog.showModal();
+
+    if (!photosCache.has(itemId)) {
+      void (async () => {
+        try {
+          const response = await fetch('/api/admin/ebay/photos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ itemId }),
+          });
+          const data = (await response.json().catch(() => ({}))) as {
+            images?: string[];
+            error?: string;
+            code?: string;
+          };
+          if (!response.ok) throw new Error(ebayErrorText(data, 'No se pudieron cargar las fotos.'));
+          const full = Array.isArray(data.images)
+            ? data.images.filter((url): url is string => typeof url === 'string')
+            : [];
+          photosCache.set(itemId, full);
+          const kept = [...selected].filter((url) => full.includes(url));
+          selected.clear();
+          for (const url of (kept.length ? kept : full).slice(0, MAX_PHOTO_SELECTION)) selected.add(url);
+          photos = full;
+          render();
+        } catch (error) {
+          errorNode.hidden = false;
+          errorNode.textContent = error instanceof Error ? error.message : 'No se pudieron cargar las fotos.';
+        }
+      })();
+    }
+  };
+
+  resultsNode.addEventListener('click', async (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const photosButton = target.closest<HTMLButtonElement>('[data-ebay-photos]');
+    if (photosButton && resultsNode.contains(photosButton)) {
+      const itemId = photosButton.dataset.ebayPhotos ?? '';
+      if (itemId) openPhotoPicker(itemId, itemCache.get(itemId));
+      return;
+    }
+
+    const button = target.closest<HTMLButtonElement>('[data-ebay-import-id]');
+    if (!button || !resultsNode.contains(button) || button.disabled) return;
+    const itemId = button.dataset.ebayImportId ?? '';
+    if (!itemId) return;
+    await importItem(itemId, itemCache.get(itemId), undefined, button);
   });
 }
 

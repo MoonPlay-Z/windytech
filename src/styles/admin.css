@@ -1201,6 +1201,68 @@ html.admin-page {
   margin-top: 6px;
 }
 
+/* Selector de fotos antes de importar un item de eBay */
+.ebay-photos-dialog {
+  width: min(760px, calc(100vw - 32px));
+}
+
+.ebay-photos-card {
+  max-height: min(86vh, 760px);
+  overflow: auto;
+}
+
+.ebay-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+  min-height: 96px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ebay-photo {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: #eef4f6;
+  cursor: pointer;
+}
+
+.ebay-photo.is-selected {
+  border-color: var(--teal-dark);
+  box-shadow: 0 0 0 2px rgba(13, 122, 122, 0.25);
+}
+
+.ebay-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ebay-photo-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--teal-dark);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ebay-photo:not(.is-selected) .ebay-photo-check {
+  background: rgba(255, 255, 255, 0.85);
+  color: transparent;
+}
+
 @media (max-width: 560px) {
   .ebay-card {
     grid-template-columns: 72px minmax(0, 1fr);

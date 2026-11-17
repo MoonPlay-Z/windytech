@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { fetchEbayItem, stripEbayMentions, type EbayItemDetail } from '../../../../lib/ebay';
+import { fetchEbayItem, getCachedEbayDetail, stripEbayMentions, type EbayItemDetail } from '../../../../lib/ebay';
 import { translateEbaySpecs, translateEbayText, translateEbayTitle } from '../../../../lib/ebay-translate';
 import { cloudinaryConfigured, uploadRemoteImage } from '../../../../lib/cloudinary';
 import { computeResaleFinalPriceCents } from '../../../../lib/pricing';
@@ -16,7 +16,7 @@ import { ebayErrorMessage } from '../../../../lib/ebay-errors';
 
 export const prerender = false;
 
-const MAX_IMAGES = 4;
+const MAX_IMAGES = 8;
 const IMAGE_FOLDER = 'windytech/productos';
 
 type ImportBody = {
@@ -25,6 +25,8 @@ type ImportBody = {
   categoryId?: number | null;
   shippingCostCents?: number;
   activate?: boolean;
+  /** Fotos elegidas por el administrador ( URLs del detalle de eBay ). */
+  selectedImages?: string[];
   /** Datos de la búsqueda, usados si eBay no devuelve el detalle del item. */
   fallback?: {
     title?: string;
@@ -175,7 +177,8 @@ export const POST: APIRoute = async ({ request }) => {
   let detail: EbayItemDetail;
   const warnings: string[] = [];
   try {
-    detail = await fetchEbayItem(itemId);
+    // El panel ya consultó el detalle para mostrar las fotos: se reutiliza.
+    detail = getCachedEbayDetail(itemId) ?? (await fetchEbayItem(itemId));
   } catch (error) {
     const info = ebayErrorMessage(error);
     console.error(`[admin] no se pudo consultar el item de eBay (${info.code}):`, error);
@@ -211,41 +214,53 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'No se pudo calcular el precio de reventa.' }, 422);
   }
 
+  const selected = Array.isArray(body?.selectedImages)
+    ? body.selectedImages.filter((url): url is string => typeof url === 'string')
+    : [];
+  const allowed = new Set(detail.images);
+  // Solo se aceptan URLs que vinieron en el detalle de eBay.
+  const sources = selected.length
+    ? [...new Set(selected)].filter((url) => allowed.has(url)).slice(0, MAX_IMAGES)
+    : detail.images.slice(0, MAX_IMAGES);
+
+  // Subidas y traducciones son independientes: se lanzan a la vez para no
+  // sumar sus esperas (antes eran secuenciales).
+  const uploadsPromise = Promise.allSettled(
+    sources.length > 0 && cloudinaryConfigured()
+      ? sources.map((url) => uploadRemoteImage(url, IMAGE_FOLDER))
+      : [],
+  );
+  const [name, translatedDescription, translatedSpecs, uploads] = await Promise.all([
+    translateEbayTitle(detail.title),
+    translateEbayText(htmlToText(detail.description)),
+    translateEbaySpecs(buildSpecs(detail)),
+    uploadsPromise,
+  ]);
+
   let images: { cloudinaryPublicId: string; alt: string; isPrimary: boolean; position: number }[] = [];
-  if (detail.images.length > 0) {
-    if (!cloudinaryConfigured()) {
-      warnings.push('Las imágenes no se importaron porque Cloudinary no está configurado.');
-    } else {
-      const sources = detail.images.slice(0, MAX_IMAGES);
-      const uploads = await Promise.allSettled(
-        sources.map((url) => uploadRemoteImage(url, IMAGE_FOLDER)),
+  if (detail.images.length > 0 && !cloudinaryConfigured()) {
+    warnings.push('Las imágenes no se importaron porque Cloudinary no está configurado.');
+  } else {
+    const alt = name.slice(0, 200);
+    images = uploads.flatMap((result, index) => {
+      if (result.status !== 'fulfilled' || !result.value) return [];
+      return [
+        {
+          cloudinaryPublicId: result.value.publicId,
+          alt,
+          isPrimary: index === 0,
+          position: index,
+        },
+      ];
+    });
+    if (images.length < sources.length) {
+      warnings.push(
+        `Se importaron ${images.length} de ${sources.length} imágenes; el resto no se pudo descargar.`,
       );
-      const alt = detail.title.slice(0, 200);
-      images = uploads.flatMap((result, index) => {
-        if (result.status !== 'fulfilled' || !result.value) return [];
-        return [
-          {
-            cloudinaryPublicId: result.value.publicId,
-            alt,
-            isPrimary: index === 0,
-            position: index,
-          },
-        ];
-      });
-      if (images.length < sources.length) {
-        warnings.push(
-          `Se importaron ${images.length} de ${sources.length} imágenes; el resto no se pudo descargar.`,
-        );
-      }
-      if (images.length > 0) {
-        images = images.map((image, index) => ({ ...image, isPrimary: index === 0, position: index }));
-      }
     }
+    images = images.map((image, index) => ({ ...image, isPrimary: index === 0, position: index }));
   }
 
-  const name = await translateEbayTitle(detail.title);
-  const plainDescription = htmlToText(detail.description);
-  const translatedDescription = await translateEbayText(plainDescription);
   const sourceText = translatedDescription || name;
   // La descripción pública no menciona eBay: el origen queda solo en la ficha
   // interna del producto (ebay_item_id).
@@ -276,7 +291,7 @@ export const POST: APIRoute = async ({ request }) => {
       availability: 'IN_STOCK',
       isActive: Boolean(body?.activate),
       isFeatured: false,
-      specs: await translateEbaySpecs(buildSpecs(detail)),
+      specs: translatedSpecs,
       translations: [
         {
           locale: 'es',
