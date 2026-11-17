@@ -890,7 +890,7 @@ function setupEbayImport() {
     }
   };
 
-  const MAX_PHOTO_SELECTION = 8;
+  const MAX_PHOTO_SELECTION = 6;
 
   const openPhotoPicker = (itemId: string, summary: EbaySearchItem | undefined) => {
     const dialog = document.createElement('dialog');

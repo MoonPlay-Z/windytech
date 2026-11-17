@@ -124,7 +124,7 @@ export const productSchema = z.object({
         position: z.coerce.number().int().min(0).default(0),
       }),
     )
-    .max(4, 'Máximo 4 imágenes por producto.')
+    .max(6, 'Máximo 6 imágenes por producto.')
     .default([]),
   variants: z
     .array(

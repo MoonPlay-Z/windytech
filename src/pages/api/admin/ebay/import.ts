@@ -16,7 +16,7 @@ import { ebayErrorMessage } from '../../../../lib/ebay-errors';
 
 export const prerender = false;
 
-const MAX_IMAGES = 8;
+const MAX_IMAGES = 6;
 const IMAGE_FOLDER = 'windytech/productos';
 
 type ImportBody = {
