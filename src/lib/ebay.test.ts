@@ -54,6 +54,15 @@ describe('errores de eBay con causa concreta', () => {
     assert.equal(error.code, 'EBAY_TOKEN_EXPIRED');
   });
 
+  it('identifica credenciales de aplicación inválidas', () => {
+    const error = parseEbayApiError(
+      401,
+      '{"error":"invalid_client","error_description":"client authentication failed"}',
+    );
+    assert.equal(error.code, 'EBAY_BAD_CREDENTIALS');
+    assert.match(error.message, /EBAY_CLIENT_ID/);
+  });
+
   it('no confunde un codigo de autorizacion invalido con un refresh token caducado', () => {
     const error = parseEbayApiError(
       400,

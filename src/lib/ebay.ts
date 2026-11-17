@@ -62,6 +62,13 @@ export type EbayPublishResult = {
 };
 
 let tokenCache: { accessToken: string; expiresAt: number } | null = null;
+let manualTokenRejected = false;
+
+/** Fuerza una renovación del token (por ejemplo, tras un 401 de eBay). */
+function invalidateEbayToken(): void {
+  tokenCache = null;
+  manualTokenRejected = true;
+}
 
 /** Detalle consultado recientemente: evita llamar dos veces a eBay (fotos + importación). */
 const detailCache = new Map<string, { at: number; detail: EbayItemDetail }>();
@@ -116,8 +123,11 @@ async function requestToken(params: URLSearchParams): Promise<string> {
 
 async function getAccessToken(): Promise<string> {
   const env = serverEnv;
-  // Token manual para pruebas: evita cualquier flujo (caduca en ~2 h).
-  if (env.ebayAccessToken) return env.ebayAccessToken;
+  // Token manual para pruebas: caduca en ~2 h y se descarta en producción o
+  // en cuanto eBay lo rechaza, para no repetir el mismo 401 indefinidamente.
+  if (env.ebayAccessToken && !manualTokenRejected && !serverEnv.isProduction) {
+    return env.ebayAccessToken;
+  }
   if (!env.ebayClientId || !env.ebayClientSecret) {
     throw new EbayError(
       'EBAY_NOT_CONFIGURED',
@@ -153,25 +163,49 @@ async function getAccessToken(): Promise<string> {
   );
 }
 
-async function ebayRequest<T = unknown>(path: string, init: { method: string; body?: unknown }): Promise<T> {
-  const accessToken = await getAccessToken();
+/**
+ * Fetch autenticado a eBay. Si el token es rechazado (401), lo invalida,
+ * obtiene uno nuevo y reintenta una sola vez.
+ */
+async function ebayFetch(
+  url: string | URL,
+  init: RequestInit,
+  retryOnUnauthorized = true,
+): Promise<Response> {
+  const token = await getAccessToken();
+  const headers = new Headers(init.headers);
+  headers.set('Authorization', `Bearer ${token}`);
   let response: Response;
   try {
-    response = await fetch(`${SELL_BASE}${path}`, {
-      method: init.method,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Content-Language': 'en-US',
-      },
-      body: init.body === undefined ? undefined : JSON.stringify(init.body),
-    });
+    response = await fetch(url, { ...init, headers });
   } catch {
     throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay. Comprueba la conexión y vuelve a intentarlo.');
+  }
+  if (response.status === 401 && retryOnUnauthorized) {
+    const detail = await response.text();
+    const info = parseEbayApiError(401, detail);
+    if (info.code === 'EBAY_TOKEN_INVALID' || info.code === 'EBAY_TOKEN_EXPIRED') {
+      console.warn(`[ebay] token rechazado (${info.code}); renovando y reintentando.`);
+      invalidateEbayToken();
+      return ebayFetch(url, init, false);
+    }
+    throw info;
   }
   if (!response.ok) {
     throw parseEbayApiError(response.status, await response.text());
   }
+  return response;
+}
+
+async function ebayRequest<T = unknown>(path: string, init: { method: string; body?: unknown }): Promise<T> {
+  const response = await ebayFetch(`${SELL_BASE}${path}`, {
+    method: init.method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Language': 'en-US',
+    },
+    body: init.body === undefined ? undefined : JSON.stringify(init.body),
+  });
   return (await response.json()) as T;
 }
 
@@ -286,27 +320,17 @@ function parsePriceCents(price?: { value?: string; currency?: string } | null): 
  * Se usa para descubrir productos que luego se importan al catálogo propio.
  */
 export async function searchEbayItems(query: string, limit = 10, offset = 0): Promise<EbayItemSummary[]> {
-  const accessToken = await getAccessToken();
   const url = new URL(`${API_BASE}/buy/browse/v1/item_summary/search`);
   url.searchParams.set('q', query);
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('offset', String(offset));
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Content-Language': 'en-US',
-      },
-    });
-  } catch {
-    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay para buscar productos. Vuelve a intentarlo.');
-  }
-  if (!response.ok) {
-    throw parseEbayApiError(response.status, await response.text());
-  }
+  const response = await ebayFetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Language': 'en-US',
+    },
+  });
   const data = (await response.json()) as {
     itemSummaries?: Array<{
       itemId?: string;
@@ -335,27 +359,17 @@ export async function searchEbayItems(query: string, limit = 10, offset = 0): Pr
  * al catálogo propio.
  */
 export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
-  const accessToken = await getAccessToken();
-  let response: Response;
-  try {
-    response = await fetch(
-      `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'Content-Language': 'en-US',
-          'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
-        },
+  const response = await ebayFetch(
+    `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Language': 'en-US',
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
       },
-    );
-  } catch {
-    throw new EbayError('EBAY_NETWORK', 'No se pudo conectar con eBay para consultar el producto. Vuelve a intentarlo.');
-  }
-  if (!response.ok) {
-    throw parseEbayApiError(response.status, await response.text());
-  }
+    },
+  );
 
   const data = (await response.json()) as {
     itemId?: string;

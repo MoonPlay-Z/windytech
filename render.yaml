@@ -48,7 +48,8 @@ services:
         sync: false
       - key: EBAY_REFRESH_TOKEN
         sync: false
-      # Token manual solo para pruebas (caduca en ~2 h). Vacío en producción normal.
+      # Token manual solo para pruebas (caduca en ~2 h). Déjalo vacío en producción:
+      # la app renueva el token sola y un valor caducado provoca 401.
       - key: EBAY_ACCESS_TOKEN
         sync: false
       - key: EBAY_SANDBOX

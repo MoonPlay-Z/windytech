@@ -5,6 +5,7 @@
 
 export type EbayErrorCode =
   | 'EBAY_NOT_CONFIGURED'
+  | 'EBAY_BAD_CREDENTIALS'
   | 'EBAY_TOKEN_INVALID'
   | 'EBAY_TOKEN_EXPIRED'
   | 'EBAY_INVALID_GRANT'
@@ -67,6 +68,13 @@ export function parseEbayApiError(status: number, body: string): EbayError {
   const suffix = apiMessage ? ` eBay indicó: «${apiMessage}».` : '';
   const withId = errorId ? ` (error ${errorId})` : '';
 
+  if (/invalid_client|client authentication failed/i.test(text)) {
+    return new EbayError(
+      'EBAY_BAD_CREDENTIALS',
+      'Las credenciales de eBay (EBAY_CLIENT_ID y EBAY_CLIENT_SECRET) no son válidas. Genéralas de nuevo en el Developer Portal y actualízalas en Render → Environment. Comprueba también que EBAY_SANDBOX coincida (credenciales SBX → true, PRD → false).',
+      detail,
+    );
+  }
   if (status === 401 || /invalid access token|access token.*invalid|token.*invalid/i.test(text)) {
     return new EbayError(
       /expir/i.test(text) ? 'EBAY_TOKEN_EXPIRED' : 'EBAY_TOKEN_INVALID',
