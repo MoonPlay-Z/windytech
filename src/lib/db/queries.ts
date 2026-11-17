@@ -10,7 +10,7 @@ import type {
   ServicePlan,
 } from '../catalog';
 import type { PromotionRule } from '../pricing';
-import { stripEbaySource, stripEbaySpecs } from '../ebay';
+import { stripEbayMentions, stripEbaySource, stripEbaySpecs } from '../ebay';
 import type { PurchaseOrderItem } from './schema';
 
 type Row = Record<string, unknown>;
@@ -232,7 +232,9 @@ export async function getProduct(slug: string): Promise<CatalogProduct | null> {
     variants,
     rules,
     // El catálogo público no revela el origen eBay (descripción ni specs).
-    descriptionMd: stripEbaySource(String(row.descriptionMd ?? '')),
+    descriptionMd: stripEbayMentions(stripEbaySource(String(row.descriptionMd ?? ''))),
+    shortDescription: stripEbayMentions(String(row.shortDescription ?? '')),
+    seoDescription: stripEbayMentions(String(row.seoDescription ?? '')),
     specs: stripEbaySpecs(row.specs as Record<string, string> | null),
   } as CatalogProduct;
 }
@@ -271,6 +273,7 @@ export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]>
     variants: variantRows.filter((variant) => Number(variant.productId) === Number(row.id)),
     rules,
     specs: stripEbaySpecs(row.specs as Record<string, string> | null),
+    shortDescription: stripEbayMentions(String(row.shortDescription ?? '')),
   })) as unknown as CatalogProduct[];
 }
 

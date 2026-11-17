@@ -196,6 +196,22 @@ export function stripEbaySource(text: string | null | undefined): string {
   return text.replace(EBAY_SOURCE_PATTERN, '').trim();
 }
 
+const EBAY_URL_PATTERN = /https?:\/\/(?:[\w-]+\.)*ebay\.[a-z.]+\S*/gi;
+const EBAY_WORD_PATTERN = /\bebay(?:'s)?\b/gi;
+
+/**
+ * Elimina menciones y enlaces a eBay del texto que ve el cliente (muchas
+ * descripciones de vendedores los incluyen). Las sustituye por la marca.
+ */
+export function stripEbayMentions(text: string | null | undefined): string {
+  if (!text) return '';
+  return text
+    .replace(EBAY_URL_PATTERN, '')
+    .replace(EBAY_WORD_PATTERN, (match) => (/['’]s$/i.test(match) ? "Windytech's" : 'Windytech'))
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+}
+
 /** Quita las claves internas de eBay de las especificaciones públicas. */
 export function stripEbaySpecs(specs?: Record<string, string> | null): Record<string, string> {
   if (!specs) return {};

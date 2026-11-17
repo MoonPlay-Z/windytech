@@ -127,6 +127,37 @@ export async function destroyAsset(publicId: string): Promise<boolean> {
   }
 }
 
+/** Renombra un asset (cambia su public_id) con la Admin API. */
+export async function renameAsset(from: string, to: string): Promise<boolean> {
+  const secret = serverEnv.cloudinarySecret;
+  const apiKey = serverEnv.cloudinaryKey;
+  const name = cloudName();
+  if (!secret || !apiKey || !name || !from || !to) return false;
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = createHash('sha1')
+    .update(
+      `from_public_id=${from}&invalidate=true&timestamp=${timestamp}&to_public_id=${to}${secret}`,
+    )
+    .digest('hex');
+
+  const body = new URLSearchParams({
+    from_public_id: from,
+    to_public_id: to,
+    invalidate: 'true',
+    timestamp: String(timestamp),
+    api_key: apiKey,
+    signature,
+  });
+
+  try {
+    const response = await fetch(`${API_BASE}/${name}/image/rename`, { method: 'POST', body });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 export function cloudinaryConfigured(): boolean {
   return Boolean(cloudName() && serverEnv.cloudinaryKey && serverEnv.cloudinarySecret);
 }

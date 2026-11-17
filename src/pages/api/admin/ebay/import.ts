@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { fetchEbayItem, type EbayItemDetail } from '../../../../lib/ebay';
+import { fetchEbayItem, stripEbayMentions, type EbayItemDetail } from '../../../../lib/ebay';
 import { cloudinaryConfigured, uploadRemoteImage } from '../../../../lib/cloudinary';
 import { computeResaleFinalPriceCents } from '../../../../lib/pricing';
 import {
@@ -15,7 +15,7 @@ import { sameOrigin } from '../../../../lib/security';
 export const prerender = false;
 
 const MAX_IMAGES = 4;
-const IMAGE_FOLDER = 'windytech/productos/ebay';
+const IMAGE_FOLDER = 'windytech/productos';
 
 type ImportBody = {
   itemId?: string;
@@ -49,7 +49,7 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, '')
     .slice(0, 90)
     .replace(/-+$/g, '');
-  return slug || 'producto-ebay';
+  return slug || 'producto';
 }
 
 /** Convierte la descripción HTML de eBay en texto plano legible. */
@@ -85,13 +85,12 @@ function mapCondition(detail: EbayItemDetail): 'NEW' | 'REFURBISHED_A' | 'USED' 
   return 'NEW';
 }
 
-async function uniqueSlug(base: string, itemId: string): Promise<string> {
-  const suffix =
-    itemId
-      .replace(/[^a-zA-Z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .toLowerCase() || 'ebay';
-  const root = `${base}-${suffix}`.slice(0, 110).replace(/-+$/g, '');
+/**
+ * Genera un slug único a partir del nombre. No se añade el id del item de eBay:
+ * la URL pública no debe delatar el origen del producto.
+ */
+async function uniqueSlug(base: string): Promise<string> {
+  const root = base.slice(0, 110).replace(/-+$/g, '');
   let candidate = root;
   let index = 2;
   while (await productSlugInUse('es', candidate)) {
@@ -249,11 +248,11 @@ export const POST: APIRoute = async ({ request }) => {
   const plainDescription = htmlToText(detail.description);
   // La descripción pública no menciona eBay: el origen queda solo en la ficha
   // interna del producto (ebay_item_id).
-  const descriptionMd = (plainDescription || name).slice(0, 20_000);
-  const shortDescription = (plainDescription || name)
+  const descriptionMd = stripEbayMentions(plainDescription || name).slice(0, 20_000);
+  const shortDescription = stripEbayMentions(plainDescription || name)
     .replace(/\s+/g, ' ')
     .slice(0, 280);
-  const slug = await uniqueSlug(slugify(name), detail.itemId);
+  const slug = await uniqueSlug(slugify(name));
   const model = (detail.aspects.Model ?? detail.aspects['Modelo'] ?? '').slice(0, 180);
 
   let productId: number | null;
@@ -271,7 +270,7 @@ export const POST: APIRoute = async ({ request }) => {
       deliveryEstimateDays: 21,
       ebayItemId: detail.itemId,
       ebayStatus: 'listed',
-      sku: `EBAY-${detail.itemId}`.replace(/[^A-Za-z0-9-]+/g, '-').replace(/-+$/g, '').slice(0, 80),
+      sku: `WT-${detail.itemId.replace(/\D+/g, '') || Date.now().toString(36)}`.slice(0, 80),
       availability: 'IN_STOCK',
       isActive: Boolean(body?.activate),
       isFeatured: false,
