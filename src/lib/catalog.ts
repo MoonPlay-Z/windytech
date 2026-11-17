@@ -149,12 +149,18 @@ export function priceFor(
   return resolvePrice(product, variant ?? null, product.rules ?? [], now);
 }
 
-export function primaryImage(product: CatalogProduct): CatalogImage | null {
-  return (
-    product.images.find((image) => image.isPrimary) ??
-    product.images[0] ??
-    null
+export function orderProductImages(images: CatalogImage[]): CatalogImage[] {
+  const ordered = [...images].sort(
+    (a, b) => a.position - b.position || a.id - b.id,
   );
+  const primary = ordered.find((image) => image.isPrimary) ?? ordered[0];
+  return primary
+    ? [primary, ...ordered.filter((image) => image.id !== primary.id)]
+    : [];
+}
+
+export function primaryImage(product: CatalogProduct): CatalogImage | null {
+  return orderProductImages(product.images)[0] ?? null;
 }
 
 export function imageForVariant(product: CatalogProduct, variantId: number | null): CatalogImage | null {

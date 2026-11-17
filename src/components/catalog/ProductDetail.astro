@@ -9,12 +9,19 @@ import {
   availabilityLabels,
   catalogCopy,
   conditionLabels,
+  orderProductImages,
   priceFor,
   primaryImage,
   type CatalogProduct,
 } from '../../lib/catalog';
-import { productImage, productSrcSet, ogImage } from '../../lib/cloudinary';
-import { renderMarkdown } from '../../lib/markdown';
+import {
+  productDetailImage,
+  productDetailSrcSet,
+  productImage,
+  productSrcSet,
+  ogImage,
+} from '../../lib/cloudinary';
+import { renderMarkdown, stripMarkdown } from '../../lib/markdown';
 import type { RateResult } from '../../lib/rate';
 import { getSocialShareForPage } from '../../lib/social-share';
 import '../../styles/catalog.css';
@@ -32,7 +39,8 @@ interface Props {
 const { product, rate, currencyDefault, categoryName, recommendedProducts = [] } = Astro.props;
 const t = catalogCopy;
 const basePrice = priceFor(product, null);
-const image = primaryImage(product);
+const galleryImages = orderProductImages(product.images);
+const image = galleryImages[0] ?? null;
 const catalogHref = '/catalogo/';
 const href = `${catalogHref}${product.slug}/`;
 const condition = conditionLabels[product.condition];
@@ -40,6 +48,11 @@ const availability = availabilityLabels[product.availability];
 const vesPrice = rate ? Math.round(basePrice.unitCents * rate.rate) : 0;
 const vesCompare = rate ? Math.round(Math.max(basePrice.compareAtCents, basePrice.listCents) * rate.rate) : 0;
 const description = product.seoDescription || product.shortDescription;
+const descriptionPreview =
+  product.shortDescription?.trim() ||
+  stripMarkdown(product.descriptionMd, 220) ||
+  product.seoDescription ||
+  '';
 const specs = Object.entries(product.specs ?? {});
 const highlights = specs.slice(0, 6);
 const sameCategory =
@@ -83,7 +96,7 @@ const conditionSchema =
 
 const imageUrl = image ? ogImage(image.cloudinaryPublicId) : new URL(site.ogImage, site.url).toString();
 /** URL de la foto principal; vacía si Cloudinary no responde. */
-const mainImageSrc = image ? productImage(image.cloudinaryPublicId, 1200) : '';
+const mainImageSrc = image ? productDetailImage(image.cloudinaryPublicId, 1200) : '';
 
 /*
  * La tarjeta específica manda. Si no existe, el producto conserva su foto;
@@ -181,38 +194,47 @@ const productSchema: Record<string, unknown> = {
       </nav>
 
       <div class="product-detail">
-        <div class="product-gallery" data-product-gallery>
+        <div
+          class:list={['product-gallery', { 'product-gallery--single': galleryImages.length <= 1 }]}
+          data-product-gallery
+        >
           <div class="product-gallery-main">
             {image && mainImageSrc ? (
               <img
+                class="product-gallery-image"
                 src={mainImageSrc}
-                srcset={productSrcSet(image.cloudinaryPublicId)}
-                sizes="(max-width: 900px) 100vw, 55vw"
+                srcset={productDetailSrcSet(image.cloudinaryPublicId)}
+                sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 900px) calc(100vw - 140px), 40vw"
                 alt={image.alt || product.name}
                 width="1200"
                 height="900"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
                 data-main-image
               />
+              <span class="product-gallery-loading" data-gallery-loading aria-hidden="true"></span>
             ) : (
               <span class="product-card-placeholder" aria-hidden="true">
                 <Icon name="monitor" size={64} />
               </span>
             )}
           </div>
-          {product.images.length > 1 && (
+          <span class="product-gallery-sr-status" role="status" aria-live="polite" data-gallery-status></span>
+          {galleryImages.length > 1 && (
             <div class="product-gallery-thumbs">
-              {product.images.map((item) => (
+              {galleryImages.map((item) => (
                 <button
                   type="button"
                   class="product-thumb"
                   data-thumb
-                  data-full={productImage(item.cloudinaryPublicId, 1200)}
-                  data-srcset={productSrcSet(item.cloudinaryPublicId)}
+                  data-full={productDetailImage(item.cloudinaryPublicId, 1200)}
+                  data-srcset={productDetailSrcSet(item.cloudinaryPublicId)}
                   aria-pressed={image?.id === item.id ? 'true' : 'false'}
                   aria-label={item.alt || product.name}
                 >
                   <img
-                    src={productImage(item.cloudinaryPublicId, 200)}
+                    src={productDetailImage(item.cloudinaryPublicId, 200)}
                     alt={item.alt || product.name}
                     width="200"
                     height="150"
@@ -290,8 +312,8 @@ const productSchema: Record<string, unknown> = {
                       data-old={Math.max(variantPrice.compareAtCents, variantPrice.listCents)}
                       data-old-ves={rate ? Math.round(Math.max(variantPrice.compareAtCents, variantPrice.listCents) * rate.rate) : 0}
                       data-availability={variant.availability}
-                      data-image={variant.imagePublicId ? productImage(variant.imagePublicId, 1200) : image ? productImage(image.cloudinaryPublicId, 1200) : ''}
-                      data-image-srcset={variant.imagePublicId ? productSrcSet(variant.imagePublicId) : image ? productSrcSet(image.cloudinaryPublicId) : ''}
+                      data-image={variant.imagePublicId ? productDetailImage(variant.imagePublicId, 1200) : image ? productDetailImage(image.cloudinaryPublicId, 1200) : ''}
+                      data-image-srcset={variant.imagePublicId ? productDetailSrcSet(variant.imagePublicId) : image ? productDetailSrcSet(image.cloudinaryPublicId) : ''}
                       disabled={variant.availability === 'OUT_OF_STOCK'}
                       aria-pressed="false"
                     >
@@ -426,8 +448,8 @@ const productSchema: Record<string, unknown> = {
           <summary>
             <span class="product-section-kicker">Detalles del equipo</span>
             <span class="product-description-title">{t.description}</span>
-            {product.shortDescription && (
-              <span class="product-description-preview">{product.shortDescription}</span>
+            {descriptionPreview && (
+              <span class="product-description-preview">{descriptionPreview}</span>
             )}
             <span class="product-description-more">
               <span class="product-description-more-label">Ver más</span>
@@ -530,6 +552,74 @@ const productSchema: Record<string, unknown> = {
     const availabilityNote = document.querySelector<HTMLElement>('[data-availability-note]');
     const addButton = document.querySelector<HTMLButtonElement>('[data-add-to-cart]');
     const mainImage = document.querySelector<HTMLImageElement>('[data-main-image]');
+    const galleryLoading = document.querySelector<HTMLElement>('[data-gallery-loading]');
+    const galleryStatus = document.querySelector<HTMLElement>('[data-gallery-status]');
+    const thumbs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-thumb]'));
+    let activeImage = mainImage?.currentSrc || mainImage?.src || '';
+    let loadToken = 0;
+
+    // Estado de carga de la imagen inicial (LCP).
+    if (mainImage) {
+      if (mainImage.complete && mainImage.naturalWidth > 0) {
+        galleryLoading?.setAttribute('hidden', '');
+      } else {
+        mainImage.classList.add('is-loading');
+        mainImage.addEventListener('load', () => {
+          mainImage.classList.remove('is-loading');
+          mainImage.classList.add('is-ready');
+          galleryLoading?.setAttribute('hidden', '');
+        }, { once: true });
+        mainImage.addEventListener('error', () => {
+          mainImage.classList.remove('is-loading');
+          galleryLoading?.setAttribute('hidden', '');
+          if (galleryStatus) galleryStatus.textContent = 'No se pudo cargar la imagen del producto.';
+        }, { once: true });
+      }
+    }
+
+    /** Cambia la imagen principal con precarga, estado de carga y transición suave. */
+    const setMainImage = (full: string, srcset: string, alt: string) => {
+      if (!mainImage || !full || full === activeImage) return;
+      const token = ++loadToken;
+      galleryLoading?.removeAttribute('hidden');
+      mainImage.classList.add('is-loading');
+
+      const preload = new Image();
+      preload.decoding = 'async';
+      preload.sizes = mainImage.sizes;
+      if (srcset) preload.srcset = srcset;
+      preload.onload = () => {
+        if (token !== loadToken) return;
+        mainImage.src = full;
+        if (srcset) mainImage.srcset = srcset;
+        mainImage.alt = alt;
+        activeImage = full;
+        mainImage.classList.remove('is-loading');
+        mainImage.classList.add('is-ready');
+        galleryLoading?.setAttribute('hidden', '');
+        if (galleryStatus) galleryStatus.textContent = 'Imagen actualizada.';
+      };
+      preload.onerror = () => {
+        if (token !== loadToken) return;
+        mainImage.classList.remove('is-loading');
+        galleryLoading?.setAttribute('hidden', '');
+        if (galleryStatus) galleryStatus.textContent = 'No se pudo cargar la imagen. Prueba otra.';
+      };
+      preload.src = full;
+      // Si ya estaba en caché, onload puede no dispararse.
+      if (preload.complete && preload.naturalWidth > 0) preload.onload(new Event('load'));
+    };
+
+    // Precarga de las primeras miniaturas para que el cambio sea instantáneo.
+    window.setTimeout(() => {
+      for (const thumb of thumbs.slice(0, 4)) {
+        const url = thumb.dataset.full;
+        if (url && url !== activeImage) {
+          const img = new Image();
+          img.src = url;
+        }
+      }
+    }, 900);
 
     document.querySelectorAll<HTMLButtonElement>('[data-variant-option]').forEach((option) => {
       if (option.dataset.wtBound === 'true') return;
@@ -574,9 +664,8 @@ const productSchema: Record<string, unknown> = {
         }
 
         const image = option.dataset.image;
-        if (mainImage && image) {
-          mainImage.src = image;
-          mainImage.srcset = option.dataset.imageSrcset ?? '';
+        if (image) {
+          setMainImage(image, option.dataset.imageSrcset ?? '', mainImage?.alt ?? '');
         }
         window.dispatchEvent(new CustomEvent('wt:prices-updated'));
       });
@@ -587,12 +676,16 @@ const productSchema: Record<string, unknown> = {
       thumb.dataset.wtBound = 'true';
 
       thumb.addEventListener('click', () => {
-        if (!mainImage) return;
-        mainImage.src = thumb.dataset.full ?? mainImage.src;
-        mainImage.srcset = thumb.dataset.srcset ?? mainImage.srcset;
-        document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((item) => {
-          item.setAttribute('aria-pressed', String(item === thumb));
-        });
+        setMainImage(
+          thumb.dataset.full ?? '',
+          thumb.dataset.srcset ?? '',
+          thumb.getAttribute('aria-label') || mainImage?.alt || '',
+        );
+        if (mainImage) {
+          document.querySelectorAll<HTMLButtonElement>('[data-thumb]').forEach((item) => {
+            item.setAttribute('aria-pressed', String(item === thumb));
+          });
+        }
       });
     });
   }

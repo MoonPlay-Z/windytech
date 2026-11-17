@@ -61,22 +61,32 @@ export function rawImageUrl(publicId: string | null | undefined): string {
 
 export const PRODUCT_WIDTHS = [400, 800, 1200, 1600, 2400] as const;
 
+/** Miniaturas y tarjetas: conservan el encuadre original (sin recortar). */
 export function productSrcSet(publicId: string | null | undefined): string {
   if (!publicId) return '';
   return PRODUCT_WIDTHS.map(
     (width) =>
-      `${imageUrl(publicId, { width, crop: 'fill', aspectRatio: '4:3', gravity: 'auto', quality: 'auto:best' })} ${width}w`,
+      `${imageUrl(publicId, { width, crop: 'limit', quality: 'auto:best' })} ${width}w`,
   ).join(', ');
 }
 
 export function productImage(publicId: string | null | undefined, width = 800): string {
-  return imageUrl(publicId, {
-    width,
-    crop: 'fill',
-    aspectRatio: '4:3',
-    gravity: 'auto',
-    quality: 'auto:best',
-  });
+  return imageUrl(publicId, { width, crop: 'limit', quality: 'auto:best' });
+}
+
+export function productDetailSrcSet(publicId: string | null | undefined): string {
+  if (!publicId) return '';
+  return PRODUCT_WIDTHS.map(
+    (width) =>
+      `${imageUrl(publicId, { width, crop: 'limit', quality: 'auto:best' })} ${width}w`,
+  ).join(', ');
+}
+
+export function productDetailImage(
+  publicId: string | null | undefined,
+  width = 1600,
+): string {
+  return imageUrl(publicId, { width, crop: 'limit', quality: 'auto:best' });
 }
 
 export function projectImage(publicId: string | null | undefined, width = 1200): string {
