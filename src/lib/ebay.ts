@@ -1,6 +1,6 @@
 import { serverEnv } from './env';
 import { computeResaleFinalPriceCents } from './pricing';
-import { EbayError, parseEbayApiError } from './ebay-errors';
+import { EbayError, ebayErrorMessage, parseEbayApiError } from './ebay-errors';
 
 /**
  * Servicio de eBay (Selling API) para publicar/republicar productos con el
@@ -342,23 +342,38 @@ export async function searchEbayItems(query: string, limit = 10, offset = 0): Pr
     }>;
   };
   const items = data.itemSummaries ?? [];
-  return items.map((item) => ({
-    itemId: String(item.itemId ?? ''),
-    title: String(item.title ?? ''),
-    priceValueCents: parsePriceCents(item.price),
-    currency: String(item.price?.currency ?? 'USD'),
-    condition: item.condition ?? null,
-    imageUrl: item.image?.imageUrl ?? null,
-    itemWebUrl: item.itemWebUrl ?? null,
-  }));
+  return items.map((item) => {
+    // Browse API devuelve `image` como objeto, pero algunas respuestas traen la URL directa.
+    const raw = item.image as unknown;
+    const imageUrl = typeof raw === 'string' ? raw : (raw as EbayImage | undefined)?.imageUrl ?? null;
+    return {
+      itemId: String(item.itemId ?? ''),
+      title: String(item.title ?? ''),
+      priceValueCents: parsePriceCents(item.price),
+      currency: String(item.price?.currency ?? 'USD'),
+      condition: item.condition ?? null,
+      imageUrl,
+      itemWebUrl: item.itemWebUrl ?? null,
+    };
+  });
 }
 
 /**
- * Obtiene el detalle completo de un item de eBay (Browse API /item/{itemId}).
- * Devuelve imágenes, envío, marca, aspectos y descripción para importarlo
- * al catálogo propio.
+ * Las URLs públicas usan IDs numéricos, pero Browse API espera el formato
+ * `v1|<itemId>|<variación>`. Si el numérico no existe, se reintenta así.
  */
 export async function fetchEbayItem(itemId: string): Promise<EbayItemDetail> {
+  try {
+    return await fetchEbayItemOnce(itemId);
+  } catch (error) {
+    if (/^\d+$/.test(itemId) && ebayErrorMessage(error).code === 'EBAY_ITEM_NOT_FOUND') {
+      return fetchEbayItemOnce(`v1|${itemId}|0`);
+    }
+    throw error;
+  }
+}
+
+async function fetchEbayItemOnce(itemId: string): Promise<EbayItemDetail> {
   const response = await ebayFetch(
     `${API_BASE}/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
     {
@@ -537,7 +552,18 @@ export async function searchEbayItemsByUrl(
 
   const itemId = directId ?? itemIdFromUrl(finalUrl);
   if (itemId) {
-    const detail = await fetchEbayItem(itemId);
+    let detail;
+    try {
+      detail = await fetchEbayItem(itemId);
+    } catch (error) {
+      if (ebayErrorMessage(error).code === 'EBAY_ITEM_NOT_FOUND') {
+        throw new EbayError(
+          'EBAY_ITEM_NOT_FOUND',
+          `eBay no encontró el artículo ${itemId}. Puede estar vendido o retirado. Búscalo por ese número en eBay o pruebe con otro enlace.`,
+        );
+      }
+      throw error;
+    }
     return [
       {
         itemId: detail.itemId || itemId,

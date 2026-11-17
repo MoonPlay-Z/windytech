@@ -55,7 +55,7 @@ function harden(headers: Headers, pathname: string) {
         "form-action 'self'",
         "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' res.cloudinary.com data: blob:",
+        "img-src 'self' res.cloudinary.com https://*.ebayimg.com https://*.ebaystatic.com data: blob:",
         "font-src 'self' data:",
         "connect-src 'self'",
         'frame-src https://www.linkedin.com',
