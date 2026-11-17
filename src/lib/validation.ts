@@ -100,6 +100,7 @@ export const productSchema = z.object({
   shipping: z.coerce.number().min(0).max(1_000_000).optional(),
   deliveryEstimateDays: z.coerce.number().int().min(1).max(120).optional(),
   ebayItemId: z.string().trim().max(64).nullable().optional(),
+  ebayItemUrl: z.string().trim().max(2048).nullable().optional(),
   ebayStatus: z.enum(['draft', 'listed', 'ended']).optional(),
   sku: z.string().trim().max(80).default(''),
   availability: z.enum(['IN_STOCK', 'OUT_OF_STOCK', 'PREORDER']).default('IN_STOCK'),

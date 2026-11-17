@@ -67,6 +67,7 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
     lineTotalCents: number;
     description: string;
     ebayItemId: string | null;
+    ebayItemUrl: string | null;
   }[] = [];
 
   for (const item of input.items) {
@@ -101,6 +102,7 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
       lineTotalCents: price.unitCents * quantity,
       description: (product.shortDescription || product.name).slice(0, 1000),
       ebayItemId: product.ebayItemId ?? null,
+      ebayItemUrl: product.ebayItemUrl ?? null,
     });
   }
 
@@ -162,13 +164,14 @@ export async function buildQuote(input: QuoteInput, siteUrl: string): Promise<Qu
         lineTotalCents: item.lineTotalCents,
         description: item.description,
         ebayItemId: item.ebayItemId,
+        ebayItemUrl: item.ebayItemUrl,
       })),
       description: items
         .map((item) => `${item.nameSnapshot}: ${item.description}`)
         .join('\n\n')
         .slice(0, 4000),
       ebayItemId: firstEbay?.ebayItemId ?? null,
-      ebayItemUrl: null,
+      ebayItemUrl: firstEbay?.ebayItemUrl ?? null,
       totalCents: totals.totalCents,
       currency: input.currency,
     });

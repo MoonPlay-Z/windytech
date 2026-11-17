@@ -272,6 +272,7 @@ export const POST: APIRoute = async ({ request }) => {
       shippingCostCents,
       deliveryEstimateDays: 21,
       ebayItemId: detail.itemId,
+      ebayItemUrl: detail.itemWebUrl || null,
       ebayStatus: 'listed',
       sku: `WT-${detail.itemId.replace(/\D+/g, '') || Date.now().toString(36)}`.slice(0, 80),
       availability: 'IN_STOCK',

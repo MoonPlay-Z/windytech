@@ -71,6 +71,7 @@ export const POST: APIRoute = async ({ request }) => {
       shippingCostCents: dollarsToCents(data.shipping ?? 0),
       deliveryEstimateDays: data.deliveryEstimateDays ?? 21,
       ebayItemId: data.ebayItemId ?? null,
+      ebayItemUrl: data.ebayItemUrl ?? null,
       ebayStatus: data.ebayStatus ?? 'draft',
       sku: data.sku,
       availability: data.availability,

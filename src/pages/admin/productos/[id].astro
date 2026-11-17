@@ -34,6 +34,7 @@ const costUsd = (product.costCents / 100).toFixed(2);
 const shippingUsd = (product.shippingCostCents / 100).toFixed(2);
 const deliveryEstimateDaysValue = String(product.deliveryEstimateDays ?? 21);
 const ebayItemIdValue = product.ebayItemId ?? '';
+const ebayItemUrlValue = product.ebayItemUrl ?? '';
 const activeChecked = product.isActive ? 'checked' : '';
 const featuredChecked = product.isFeatured ? 'checked' : '';
 ---
@@ -80,6 +81,10 @@ const featuredChecked = product.isFeatured ? 'checked' : '';
         <label>
           <span>Item ID eBay</span>
           <input name="ebayItemId" data-field="ebayItemId" type="text" value={ebayItemIdValue} />
+        </label>
+        <label>
+          <span>URL en eBay</span>
+          <input name="ebayItemUrl" data-field="ebayItemUrl" type="url" value={ebayItemUrlValue} placeholder="https://www.ebay.com/itm/..." />
         </label>
       </div>
       <div class="admin-form-row">

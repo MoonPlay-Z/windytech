@@ -48,11 +48,14 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
 
-    // Se persiste el itemId y el estado devueltos por eBay.
+    // Se persisten el itemId, la URL del listing y el estado devueltos por eBay.
     const client = getDb();
     if (client) {
       await client.execute(
-        sql`UPDATE products SET ebay_item_id = ${result.itemId}, ebay_status = ${action === 'end' ? 'ended' : 'listed'}, updated_at = now() WHERE id = ${productId}`,
+        sql`UPDATE products SET ebay_item_id = ${result.itemId},
+                ebay_item_url = COALESCE(${result.itemUrl}, ebay_item_url),
+                ebay_status = ${action === 'end' ? 'ended' : 'listed'}, updated_at = now()
+            WHERE id = ${productId}`,
       );
     }
 

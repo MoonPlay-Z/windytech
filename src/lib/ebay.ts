@@ -22,6 +22,19 @@ const CONDITION_MAP: Record<string, string> = {
   USED: 'Used',
 };
 
+/**
+ * URL pública de un item de eBay. Los IDs del Browse API son compuestos
+ * (`v1|<itemId>|<variationId>`); la URL del listing usa solo el itemId.
+ * Se usa como respaldo para productos antiguos que no guardaron su URL.
+ */
+export function ebayItemWebUrl(itemId: string | null | undefined): string | null {
+  const raw = String(itemId ?? '').trim();
+  if (!raw) return null;
+  const match = /^v\d+\|(\d+)(?:\|\d+)?$/.exec(raw);
+  const publicId = match?.[1] ?? raw;
+  return `https://www.ebay.com/itm/${encodeURIComponent(publicId)}`;
+}
+
 export type EbayPublishInput = {
   productId: number;
   action: EbayPublishAction;
@@ -41,6 +54,8 @@ export type EbayPublishInput = {
 
 export type EbayPublishResult = {
   itemId: string | null;
+  /** URL del listing en eBay (null al retirar un item). */
+  itemUrl: string | null;
   finalPriceCents: number;
   action: EbayPublishAction;
 };
@@ -133,8 +148,8 @@ async function createEbayItem(input: {
   finalPriceCents: number;
   condition: string;
   deliveryEstimateDays?: number;
-}): Promise<{ itemId: string }> {
-  const item = await ebayRequest<{ itemId?: string }>('/item', {
+}): Promise<{ itemId: string; itemWebUrl: string }> {
+  const item = await ebayRequest<{ itemId?: string; itemWebUrl?: string }>('/item', {
     method: 'POST',
     body: {
       item: {
@@ -146,7 +161,11 @@ async function createEbayItem(input: {
   });
   const itemId = item?.itemId;
   if (!itemId) throw new Error('eBay no devolvió itemId al crear el listing.');
-  return { itemId };
+  // Algunas respuestas no traen itemWebUrl: se construye con el dominio del entorno.
+  const itemWebUrl =
+    String(item?.itemWebUrl ?? '').trim() ||
+    `https://${serverEnv.ebaySandbox ? 'www.sandbox.ebay.com' : 'www.ebay.com'}/itm/${encodeURIComponent(itemId)}`;
+  return { itemId, itemWebUrl };
 }
 
 async function endEbayItem(itemId: string): Promise<void> {
@@ -364,7 +383,12 @@ export async function publishProduct(input: EbayPublishInput): Promise<EbayPubli
 
   if (input.action === 'end') {
     if (input.product.ebayItemId) await endEbayItem(input.product.ebayItemId);
-    return { itemId: input.product.ebayItemId ?? null, finalPriceCents, action: input.action };
+    return {
+      itemId: input.product.ebayItemId ?? null,
+      itemUrl: null,
+      finalPriceCents,
+      action: input.action,
+    };
   }
 
   const shouldRecreate = input.action === 'relist';
@@ -372,14 +396,17 @@ export async function publishProduct(input: EbayPublishInput): Promise<EbayPubli
     await endEbayItem(input.product.ebayItemId);
   }
 
-  const itemId = (
-    await createEbayItem({
-      title: input.product.title,
-      finalPriceCents,
-      condition: input.product.condition,
-      deliveryEstimateDays: input.product.deliveryEstimateDays,
-    })
-  ).itemId;
+  const created = await createEbayItem({
+    title: input.product.title,
+    finalPriceCents,
+    condition: input.product.condition,
+    deliveryEstimateDays: input.product.deliveryEstimateDays,
+  });
 
-  return { itemId, finalPriceCents, action: input.action };
+  return {
+    itemId: created.itemId,
+    itemUrl: created.itemWebUrl,
+    finalPriceCents,
+    action: input.action,
+  };
 }

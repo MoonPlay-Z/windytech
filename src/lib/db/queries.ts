@@ -196,7 +196,7 @@ export async function getProduct(slug: string): Promise<CatalogProduct | null> {
                p.price_cents AS "priceCents", p.compare_at_cents AS "compareAtCents",
                p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
                p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
-               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus",
+               p.ebay_item_id AS "ebayItemId", p.ebay_item_url AS "ebayItemUrl", p.ebay_status AS "ebayStatus",
                p.sku, p.availability, p.is_featured AS "isFeatured", p.specs,
                t.slug, t.name, t.short_description AS "shortDescription",
                t.description_md AS "descriptionMd", t.seo_title AS "seoTitle",
@@ -247,7 +247,7 @@ export async function getProductsByIds(ids: number[]): Promise<CatalogProduct[]>
                p.price_cents AS "priceCents", p.compare_at_cents AS "compareAtCents",
                p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
                p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
-               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus",
+               p.ebay_item_id AS "ebayItemId", p.ebay_item_url AS "ebayItemUrl", p.ebay_status AS "ebayStatus",
                p.sku, p.availability, p.is_featured AS "isFeatured", p.specs,
                COALESCE(t.slug, '') AS slug, COALESCE(t.name, p.model) AS name,
                COALESCE(t.short_description, '') AS "shortDescription"
@@ -666,7 +666,7 @@ export async function listProductsAdmin() {
                (SELECT COUNT(*)::int FROM product_images i WHERE i.product_id = p.id) AS images,
                p.cost_cents AS "costCents", p.resale_margin_percent AS "resaleMarginPercent",
                p.shipping_cost_cents AS "shippingCostCents", p.delivery_estimate_days AS "deliveryEstimateDays",
-               p.ebay_item_id AS "ebayItemId", p.ebay_status AS "ebayStatus"
+               p.ebay_item_id AS "ebayItemId", p.ebay_item_url AS "ebayItemUrl", p.ebay_status AS "ebayStatus"
         FROM products p
         LEFT JOIN product_translations t ON t.product_id = p.id AND t.locale = 'es'
         ORDER BY p.created_at DESC`,
@@ -686,6 +686,7 @@ export type ProductAdmin = {
   shippingCostCents: number;
   deliveryEstimateDays: number;
   ebayItemId: string | null;
+  ebayItemUrl: string | null;
   ebayStatus: string;
   sku: string;
   availability: string;
@@ -703,7 +704,7 @@ export async function getProductAdmin(id: number): Promise<ProductAdmin | null> 
                price_cents AS "priceCents", compare_at_cents AS "compareAtCents",
                cost_cents AS "costCents", resale_margin_percent AS "resaleMarginPercent",
                shipping_cost_cents AS "shippingCostCents", delivery_estimate_days AS "deliveryEstimateDays",
-               ebay_item_id AS "ebayItemId", ebay_status AS "ebayStatus", sku,
+               ebay_item_id AS "ebayItemId", ebay_item_url AS "ebayItemUrl", ebay_status AS "ebayStatus", sku,
                availability, is_active AS "isActive", is_featured AS "isFeatured", specs
         FROM products WHERE id = ${id} LIMIT 1`,
   );
@@ -738,6 +739,7 @@ export type ProductInput = {
   shippingCostCents: number;
   deliveryEstimateDays: number;
   ebayItemId: string | null;
+  ebayItemUrl: string | null;
   ebayStatus: string;
   sku: string;
   availability: string;
@@ -863,7 +865,8 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
                 price_cents = ${input.priceCents}, compare_at_cents = ${input.compareAtCents},
                 cost_cents = ${input.costCents}, resale_margin_percent = ${input.resaleMarginPercent},
                 shipping_cost_cents = ${input.shippingCostCents}, delivery_estimate_days = ${input.deliveryEstimateDays},
-                ebay_item_id = ${input.ebayItemId}, ebay_status = ${input.ebayStatus},
+                ebay_item_id = ${input.ebayItemId}, ebay_item_url = ${input.ebayItemUrl},
+                ebay_status = ${input.ebayStatus},
                 sku = ${input.sku}, availability = ${input.availability},
                 is_active = ${input.isActive}, is_featured = ${input.isFeatured},
                 specs = ${JSON.stringify(input.specs)}::jsonb, updated_at = now()
@@ -873,11 +876,11 @@ export async function saveProduct(input: ProductInput): Promise<number | null> {
       const result = await tx.execute(
         sql`INSERT INTO products (category_id, brand, model, condition, price_cents,
                 compare_at_cents, cost_cents, resale_margin_percent, shipping_cost_cents,
-                delivery_estimate_days, ebay_item_id, ebay_status, sku, availability,
+                delivery_estimate_days, ebay_item_id, ebay_item_url, ebay_status, sku, availability,
                 is_active, is_featured, specs)
             VALUES (${input.categoryId}, ${input.brand}, ${input.model}, ${input.condition},
                 ${input.priceCents}, ${input.compareAtCents}, ${input.costCents}, ${input.resaleMarginPercent},
-                ${input.shippingCostCents}, ${input.deliveryEstimateDays}, ${input.ebayItemId}, ${input.ebayStatus},
+                ${input.shippingCostCents}, ${input.deliveryEstimateDays}, ${input.ebayItemId}, ${input.ebayItemUrl}, ${input.ebayStatus},
                 ${input.sku}, ${input.availability}, ${input.isActive}, ${input.isFeatured},
                 ${JSON.stringify(input.specs)}::jsonb)
             RETURNING id`,

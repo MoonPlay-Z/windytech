@@ -2,6 +2,7 @@
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { sessionFromRequest } from '../../../lib/auth';
 import { listPurchaseOrders } from '../../../lib/db/queries';
+import { ebayItemWebUrl } from '../../../lib/ebay';
 
 export const prerender = false;
 
@@ -141,9 +142,12 @@ const statusTone = (status: string) => {
                   <div class="orders-items">
                     {order.items.map((item) => {
                       const ebayId = item.ebayItemId ?? (order.items.length === 1 ? order.ebayItemId : null);
-                      const ebayUrl = ebayId
-                        ? `https://www.ebay.com/itm/${encodeURIComponent(ebayId)}`
-                        : order.items.length === 1 ? order.ebayItemUrl : null;
+                      // Se prefiere la URL guardada al publicar; la construida es solo
+                      // un respaldo para órdenes antiguas que no la tenían.
+                      const ebayUrl =
+                        item.ebayItemUrl ??
+                        (order.items.length === 1 ? order.ebayItemUrl : null) ??
+                        (ebayId ? ebayItemWebUrl(ebayId) : null);
                       return (
                         <article class="orders-item">
                           <span class="orders-item-mark" aria-hidden="true">▦</span>

@@ -42,6 +42,7 @@ export type CatalogProduct = {
   shippingCostCents?: number;
   deliveryEstimateDays?: number;
   ebayItemId?: string | null;
+  ebayItemUrl?: string | null;
   ebayStatus?: string;
   sku: string;
   availability: Availability;

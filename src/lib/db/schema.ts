@@ -68,6 +68,7 @@ export const products = pgTable(
     shippingCostCents: integer('shipping_cost_cents').notNull().default(0),
     deliveryEstimateDays: integer('delivery_estimate_days').notNull().default(21),
     ebayItemId: text('ebay_item_id'),
+    ebayItemUrl: text('ebay_item_url'),
     ebayStatus: text('ebay_status').notNull().default('draft'),
     sku: text('sku').notNull().default(''),
     availability: availabilityEnum('availability').notNull().default('IN_STOCK'),
@@ -420,6 +421,7 @@ export type PurchaseOrderItem = {
   lineTotalCents: number;
   description: string;
   ebayItemId: string | null;
+  ebayItemUrl: string | null;
 };
 
 /**
