@@ -7,6 +7,7 @@ export type EbayErrorCode =
   | 'EBAY_NOT_CONFIGURED'
   | 'EBAY_TOKEN_INVALID'
   | 'EBAY_TOKEN_EXPIRED'
+  | 'EBAY_INVALID_GRANT'
   | 'EBAY_FORBIDDEN'
   | 'EBAY_RATE_LIMIT'
   | 'EBAY_ITEM_NOT_FOUND'
@@ -68,15 +69,22 @@ export function parseEbayApiError(status: number, body: string): EbayError {
 
   if (status === 401 || /invalid access token|access token.*invalid|token.*invalid/i.test(text)) {
     return new EbayError(
-      /expir|invalid_grant/i.test(text) ? 'EBAY_TOKEN_EXPIRED' : 'EBAY_TOKEN_INVALID',
+      /expir/i.test(text) ? 'EBAY_TOKEN_EXPIRED' : 'EBAY_TOKEN_INVALID',
       'El token de acceso de eBay no es válido o ha caducado. Actualiza EBAY_REFRESH_TOKEN (o EBAY_ACCESS_TOKEN si lo usas) en el entorno y vuelve a intentarlo.',
       detail,
     );
   }
-  if (/expir|invalid_grant/i.test(text)) {
+  if (/expir/i.test(text) && /token/i.test(text)) {
     return new EbayError(
       'EBAY_TOKEN_EXPIRED',
-      'El refresh token de eBay ha caducado o no es válido. Genera uno nuevo desde el portal de desarrollador y actualiza EBAY_REFRESH_TOKEN.',
+      'El refresh token de eBay ha caducado. Genera uno nuevo desde el portal de desarrollador y actualiza EBAY_REFRESH_TOKEN.',
+      detail,
+    );
+  }
+  if (/invalid_grant/i.test(text)) {
+    return new EbayError(
+      'EBAY_INVALID_GRANT',
+      'eBay rechazó la autorización (invalid_grant). Si renuevas el token, actualiza EBAY_REFRESH_TOKEN; si estás dando el consentimiento, genera un código nuevo desde el Developer Portal.',
       detail,
     );
   }

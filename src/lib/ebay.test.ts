@@ -54,6 +54,14 @@ describe('errores de eBay con causa concreta', () => {
     assert.equal(error.code, 'EBAY_TOKEN_EXPIRED');
   });
 
+  it('no confunde un codigo de autorizacion invalido con un refresh token caducado', () => {
+    const error = parseEbayApiError(
+      400,
+      '{"error":"invalid_grant","error_description":"The authorization code is invalid"}',
+    );
+    assert.equal(error.code, 'EBAY_INVALID_GRANT');
+  });
+
   it('identifica permisos insuficientes, límite de peticiones e items no encontrados', () => {
     assert.equal(parseEbayApiError(403, '{"errors":[{"message":"Insufficient scope"}]}').code, 'EBAY_FORBIDDEN');
     assert.equal(parseEbayApiError(429, '{"errors":[{"message":"Rate limit exceeded"}]}').code, 'EBAY_RATE_LIMIT');
