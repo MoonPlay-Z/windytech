@@ -5,7 +5,11 @@ function read(name: string): string {
   // carga en import.meta.env, así que se usa como respaldo para probar local.
   const fromAstro = (import.meta as unknown as { env?: Record<string, unknown> }).env;
   const value = process.env[name] ?? fromAstro?.[name];
-  return typeof value === 'string' ? value.trim() : '';
+  if (typeof value !== 'string') return '';
+  // Se quitan comillas externas (tokens con '#' pueden quedar truncados si el
+  // valor se interpreta como comentado; defensa para envs pegadas con comillas).
+  const unquoted = value.trim().replace(/^["'](.*)["']$/, '$1').trim();
+  return unquoted;
 }
 
 export const serverEnv = {
