@@ -15,6 +15,15 @@ export default defineConfig({
   security: {
     checkOrigin: false,
   },
+  // Las URLs públicas de productos importados ya no incluyen el id del item
+  // de eBay. Estas redirecciones conservan los enlaces compartidos antes del
+  // cambio.
+  redirects: {
+    '/catalogo/dell-latitude-7420-14-fhd-i7-1185g7-16gb-256gb-ssd-new-v1-110591463017-0':
+      '/catalogo/dell-latitude-7420-14-fhd-i7-1185g7-16gb-256gb-ssd-new',
+    '/catalogo/lenovo-thinkpad-t16-gen-5-amd-laptop-21wx002pus-v1-110591578540-0':
+      '/catalogo/lenovo-thinkpad-t16-gen-5-amd-laptop-21wx002pus',
+  },
   // Precarga los enlaces al pasar el ratón para que la navegación cliente sea
   // casi instantánea, incluso en páginas renderizadas bajo demanda.
   prefetch: {
