@@ -15,7 +15,7 @@ Guía práctica para verificar, indexar y medir el sitio. Está adaptada a Windy
 | Sitemap | `https://windytech.studio/sitemap.xml` |
 | Códigos de verificación | `src/data/site.ts` → `site.verification` |
 | Script IndexNow | `npm run indexnow` |
-| Guía SEO/GEO | `SEO-GEO.md` |
+| Guía SEO/GEO | `documentacion/SEO-GEO.md` |
 | Panel | https://search.google.com/search-console |
 
 Páginas incluidas en el sitemap (se genera en cada build, hoy 22 URLs):
@@ -525,7 +525,7 @@ src/data/site.ts              verificación y sameAs
 src/layouts/BaseLayout.astro  metadatos, schema, iconos
 public/sitemap.xml            URLs y lastmod
 public/robots.txt             directivas de rastreo
-SEO-GEO.md                    estrategia SEO/GEO
+documentacion/SEO-GEO.md      estrategia SEO/GEO
 ```
 
 ---

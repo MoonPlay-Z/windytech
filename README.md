@@ -1,8 +1,8 @@
 # Windytech — sitio web
 
-Sitio en español para Windytech, construido con Astro y CSS propio.
-La primera versión está enfocada en **servicios**: desarrollo de software, automatización,
-webs, marketing, redes y equipos. El catálogo de equipos queda para una fase posterior.
+Sitio en español para Windytech, construido con Astro y CSS propio. Cubre servicios,
+catálogo de equipos, carrito, área de cliente y panel de administración, con datos en
+vivo y navegación con transiciones fluidas.
 
 ## Requisitos
 
@@ -17,6 +17,7 @@ npm run dev       # servidor local en http://localhost:4321
 npm run build     # compila el servidor SSR en dist/
 npm run preview   # previsualiza el build
 npm run check     # revisión de tipos y plantillas Astro
+npm run css:audit # detecta clases CSS huérfanas y plantillas sin estilo
 npm test          # pruebas unitarias (node:test + tsx)
 npm run sitemap   # genera dist/sitemap.xml sobre un build estático
 npm run seo:check # valida canonical, títulos, JSON-LD y enlaces
@@ -39,9 +40,9 @@ src/
   layouts/        BaseLayout.astro (SEO, iconos, Open Graph, schema)
   lib/            API, auth, base de datos Drizzle, catálogo, precios, seguridad
   pages/          marketing (/, /servicios/*, /nosotros/…), /cuenta/*, /admin/*, /api/*
-  scripts/        JS de cliente (panel, cuenta, carrito)
+  scripts/        JS de cliente (panel, cuenta, carrito, datos en vivo, progreso)
   styles/         estilos base: global.css, catalog.css, detail.css, cart.css,
-                  account.css, admin.css
+                  account.css, admin.css, live.css
   styles/responsive/  ajustes por dispositivo (desktop, tablet, mobile, small)
   lib/icons.ts    registro de iconos del sitio (grupos por familia)
   middleware.ts   cabeceras de seguridad y caché
@@ -55,13 +56,26 @@ public/
   <clave>.txt     verificación de IndexNow
 scripts/
   bootstrap-admin.ts    crea el administrador inicial
-  generate-sitemap.mjs  genera dist/sitemap.xml desde el HTML construido
+  generate-sitemap.ts   genera dist/sitemap.xml desde la base de datos
   check-seo.mjs         comprobaciones SEO sobre dist o el sitio live
   indexnow.mjs          aviso de cambios a Bing, Brave, Yandex y otros
+  audit-css.mjs         auditoría de clases CSS (npm run css:audit)
 render.yaml       despliegue del servicio web Node en Render
 .github/workflows/seo.yml  CI de check y build
-SEO-GEO.md        guía de SEO, GEO y presencia en buscadores
+documentacion/    guías en español (ver sección «Documentación»)
 ```
+
+## Documentación
+
+Las guías en español están agrupadas en `documentacion/`:
+
+| Archivo | Contenido |
+| --- | --- |
+| `SEO-GEO.md` | Estrategia SEO/GEO y presencia en buscadores |
+| `MANUAL-SEO.md` | Tareas SEO manuales y optimización on-page |
+| `GUIA-SEARCH-CONSOLE.md` | Search Console, verificaciones y datos estructurados |
+| `PROTOCOLO-REVISION-CSS.md` | Auditoría de clases CSS y checklist de revisión |
+| `SISTEMA-TIEMPO-REAL.md` | Datos en vivo y navegación con transiciones fluidas |
 
 ## Sistema responsive (modular por dispositivo)
 
@@ -155,7 +169,7 @@ El sitio incluye metadatos estructurados en español, páginas de servicio, una 
 para vistas previas, directivas para rastreadores y `llms.txt` + `llms-full.txt`. Estas
 mejoras ayudan a interpretar el contenido y a construir la entidad de la empresa, pero no
 garantizan posiciones ni un panel de conocimiento automático. La guía completa está en
-[`SEO-GEO.md`](SEO-GEO.md).
+[`documentacion/SEO-GEO.md`](documentacion/SEO-GEO.md).
 La portada también incluye enlaces de compartir en WhatsApp, Facebook y LinkedIn, más una
 acción para copiar el enlace; son enlaces directos y no cargan widgets externos de seguimiento.
 

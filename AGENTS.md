@@ -78,8 +78,9 @@ Verification order (mirrors CI): `npm run check && npm test && npm run build`
   (`output: 'server'`), `dist/` has no prerendered HTML in CI → run against the
   deployed site: `node scripts/check-seo.mjs --site=https://windytech.studio`.
 - No lint/format tooling is configured; do not introduce or run ESLint/Prettier.
-- Docs (`README.md`, `SEO-GEO.md`, `MANUAL-SEO.md`, `GUIA-SEARCH-CONSOLE.md`) are in
-  Spanish; `README.md.bak` is a stale duplicate.
+- Spanish docs live in `documentacion/` (`SEO-GEO.md`, `MANUAL-SEO.md`,
+  `GUIA-SEARCH-CONSOLE.md`, `PROTOCOLO-REVISION-CSS.md`, `SISTEMA-TIEMPO-REAL.md`).
+  `README.md` and `AGENTS.md` stay at the repo root.
 
 ## Testing quirks
 

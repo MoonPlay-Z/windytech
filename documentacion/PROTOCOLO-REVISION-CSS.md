@@ -23,7 +23,8 @@ scoped de Astro) repartido en 11 archivos (~9.500 líneas):
 | `src/styles/live.css` | Barra de progreso, destello de datos en vivo y avisos |
 | `src/styles/responsive/*.css` | Ajustes por dispositivo, dentro de `@layer responsive` |
 
-El sistema de actualización en tiempo real está descrito en `SISTEMA-TIEMPO-REAL.md`.
+El sistema de actualización en tiempo real está descrito en
+[SISTEMA-TIEMPO-REAL.md](SISTEMA-TIEMPO-REAL.md).
 
 Los estilos se importan desde `BaseLayout.astro`, `AdminLayout.astro` y las páginas
 que los necesitan. `astro.config.mjs` usa `build.inlineStylesheets: 'always'`.
