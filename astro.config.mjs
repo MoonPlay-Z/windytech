@@ -23,6 +23,10 @@ export default defineConfig({
       '/catalogo/dell-latitude-7420-14-fhd-i7-1185g7-16gb-256gb-ssd-new',
     '/catalogo/lenovo-thinkpad-t16-gen-5-amd-laptop-21wx002pus-v1-110591578540-0':
       '/catalogo/lenovo-thinkpad-t16-gen-5-amd-laptop-21wx002pus',
+    // Corrección del mapa local: "Valle de Aragua" es una región y
+    // "Portuguesa" es un estado, no una ciudad de Barinas.
+    '/valle-de-aragua/': '/la-victoria/',
+    '/portuguesa/': '/guanare/',
   },
   // Precarga los enlaces al pasar el ratón para que la navegación cliente sea
   // casi instantánea, incluso en páginas renderizadas bajo demanda.

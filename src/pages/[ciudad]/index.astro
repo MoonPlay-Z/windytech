@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
+import ProductCard from '../../components/catalog/ProductCard.astro';
 import { site, whatsappLink } from '../../data/site';
 import { services } from '../../data/services';
-import { CITIES, cityBySlug } from '../../data/ciudades';
+import { CITIES, cityBySlug, stateEntityType } from '../../data/ciudades';
 import { getCatalog } from '../../lib/db/queries';
 import { notFoundResponse } from '../../lib/not-found';
+import { currentRate } from '../../lib/rate';
 
 export const prerender = false;
 
@@ -17,7 +19,10 @@ if (!city) {
   return notFoundResponse(Astro);
 }
 
-const products = await getCatalog({ limit: 3 });
+const [products, rate] = await Promise.all([
+  getCatalog({ limit: 3 }),
+  currentRate(),
+]);
 
 /*
  * Preguntas frecuentes propias de cada ciudad. Se construyen con los datos
@@ -27,7 +32,7 @@ const products = await getCatalog({ limit: 3 });
 const faqsLocales = [
   {
     question: `¿Windytech trabaja en ${city.name}?`,
-    answer: `Sí. Atendemos negocios de ${city.name} y municipios cercanos del estado de ${city.state}, entre ellos ${city.zones.slice(0, 3).join(', ')}. Todo el trabajo se realiza en remoto, así que no hay costos de desplazamiento ni Loss de tiempo por visitas.`,
+    answer: `Sí. Atendemos negocios de ${city.name} y municipios cercanos de ${city.state}, entre ellos ${city.zones.slice(0, 3).join(', ')}. Todo el trabajo se realiza en remoto, así que no hay costos de desplazamiento ni pérdida de tiempo por visitas.`,
   },
   {
     question: `¿Cuánto cuesta un servicio en ${city.name}?`,
@@ -62,7 +67,7 @@ const schema = {
   provider: { '@id': `${site.url}/#organization` },
   areaServed: [
     { '@type': 'City', name: city.name },
-    { '@type': 'State', name: city.state },
+    { '@type': stateEntityType(city.state), name: city.state },
     ...city.zones.map((zone) => ({ '@type': 'Place', name: zone })),
   ],
   /*
@@ -74,10 +79,10 @@ const schema = {
     '@type': 'GeoCircle',
     geoMidpoint: {
       '@type': 'GeoCoordinates',
-      latitude: 10.4806,
-      longitude: -66.9036,
+      latitude: city.latitude,
+      longitude: city.longitude,
     },
-    geoRadius: '80000',
+    geoRadius: String((city.radiusKm ?? 50) * 1000),
   },
   telephone: `+${site.whatsappNumber}`,
   availableLanguage: ['Spanish', 'English'],
@@ -230,31 +235,7 @@ const schema = {
           </div>
           <div class="product-grid">
             {products.map((product) => (
-              <article class="product-card">
-                <a class="product-card-media" href={`/catalogo/${product.slug}/`}>
-                  <span class="product-card-placeholder" aria-hidden="true">
-                    <Icon name="monitor" size={40} />
-                  </span>
-                  <span class="product-availability">
-                    {product.availability === 'IN_STOCK'
-                      ? 'Disponible'
-                      : product.availability === 'PREORDER'
-                        ? 'Preventa'
-                        : 'Agotado'}
-                  </span>
-                </a>
-                <div class="product-card-body">
-                  <div class="product-meta">
-                    <span>{product.brand}</span>
-                  </div>
-                  <h3>
-                    <a href={`/catalogo/${product.slug}/`}>{product.name}</a>
-                  </h3>
-                  <p class="product-price">
-                    <span class="product-price-now">${(product.priceCents / 100).toFixed(2)}</span>
-                  </p>
-                </div>
-              </article>
+              <ProductCard product={product} rate={rate} />
             ))}
           </div>
           <p class="city-more">
@@ -279,3 +260,7 @@ const schema = {
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  import '../../scripts/cart';
+</script>

@@ -76,6 +76,7 @@ Las guías en español están agrupadas en `documentacion/`:
 | `GUIA-SEARCH-CONSOLE.md` | Search Console, verificaciones y datos estructurados |
 | `PROTOCOLO-REVISION-CSS.md` | Auditoría de clases CSS y checklist de revisión |
 | `SISTEMA-TIEMPO-REAL.md` | Datos en vivo y navegación con transiciones fluidas |
+| `ESTADOS-VENEZUELA.md` | Entidades federales, capitales y corrección del mapa local |
 
 ## Sistema responsive (modular por dispositivo)
 

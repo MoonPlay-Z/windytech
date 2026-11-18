@@ -10,7 +10,7 @@
  * virtuales o ficticias en el `PostalAddress`.
  */
 
-import { STATES } from './ciudades';
+import { STATES, stateEntityType } from './ciudades';
 
 export type SocialProfile = {
   /** Nombre de la red, tal como se muestra en el schema. */
@@ -99,8 +99,11 @@ export type CompanyProfile = {
   /** Ciudad y zona horaria. */
   timeZone: string;
 
-  /** Áreas donde se presta el servicio: estados y países. */
-  areaServed: { name: string; type: 'Country' | 'Place' | 'City' | 'State' }[];
+  /** Áreas donde se presta el servicio: entidades federales y países. */
+  areaServed: {
+    name: string;
+    type: 'Country' | 'Place' | 'City' | 'State' | 'AdministrativeArea';
+  }[];
 
   /** Métodos de pago. */
   paymentAccepted: string;
@@ -186,8 +189,11 @@ export const company: CompanyProfile = {
   timeZone: 'America/Caracas',
   areaServed: [
     { name: 'Venezuela', type: 'Country' },
-    // Los estados salen de la lista de ciudades: una sola fuente de verdad.
-    ...STATES.map((state) => ({ name: state.name, type: 'State' as const })),
+    // Las entidades salen de la lista de ciudades: una sola fuente de verdad.
+    ...STATES.map((state) => ({
+      name: state.name,
+      type: stateEntityType(state.name),
+    })),
     { name: 'Latinoamérica', type: 'Place' },
     { name: 'Worldwide', type: 'Place' },
   ],

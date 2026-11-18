@@ -79,7 +79,8 @@ Verification order (mirrors CI): `npm run check && npm test && npm run build`
   deployed site: `node scripts/check-seo.mjs --site=https://windytech.studio`.
 - No lint/format tooling is configured; do not introduce or run ESLint/Prettier.
 - Spanish docs live in `documentacion/` (`SEO-GEO.md`, `MANUAL-SEO.md`,
-  `GUIA-SEARCH-CONSOLE.md`, `PROTOCOLO-REVISION-CSS.md`, `SISTEMA-TIEMPO-REAL.md`).
+  `GUIA-SEARCH-CONSOLE.md`, `PROTOCOLO-REVISION-CSS.md`, `SISTEMA-TIEMPO-REAL.md`,
+  `ESTADOS-VENEZUELA.md`).
   `README.md` and `AGENTS.md` stay at the repo root.
 
 ## Testing quirks
