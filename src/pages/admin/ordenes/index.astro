@@ -48,7 +48,13 @@ const statusTone = (status: string) => {
 ---
 
 <AdminLayout title="Órdenes de compra" admin={admin} active="orders">
-  <section class="orders-page" aria-label="Administración de órdenes de compra">
+  <section
+    class="orders-page"
+    aria-label="Administración de órdenes de compra"
+    data-live-orders
+    data-live-url="/api/admin/purchase-orders"
+    data-live-interval="15000"
+  >
     <header class="orders-heading">
       <div>
         <span class="admin-overline">Gestión comercial</span>
@@ -80,9 +86,15 @@ const statusTone = (status: string) => {
         <input type="date" aria-label="Filtrar por fecha" data-orders-date />
       </label>
       <p class="orders-result" data-orders-result>
-        Mostrando <strong>{orders.length}</strong> de {orders.length} órdenes
+        Mostrando <strong data-live-count>{orders.length}</strong> de {orders.length} órdenes
       </p>
     </div>
+
+    <aside class="live-toast" data-live-toast aria-live="polite" hidden>
+      <span class="live-toast-label" data-live-toast-label></span>
+      <a class="live-toast-link" href="/admin/ordenes/">Actualizar</a>
+      <button class="live-toast-close" type="button" data-live-toast-close aria-label="Cerrar aviso">×</button>
+    </aside>
 
     <div class="orders-table-wrap">
       <table class="orders-table">
@@ -109,6 +121,7 @@ const statusTone = (status: string) => {
             return (
               <tr
                 data-order-row
+                data-order-id={order.id}
                 data-status={order.status}
                 data-date={filterDate}
                 data-search={searchText}
@@ -128,7 +141,11 @@ const statusTone = (status: string) => {
               >
                 <td class="orders-number-cell">
                   <strong>{order.number}</strong>
-                  <span class:list={['orders-status', `orders-status--${statusTone(order.status)}`]}>
+                  <span
+                    class:list={['orders-status', `orders-status--${statusTone(order.status)}`]}
+                    data-live-order-status
+                    data-status-label={statusLabel(order.status)}
+                  >
                     {statusLabel(order.status)}
                   </span>
                   <small>{order.items.length} {order.items.length === 1 ? 'artículo' : 'artículos'}</small>
@@ -328,7 +345,7 @@ const statusTone = (status: string) => {
         if (matches) shown += 1;
       });
       empty.hidden = shown > 0 || rows.length === 0;
-      result.innerHTML = `Mostrando <strong>${shown}</strong> de ${rows.length} órdenes`;
+      result.innerHTML = `Mostrando <strong data-live-count>${shown}</strong> de ${rows.length} órdenes`;
     };
 
     search.addEventListener('input', filterRows);

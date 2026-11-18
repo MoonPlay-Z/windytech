@@ -31,22 +31,29 @@ const [products, projects, posts, quotes, plans, leads, trackings] = await Promi
 ]);
 
 const embudo = [
-  { label: 'Consultas recibidas', value: leads.new ?? 0, href: '/admin/leads/' },
+  { label: 'Consultas recibidas', value: leads.new ?? 0, key: 'newLeads', href: '/admin/leads/' },
   {
     label: 'Cotizaciones',
     value: Object.values(quotes).reduce((a, b) => a + b, 0),
+    key: 'quotes',
     href: '/admin/cotizaciones/',
   },
-  { label: 'Cotizaciones nuevas', value: quotes.NEW ?? 0, href: '/admin/cotizaciones/' },
-  { label: 'Cerradas (aceptadas)', value: quotes.CLOSED ?? 0, href: '/admin/cotizaciones/' },
+  { label: 'Cotizaciones nuevas', value: quotes.NEW ?? 0, key: 'newQuotes', href: '/admin/cotizaciones/' },
+  { label: 'Cerradas (aceptadas)', value: quotes.CLOSED ?? 0, key: 'closedQuotes', href: '/admin/cotizaciones/' },
   {
     label: 'Seguimientos activos',
     value: Object.entries(trackings)
       .filter(([status]) => status !== 'entregado' && status !== 'cancelado')
       .reduce((a, [, b]) => a + b, 0),
+    key: 'trackingsActive',
     href: '/admin/seguimientos/',
   },
-  { label: 'Equipos entregados', value: trackings.entregado ?? 0, href: '/admin/seguimientos/' },
+  {
+    label: 'Equipos entregados',
+    value: trackings.entregado ?? 0,
+    key: 'trackingsDelivered',
+    href: '/admin/seguimientos/',
+  },
 ];
 ---
 
@@ -60,46 +67,51 @@ const embudo = [
     <a class="admin-btn" href="/admin/productos/nuevo/">+ Añadir producto</a>
   </section>
 
-  <div class="admin-grid">
+  <div
+    class="admin-grid"
+    data-live-values
+    data-live-url="/api/admin/live/stats"
+    data-live-interval="20000"
+  >
     <a class="admin-stat admin-stat--products" href="/admin/productos/">
       <span class="admin-stat-icon" aria-hidden="true">▦</span>
       <span class="admin-stat-label">CATÁLOGO</span>
-      <strong>{products.length}</strong>
+      <strong data-live-key="products">{products.length}</strong>
       <span class="admin-stat-caption">Productos registrados</span>
       <span class="admin-stat-link">Ver productos <span aria-hidden="true">→</span></span>
     </a>
     <a class="admin-stat admin-stat--quotes" href="/admin/cotizaciones/">
       <span class="admin-stat-icon" aria-hidden="true">◷</span>
       <span class="admin-stat-label">PENDIENTES</span>
-      <strong>{quotes.NEW ?? 0}</strong>
+      <strong data-live-key="newQuotes">{quotes.NEW ?? 0}</strong>
       <span class="admin-stat-caption">Cotizaciones nuevas</span>
       <span class="admin-stat-link">Revisar solicitudes <span aria-hidden="true">→</span></span>
     </a>
     <a class="admin-stat admin-stat--projects" href="/admin/proyectos/">
       <span class="admin-stat-icon" aria-hidden="true">◇</span>
       <span class="admin-stat-label">PORTAFOLIO</span>
-      <strong>{projects.length}</strong>
+      <strong data-live-key="projects">{projects.length}</strong>
       <span class="admin-stat-caption">Proyectos registrados</span>
       <span class="admin-stat-link">Ver proyectos <span aria-hidden="true">→</span></span>
     </a>
     <a class="admin-stat admin-stat--posts" href="/admin/publicaciones/">
       <span class="admin-stat-icon" aria-hidden="true">▤</span>
       <span class="admin-stat-label">CONTENIDO</span>
-      <strong>{posts.length}</strong>
+      <strong data-live-key="posts">{posts.length}</strong>
       <span class="admin-stat-caption">Publicaciones</span>
       <span class="admin-stat-link">Gestionar contenido <span aria-hidden="true">→</span></span>
     </a>
     <a class="admin-stat admin-stat--leads" href="/admin/leads/">
       <span class="admin-stat-icon" aria-hidden="true">◎</span>
       <span class="admin-stat-label">CONSULTAS</span>
-      <strong>{leads.new ?? 0}</strong>
+      <strong data-live-key="newLeads">{leads.new ?? 0}</strong>
       <span class="admin-stat-caption">Consultas nuevas</span>
       <span class="admin-stat-link">Ver consultas <span aria-hidden="true">→</span></span>
     </a>
     <a class="admin-stat admin-stat--services" href="/admin/servicios/">
       <span class="admin-stat-icon" aria-hidden="true">◈</span>
       <span class="admin-stat-label">PAQUETES</span>
-      <strong>{plans.length}</strong>
+      <strong data-live-key="services">{plans.length}</strong>
       <span class="admin-stat-caption">Paquetes de servicio</span>
       <span class="admin-stat-link">Ver paquetes <span aria-hidden="true">→</span></span>
     </a>
@@ -126,10 +138,15 @@ const embudo = [
         <h2>De la consulta a la entrega</h2>
       </div>
     </div>
-    <div class="admin-funnel">
+    <div
+      class="admin-funnel"
+      data-live-values
+      data-live-url="/api/admin/live/stats"
+      data-live-interval="20000"
+    >
       {embudo.map((paso) => (
         <a class="admin-funnel-step" href={paso.href}>
-          <strong>{paso.value}</strong>
+          <strong data-live-key={paso.key}>{paso.value}</strong>
           <span>{paso.label}</span>
         </a>
       ))}

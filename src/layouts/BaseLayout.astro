@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
 import '../styles/responsive/index.css';
+import '../styles/live.css';
 import { ClientRouter } from 'astro:transitions';
+import NavigationProgress from '../components/NavigationProgress.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
@@ -416,6 +418,7 @@ const schemaGraph = {
     <ClientRouter />
   </head>
   <body data-currency-default={currencyDefault}>
+    <NavigationProgress />
     <a class="skip-link" href="#main">{skipLabel}</a>
     <Header customer={customer} />
     <main id="main">
@@ -438,6 +441,8 @@ const schemaGraph = {
       import '../scripts/cart';
       import '../scripts/float';
       import '../scripts/attribution';
+      import '../scripts/navigation-progress';
+      import '../scripts/live-updates';
     </script>
   </body>
 </html>

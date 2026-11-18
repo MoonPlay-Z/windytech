@@ -10,6 +10,8 @@ import type {
   ServicePlan,
 } from '../catalog';
 import type { PromotionRule } from '../pricing';
+import type { LiveStats } from '../live';
+import { parseLiveStats } from '../live';
 import { stripEbayMentions, stripEbaySource, stripEbaySpecs } from '../ebay';
 import type { PurchaseOrderItem } from './schema';
 
@@ -1574,6 +1576,41 @@ export async function countQuotesByStatus() {
     sql`SELECT status, COUNT(*)::int AS total FROM quotes GROUP BY status`,
   );
   return Object.fromEntries(rows.map((row) => [row.status, Number(row.total)]));
+}
+
+/**
+ * Recuentos del panel en una sola consulta, para el endpoint de datos en vivo.
+ * Devuelve ceros cuando no hay base de datos (getDb() === null).
+ */
+export async function countAdminStats() {
+  const row = await one<Record<keyof LiveStats, number>>(sql`
+    SELECT
+      (SELECT COUNT(*)::int FROM products) AS products,
+      (SELECT COUNT(*)::int FROM projects) AS projects,
+      (SELECT COUNT(*)::int FROM posts) AS posts,
+      (SELECT COUNT(*)::int FROM service_plans) AS services,
+      (SELECT COUNT(*)::int FROM quotes WHERE status = 'NEW') AS "newQuotes",
+      (SELECT COUNT(*)::int FROM quotes) AS quotes,
+      (SELECT COUNT(*)::int FROM quotes WHERE status = 'CLOSED') AS "closedQuotes",
+      (SELECT COUNT(*)::int FROM leads WHERE status = 'new') AS "newLeads",
+      (SELECT COUNT(*)::int FROM service_trackings
+        WHERE status <> 'entregado' AND status <> 'cancelado') AS "trackingsActive",
+      (SELECT COUNT(*)::int FROM service_trackings WHERE status = 'entregado') AS "trackingsDelivered",
+      (SELECT COUNT(*)::int FROM purchase_orders) AS orders
+  `);
+  return parseLiveStats(row) ?? {
+    products: 0,
+    projects: 0,
+    posts: 0,
+    services: 0,
+    newQuotes: 0,
+    quotes: 0,
+    closedQuotes: 0,
+    newLeads: 0,
+    trackingsActive: 0,
+    trackingsDelivered: 0,
+    orders: 0,
+  };
 }
 
 /* Órdenes de compra (panel) */

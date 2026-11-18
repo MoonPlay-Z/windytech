@@ -2,7 +2,9 @@
 import '../../styles/global.css';
 import '../../styles/admin.css';
 import '../../styles/responsive/index.css';
+import '../../styles/live.css';
 import { ClientRouter } from 'astro:transitions';
+import NavigationProgress from '../NavigationProgress.astro';
 import type { AdminSession } from '../../lib/auth';
 import AdminNav from './AdminNav.astro';
 import { site } from '../../data/site';
@@ -30,6 +32,7 @@ const { title, admin, active } = Astro.props;
     <ClientRouter />
   </head>
   <body class="admin-body">
+    <NavigationProgress />
     <div class="admin-shell">
       <aside class="admin-sidebar">
         <a class="admin-brand" href="/admin/">
@@ -64,6 +67,8 @@ const { title, admin, active } = Astro.props;
     </div>
     <script>
       import '../../scripts/admin';
+      import '../../scripts/navigation-progress';
+      import '../../scripts/live-updates';
     </script>
   </body>
 </html>

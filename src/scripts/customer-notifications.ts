@@ -12,8 +12,19 @@ let ultimaMostrada = 0;
 
 function badge(total: number) {
   document.querySelectorAll<HTMLElement>('[data-notifications-badge]').forEach((node) => {
+    const previous = node.textContent?.trim();
     node.textContent = String(total);
     node.hidden = total === 0;
+
+    // La insignia usa la misma animación que el resto de datos en vivo.
+    if (previous !== String(total) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      node.classList.remove('is-live-updated');
+      void node.offsetWidth;
+      node.classList.add('is-live-updated');
+      node.addEventListener('animationend', () => node.classList.remove('is-live-updated'), {
+        once: true,
+      });
+    }
   });
 }
 

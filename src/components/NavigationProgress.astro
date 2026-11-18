@@ -1,0 +1,15 @@
+---
+/**
+ * Indicador de carga del ClientRouter. Se conserva entre navegaciones para que
+ * la animación no se reinicie a mitad de camino.
+ */
+---
+
+<div
+  id="nav-progress"
+  class="nav-progress"
+  data-nav-progress
+  role="progressbar"
+  aria-label="Cargando página"
+  transition:persist="nav-progress"
+></div>
