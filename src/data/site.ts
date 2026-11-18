@@ -53,9 +53,9 @@ export function whatsappLink(message: string) {
 
 export const content = {
   meta: {
-    homeTitle: 'Windytech | Software a medida, WhatsApp y páginas web',
+    homeTitle: 'Windytech | Software a medida, WhatsApp y webs que venden',
     homeDescription:
-      'Desarrollo de software a medida, automatización de WhatsApp, webs y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
+      'Software a medida, automatización de WhatsApp, webs y SEO para empresas que quieren vender más. Un solo equipo, cotización clara y pagos con Binance o PayPal.',
     homeOgAlt: 'Windytech — Desarrollo de software, automatización y marketing',
   },
   nav: {
@@ -68,8 +68,8 @@ export const content = {
       { label: 'Blog', href: '/blog/' },
       { label: 'Contacto', href: '#contacto' },
     ],
-    cta: 'Pedir cotización por WhatsApp',
-    headerCta: 'Cuéntanos sobre tu proyecto',
+    cta: 'Cotizar por WhatsApp',
+    headerCta: 'Cuéntanos qué necesitas',
     menu: 'Abrir menú',
     closeMenu: 'Cerrar menú',
     about: 'Acerca de Windytech',
@@ -77,35 +77,35 @@ export const content = {
   },
   campaignBar: {
     label: 'CAMPAÑA ACTIVA',
-    text: 'Landing page + bot de WhatsApp para tu negocio',
+    text: 'Tu landing page y tu bot de WhatsApp, listos para vender',
     link: 'Ver campañas',
   },
   whatsapp: {
-    general: 'Hola Windytech, quiero una cotización.',
+    general: 'Hola Windytech, quiero cotizar mi proyecto.',
     floatLabel: 'Escríbenos por WhatsApp',
     campaign: 'Hola Windytech, vengo de la campaña ',
   },
   hero: {
     badge: 'Windytech · Desarrollo & Automatización',
-    titleBefore: 'Desarrollo de software,',
-    titleHighlight: 'WhatsApp y páginas web',
+    titleBefore: 'Software a medida,',
+    titleHighlight: 'WhatsApp y webs que venden',
     description:
-      'Desarrollamos software a medida, automatizamos tu WhatsApp y creamos webs que convierten visitas en clientes. Marketing, SEO y equipos informáticos para empresas que quieren crecer.',
+      'Convertimos tu idea en herramientas que trabajan por ti. Automatizamos tu WhatsApp, creamos webs que convierten y desarrollamos software a tu medida. Un solo equipo. Un solo proveedor.',
     bullets: [
-      'Software a medida y automatizaciones para tu operación',
-      'Webs y landing pages que convierten visitas en clientes',
-      'Pagos internacionales con Binance y PayPal',
+      'Software hecho a tu medida',
+      'WhatsApp que responde por ti',
+      'Webs que convierten visitas en clientes',
     ],
-    primaryCta: 'Hablar por WhatsApp',
+    primaryCta: 'Pedir cotización por WhatsApp',
     secondaryCta: 'Ver servicios',
     panelTitle: '¿Qué necesitas hoy?',
-    panelSubtitle: 'Elige un servicio y te respondemos por WhatsApp.',
+    panelSubtitle: 'Elige un servicio. Te respondemos por WhatsApp.',
     quickLinks: [
       {
-        label: 'Desarrollo de software',
+        label: 'Software a medida',
         icon: 'code',
         href: '/servicios/desarrollo-de-software/',
-        message: 'Hola Windytech, quiero desarrollar software a medida para mi negocio.',
+        message: 'Hola Windytech, quiero software a medida para mi negocio.',
       },
       {
         label: 'Automatización de WhatsApp',
@@ -114,21 +114,22 @@ export const content = {
         message: 'Hola Windytech, quiero automatizar mi WhatsApp.',
       },
       {
-        label: 'Landing page o sitio web',
+        label: 'Páginas web y landing',
         icon: 'layout',
         href: '/servicios/paginas-web/',
-        message: 'Hola Windytech, quiero una landing page o un sitio web.',
+        message: 'Hola Windytech, quiero una web que convierta visitas en clientes.',
       },
       {
-        label: 'Marketing, SEO y publicidad',
+        label: 'SEO y marketing',
         icon: 'chart',
         href: '/servicios/marketing-seo/',
-        message: 'Hola Windytech, quiero marketing, SEO y publicidad para mi negocio.',
+        message: 'Hola Windytech, quiero aparecer en Google y atraer clientes.',
       },
       {
-        label: 'Equipos informáticos',
+        label: 'Equipos y redes',
         icon: 'monitor',
         href: '/servicios/equipos-informaticos/',
+        message: 'Hola Windytech, quiero cotizar equipos informáticos.',
       },
     ],
     panelFooter: [
@@ -139,9 +140,9 @@ export const content = {
   },
   campaigns: {
     eyebrow: 'CAMPAÑAS WINDY TECH',
-    title: 'Elige la campaña que necesita tu negocio',
+    title: 'Elige por dónde quieres crecer',
     subtitle:
-      'Cada campaña abre un chat de WhatsApp con su nombre. Al responderte, te contamos la promoción vigente.',
+      'Cada campaña abre un chat de WhatsApp y te cuenta la promoción vigente.',
     cards: [
       {
         slug: 'software-a-medida',
@@ -149,7 +150,7 @@ export const content = {
         tag: 'Software a medida',
         icon: 'code',
         title: 'Un sistema que trabaja como tu negocio',
-        text: 'Diseñamos y desarrollamos herramientas, paneles e integraciones para ordenar tu operación.',
+        text: 'Creamos paneles e integraciones que ordenan tu operación y te devuelven horas cada semana.',
         cta: 'Quiero mi sistema',
         message: 'Hola Windytech, vengo de la campaña Software a medida',
       },
@@ -159,7 +160,7 @@ export const content = {
         tag: 'WhatsApp 24/7',
         icon: 'bot',
         title: 'Atiende a tus clientes sin parar',
-        text: 'Un asistente automático responde, toma pedidos y agenda citas mientras tú trabajas.',
+        text: 'Responde, toma pedidos y agenda citas las 24 horas. Tus clientes escriben; tu bot contesta.',
         cta: 'Quiero mi asistente',
         message: 'Hola Windytech, vengo de la campaña WhatsApp 24/7',
       },
@@ -169,7 +170,7 @@ export const content = {
         tag: 'Página web',
         icon: 'layout',
         title: 'Tu landing page lista para vender',
-        text: 'Una página clara, rápida y con botón directo a tu WhatsApp para convertir visitas en clientes.',
+        text: 'Rápida, clara y lista para celular. Cada sección empuja al visitante a escribirte o comprarte.',
         cta: 'Quiero mi página',
         message: 'Hola Windytech, vengo de la campaña Página web',
       },
@@ -179,52 +180,51 @@ export const content = {
         tag: 'Marketing y SEO',
         icon: 'chart',
         title: 'Atrae clientes nuevos cada semana',
-        text: 'Posicionamiento en Google y publicidad para que más personas encuentren tu negocio.',
+        text: 'Posicionamiento local, contenido y campañas con métricas reales. Sin promesas vacías.',
         cta: 'Quiero más clientes',
         message: 'Hola Windytech, vengo de la campaña Marketing y SEO',
       },
     ],
   },
   services: {
-    title: 'Nuestros servicios',
-    subtitle:
-      'Todo lo que tu negocio necesita para vender más y trabajar mejor, en un solo equipo.',
+    title: 'Todo lo que tu negocio necesita, en un solo lugar',
+    subtitle: 'Un solo equipo para vender más y trabajar mejor.',
     cta: 'Cotizar este servicio',
     cards: [
       {
         icon: 'code',
         title: 'Desarrollo de software a medida',
-        text: 'Aplicaciones web, paneles, integraciones y herramientas internas diseñadas para tu forma de trabajar.',
+        text: '¿Planillas y procesos manuales? Construimos herramientas que ordenan tu operación y te devuelven horas cada semana.',
         message: 'Hola Windytech, quiero cotizar desarrollo de software a medida.',
       },
       {
         icon: 'chat',
         title: 'Automatización de WhatsApp',
-        text: 'Chatbots y respuestas automáticas para atender clientes, tomar pedidos y agendar citas sin que tu equipo esté pegado al teléfono.',
+        text: 'Responde preguntas, toma pedidos y agenda citas las 24 horas. Sin que tu equipo esté pegado al teléfono.',
         message: 'Hola Windytech, quiero cotizar automatización de WhatsApp.',
       },
       {
         icon: 'layout',
         title: 'Landing pages y sitios web',
-        text: 'Diseño y desarrollo de páginas rápidas, claras y listas para celular, pensadas para que el visitante te escriba o te compre.',
+        text: 'Rápidas, claras y listas para celular. Cada sección empuja al visitante a escribirte o comprarte.',
         message: 'Hola Windytech, quiero cotizar una landing page o sitio web.',
       },
       {
         icon: 'chart',
         title: 'Marketing, SEO y publicidad',
-        text: 'Posicionamiento en Google y campañas publicitarias para atraer clientes nuevos y medir resultados.',
+        text: 'Aparece cuando tus clientes te buscan. Posicionamiento local, contenido y campañas con métricas reales.',
         message: 'Hola Windytech, quiero cotizar marketing, SEO y publicidad.',
       },
       {
         icon: 'network',
         title: 'Redes e infraestructura',
-        text: 'Configuramos tus equipos en red y la infraestructura de tu local u oficina. Disponible solo en Venezuela.',
+        text: 'Configuramos tu red e infraestructura. Disponible solo en Venezuela.',
         message: 'Hola Windytech, quiero cotizar configuración de redes e infraestructura.',
       },
       {
         icon: 'monitor',
         title: 'Equipos informáticos',
-        text: 'Venta de computadoras y equipos para oficinas, tiendas y empresas, con asesoría para elegir lo que de verdad necesitas.',
+        text: 'Laptops, monitores y equipos para tu oficina. Te asesoramos para elegir lo que de verdad necesitas.',
         message: 'Hola Windytech, quiero cotizar equipos informáticos.',
       },
     ],
@@ -240,41 +240,41 @@ export const content = {
     copyError: 'No se pudo copiar. Copia la dirección desde el navegador.',
   },
   clients: {
-    title: 'Trabajamos con negocios de todos los tamaños',
-    text: 'Desde un emprendimiento que arranca hasta una empresa con varias sedes. Ajustamos el servicio a tu etapa y a tu presupuesto.',
+    title: 'Trabajamos contigo, estés donde estés',
+    text: 'Desde tu primer cliente hasta varias sedes. Ajustamos el servicio a tu etapa y a tu presupuesto.',
     bullets: [
       {
         title: 'Precios claros',
-        text: 'Te decimos cuánto cuesta antes de empezar.',
+        text: 'Sabes cuánto cuesta antes de empezar.',
       },
       {
         title: 'Atención directa',
-        text: 'Hablas con el equipo que hace el trabajo.',
+        text: 'Hablas con quien hace el trabajo.',
       },
       {
         title: 'Todo en un solo lugar',
-        text: 'Web, WhatsApp, marketing y equipos con un solo proveedor.',
+        text: 'Web, WhatsApp, marketing y equipos. Un solo proveedor.',
       },
     ],
     segments: [
       {
         label: 'PEQUEÑAS EMPRESAS',
-        text: 'Una página web profesional, un bot de WhatsApp y publicidad para conseguir tus primeros clientes en línea.',
+        text: 'Una web profesional, un bot de WhatsApp y publicidad para conseguir tus primeros clientes en línea.',
       },
       {
         label: 'MEDIANAS EMPRESAS',
-        text: 'Automatización de ventas y atención, SEO constante y software para ordenar tu operación mientras creces.',
+        text: 'Automatizamos ventas y atención, sumamos SEO y software para ordenar tu operación mientras creces.',
       },
       {
         label: 'GRANDES EMPRESAS',
-        text: 'Equipo de marketing dedicado, campañas a gran escala, equipamiento informático y automatizaciones a medida.',
+        text: 'Equipo de marketing dedicado, campañas a gran escala, equipamiento y automatizaciones a medida.',
       },
     ],
   },
   equipment: {
     eyebrow: 'EQUIPOS INFORMÁTICOS',
     title: 'Equipos listos para tu puesto de trabajo',
-    text: 'Tenemos laptops, desktops, monitores y accesorios con precio en dólares. Mira el catálogo, pide tu cotización y te confirmamos la entrega.',
+    text: 'Laptops, monitores y accesorios con precio en dólares. Pides tu cotización y te confirmamos stock y entrega.',
     bullets: [
       'Laptops y computadoras de escritorio',
       'Monitores, impresoras y accesorios',
@@ -283,12 +283,12 @@ export const content = {
     ],
     cta: 'Ver el catálogo',
     message: 'Hola Windytech, quiero cotizar un equipo informático.',
-    note: 'Te confirmamos disponibilidad, precio y tiempo de entrega al cotizar.',
+    note: 'Al cotizar confirmamos disponibilidad, precio y tiempo de entrega.',
   },
   payments: {
     eyebrow: 'PAGOS INTERNACIONALES',
-    title: 'Medios de pago',
-    text: 'Pagas de forma segura desde cualquier país con las plataformas que ya usas.',
+    title: 'Pagas como ya pagas',
+    text: 'Paga desde cualquier país con Binance o PayPal. Seguro y sin rodeos.',
     methods: ['Binance', 'PayPal'],
     methodDetails: {
       Binance: 'USDT · Sin comisiones',
@@ -299,20 +299,20 @@ export const content = {
       Binance: 'Binance Pay',
       PayPal: 'PayPal',
     },
-    stepsTitle: '¿Cómo funciona el pago?',
+    stepsTitle: 'Tres pasos y listo',
     steps: [
-      'Solicitas tu cotización en el catálogo.',
+      'Pides tu cotización en el catálogo.',
       'Confirmamos stock y tiempo de entrega.',
       'Recibes los datos oficiales para transferir.',
     ],
-    secureNote: 'Transacción verificada directamente con nuestro equipo',
-    note: 'Al aceptar tu cotización te enviamos los datos para pagar.',
+    secureNote: 'Verificamos cada transacción con nuestro equipo',
+    note: 'Aceptas la cotización y te enviamos los datos para pagar.',
   },
   visibility: {
     eyebrow: 'VISIBILIDAD EN GOOGLE',
     title: 'Así te ven tus clientes cuando te buscan',
     text:
-      'Posicionamos tu negocio en Google con SEO local, páginas optimizadas y contenido que responde lo que tu cliente escribe en el buscador. Este es un ejemplo de un resultado de búsqueda.',
+      'Posicionamos tu negocio en Google con SEO local, páginas optimizadas y contenido que responde lo que tu cliente escribe. Así se ve un resultado real.',
     bullets: [
       {
         title: 'Posicionamiento local',
@@ -329,74 +329,74 @@ export const content = {
     ],
     cta: 'Mejorar mi posición en Google',
     message: 'Hola Windytech, quiero mejorar la posición de mi negocio en Google.',
-    previewTitle: 'Windytech | Software a medida, WhatsApp y páginas web',
+    previewTitle: 'Windytech | Software a medida, WhatsApp y webs que venden',
     previewUrl: 'https://windytech.studio',
     previewDescription:
-      'Desarrollo de software a medida, automatización de WhatsApp, webs y SEO para empresas. Servicios digitales remotos y soporte de redes en Venezuela.',
+      'Software a medida, automatización de WhatsApp, webs y SEO para empresas que quieren vender más. Un solo equipo, cotización clara y pagos con Binance o PayPal.',
   },
   cta: {
-    title: '¿Listo para automatizar tu negocio?',
-    text: 'Escríbenos y recibe tu cotización por WhatsApp. Aceptamos Binance y PayPal.',
+    title: 'Hablemos de tu proyecto',
+    text: 'Cuéntanos qué necesitas resolver. Te respondemos por WhatsApp con alcance y precio.',
     button: 'Inicia tu proyecto por WhatsApp',
   },
   faqs: {
     eyebrow: 'PREGUNTAS FRECUENTES',
-    title: 'Respuestas sobre nuestros servicios',
-    subtitle: 'Conoce qué hacemos, cómo trabajamos y cómo pedir una cotización.',
+    title: 'Preguntas que nos hacen siempre',
+    subtitle: 'Qué hacemos, cómo trabajamos y cómo cotizar. En corto.',
     items: [
       {
         question: '¿Qué es Windytech y a qué se dedica?',
         answer:
-          'Windytech es un estudio de desarrollo de software, automatización de WhatsApp, diseño web y marketing digital con base en Venezuela. Ayuda a empresas de cualquier país a vender más y trabajar mejor con soluciones digitales a la medida.',
+          'Somos un estudio de software, automatización de WhatsApp, diseño web y marketing con base en Venezuela. Ayudamos a empresas de cualquier país a vender más y trabajar mejor.',
       },
       {
         question: '¿Dónde está ubicada Windytech?',
         answer:
-          'Windytech tiene su base en Venezuela y atiende proyectos digitales de forma remota en cualquier país. La instalación de redes, la infraestructura y la entrega física de equipos se coordinan únicamente en Venezuela.',
+          'Estamos en Venezuela y atendemos proyectos digitales de forma remota en cualquier país. Redes, infraestructura y entrega de equipos, solo en Venezuela.',
       },
       {
         question: '¿Qué servicios digitales ofrece Windytech?',
         answer:
-          'Desarrollamos software a medida y aplicaciones web, automatizamos WhatsApp Business, diseñamos páginas web y landing pages, y ofrecemos SEO, marketing digital, publicidad, redes e infraestructura y equipos informáticos.',
+          'Desarrollamos software y aplicaciones web, automatizamos WhatsApp Business, diseñamos webs y landing pages, y ofrecemos SEO, publicidad, redes e infraestructura.',
       },
       {
         question: '¿Cuánto cuesta una página web o un software a medida?',
         answer:
-          'El precio depende del alcance, las funciones y las integraciones que necesite tu negocio. Cuéntanos tu objetivo y te enviaremos una cotización antes de comenzar.',
+          'Depende del alcance, las funciones y las integraciones. Cuéntanos tu objetivo y te enviamos la cotización antes de empezar.',
       },
       {
         question: '¿Pueden automatizar WhatsApp Business para pedidos o citas?',
         answer:
-          'Sí. Podemos ayudarte a automatizar respuestas y flujos de atención para consultas, pedidos o citas. Revisamos tu proceso y definimos el alcance contigo antes de cotizar.',
+          'Sí. Automatizamos respuestas y flujos para consultas, pedidos y citas. Revisamos tu proceso y definimos el alcance contigo antes de cotizar.',
       },
       {
         question: '¿Ofrecen posicionamiento SEO y marketing digital?',
         answer:
-          'Sí. Trabajamos en optimización para buscadores, contenido y campañas publicitarias según los objetivos del negocio. El posicionamiento depende de factores como la competencia, el sitio y la demanda; no prometemos posiciones ni resultados garantizados.',
+          'Sí. Trabajamos SEO, contenido y campañas según tus objetivos. No prometemos posiciones: medimos visitas, consultas y cotizaciones reales.',
       },
       {
         question: '¿Trabajan con empresas fuera de Venezuela?',
         answer:
-          'Podemos atender proyectos digitales de forma remota para clientes en otros países. Los servicios de instalación de redes e infraestructura están disponibles únicamente en Venezuela.',
+          'Sí. Atendemos proyectos digitales de forma remota en cualquier país. Redes e infraestructura, solo en Venezuela.',
       },
       {
         question: '¿Cómo solicito una cotización?',
         answer:
-          'Escríbenos por WhatsApp o usa el formulario de contacto. Indica el servicio, qué necesitas resolver y cómo podemos contactarte para preparar una cotización.',
+          'Escríbenos por WhatsApp o usa el formulario. Indica el servicio, qué necesitas resolver y cómo contactarte. Te respondemos con alcance y precio.',
       },
     ],
   },
   contact: {
     eyebrow: 'CONTACTO',
     title: 'Hablemos de tu proyecto',
-    text: 'Cuéntanos qué necesitas y te enviamos una cotización por WhatsApp.',
+    text: 'Cuéntanos qué necesitas. Te respondemos por WhatsApp con alcance y precio.',
     cards: [
       { label: 'WHATSAPP', value: site.whatsappDisplay, href: `https://wa.me/${site.whatsappNumber}`, icon: 'whatsapp' },
       { label: 'CORREO', value: site.email, href: `mailto:${site.email}`, icon: 'mail' },
       { label: 'SITIO WEB', value: site.domain, href: site.url, icon: 'globe' },
       {
         label: 'COBERTURA',
-        value: 'Servicios digitales para cualquier país. Redes e infraestructuras solo en Venezuela.',
+        value: 'Digital para cualquier país. Redes e infraestructura, solo en Venezuela.',
         icon: 'globe',
       },
     ],
