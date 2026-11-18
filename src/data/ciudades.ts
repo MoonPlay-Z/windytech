@@ -34,36 +34,173 @@ export type StateEntity = {
   name: string;
   capital: string;
   type: 'state' | 'district' | 'federal';
+  /** Cinco ciudades o localidades principales de la entidad. */
+  cities: string[];
 };
 
-/** Entidades federales de Venezuela, con su capital. */
+/**
+ * Entidades federales de Venezuela: capital y cinco ciudades principales.
+ *
+ * Esta lista es referencia geográfica y validación de datos; NO declara
+ * cobertura de servicio. Las fichas con página propia están en `CITIES`.
+ */
 export const VENEZUELA_STATES: StateEntity[] = [
-  { name: 'Amazonas', capital: 'Puerto Ayacucho', type: 'state' },
-  { name: 'Anzoátegui', capital: 'Barcelona', type: 'state' },
-  { name: 'Apure', capital: 'San Fernando', type: 'state' },
-  { name: 'Aragua', capital: 'Maracay', type: 'state' },
-  { name: 'Barinas', capital: 'Barinas', type: 'state' },
-  { name: 'Bolívar', capital: 'Ciudad Bolívar', type: 'state' },
-  { name: 'Carabobo', capital: 'Valencia', type: 'state' },
-  { name: 'Cojedes', capital: 'San Carlos', type: 'state' },
-  { name: 'Delta Amacuro', capital: 'Tucupita', type: 'state' },
-  { name: 'Falcón', capital: 'Coro', type: 'state' },
-  { name: 'Guárico', capital: 'San Juan de los Morros', type: 'state' },
-  { name: 'La Guaira', capital: 'La Guaira', type: 'state' },
-  { name: 'Lara', capital: 'Barquisimeto', type: 'state' },
-  { name: 'Mérida', capital: 'Mérida', type: 'state' },
-  { name: 'Miranda', capital: 'Los Teques', type: 'state' },
-  { name: 'Monagas', capital: 'Maturín', type: 'state' },
-  { name: 'Nueva Esparta', capital: 'La Asunción', type: 'state' },
-  { name: 'Portuguesa', capital: 'Guanare', type: 'state' },
-  { name: 'Sucre', capital: 'Cumaná', type: 'state' },
-  { name: 'Táchira', capital: 'San Cristóbal', type: 'state' },
-  { name: 'Trujillo', capital: 'Trujillo', type: 'state' },
-  { name: 'Yaracuy', capital: 'San Felipe', type: 'state' },
-  { name: 'Zulia', capital: 'Maracaibo', type: 'state' },
-  { name: 'Distrito Capital', capital: 'Caracas', type: 'district' },
-  { name: 'Dependencias Federales', capital: 'Gran Roque', type: 'federal' },
+  {
+    name: 'Amazonas',
+    capital: 'Puerto Ayacucho',
+    type: 'state',
+    cities: ['Puerto Ayacucho', 'San Fernando de Atabapo', 'La Esmeralda', 'Maroa', 'Alto Orinoco'],
+  },
+  {
+    name: 'Anzoátegui',
+    capital: 'Barcelona',
+    type: 'state',
+    cities: ['Barcelona', 'Puerto La Cruz', 'El Tigre', 'Lechería', 'Anaco'],
+  },
+  {
+    name: 'Apure',
+    capital: 'San Fernando',
+    type: 'state',
+    cities: ['San Fernando', 'Guasdualito', 'Achaguas', 'Biruaca', 'El Amparo'],
+  },
+  {
+    name: 'Aragua',
+    capital: 'Maracay',
+    type: 'state',
+    cities: ['Maracay', 'Turmero', 'La Victoria', 'Villa de Cura', 'Cagua'],
+  },
+  {
+    name: 'Barinas',
+    capital: 'Barinas',
+    type: 'state',
+    cities: ['Barinas', 'Barinitas', 'Sabaneta', 'Santa Bárbara', 'Ciudad Bolivia'],
+  },
+  {
+    name: 'Bolívar',
+    capital: 'Ciudad Bolívar',
+    type: 'state',
+    cities: ['Ciudad Bolívar', 'Ciudad Guayana', 'Upata', 'El Callao', 'Caicara del Orinoco'],
+  },
+  {
+    name: 'Carabobo',
+    capital: 'Valencia',
+    type: 'state',
+    cities: ['Valencia', 'Naguanagua', 'San Diego', 'Puerto Cabello', 'Guacara'],
+  },
+  {
+    name: 'Cojedes',
+    capital: 'San Carlos',
+    type: 'state',
+    cities: ['San Carlos', 'Tinaquillo', 'Tinaco', 'El Baúl', 'Las Vegas'],
+  },
+  {
+    name: 'Delta Amacuro',
+    capital: 'Tucupita',
+    type: 'state',
+    cities: ['Tucupita', 'Pedernales', 'Curiapo', 'Casacoima', 'San José de Amacuro'],
+  },
+  {
+    name: 'Falcón',
+    capital: 'Coro',
+    type: 'state',
+    cities: ['Coro', 'Punto Fijo', 'Puerto Cumarebo', 'Churuguara', 'Tucacas'],
+  },
+  {
+    name: 'Guárico',
+    capital: 'San Juan de los Morros',
+    type: 'state',
+    cities: ['San Juan de los Morros', 'Calabozo', 'Valle de la Pascua', 'Zaraza', 'El Sombrero'],
+  },
+  {
+    name: 'La Guaira',
+    capital: 'La Guaira',
+    type: 'state',
+    cities: ['La Guaira', 'Maiquetía', 'Catia La Mar', 'Macuto', 'Carayaca'],
+  },
+  {
+    name: 'Lara',
+    capital: 'Barquisimeto',
+    type: 'state',
+    cities: ['Barquisimeto', 'Cabudare', 'El Tocuyo', 'Quíbor', 'Carora'],
+  },
+  {
+    name: 'Mérida',
+    capital: 'Mérida',
+    type: 'state',
+    cities: ['Mérida', 'Ejido', 'Tovar', 'Santa Cruz de Mora', 'Mucuchíes'],
+  },
+  {
+    name: 'Miranda',
+    capital: 'Los Teques',
+    type: 'state',
+    cities: ['Los Teques', 'Guarenas', 'Guatire', 'Cúa', 'Chacao'],
+  },
+  {
+    name: 'Monagas',
+    capital: 'Maturín',
+    type: 'state',
+    cities: ['Maturín', 'Punta de Mata', 'Temer', 'Aguasay', 'Quiriquire'],
+  },
+  {
+    name: 'Nueva Esparta',
+    capital: 'La Asunción',
+    type: 'state',
+    cities: ['La Asunción', 'Porlamar', 'Pampatar', 'Juan Griego', 'Las Nieves'],
+  },
+  {
+    name: 'Portuguesa',
+    capital: 'Guanare',
+    type: 'state',
+    cities: ['Guanare', 'Acarigua', 'Agua Blanca', 'Araure', 'Ospino'],
+  },
+  {
+    name: 'Sucre',
+    capital: 'Cumaná',
+    type: 'state',
+    cities: ['Cumaná', 'Carúpano', 'Güiria', 'Cumanacoa', 'Irapa'],
+  },
+  {
+    name: 'Táchira',
+    capital: 'San Cristóbal',
+    type: 'state',
+    cities: ['San Cristóbal', 'San Antonio del Táchira', 'Rubio', 'La Grita', 'Táriba'],
+  },
+  {
+    name: 'Trujillo',
+    capital: 'Trujillo',
+    type: 'state',
+    cities: ['Trujillo', 'Valera', 'Boconó', 'Betijoque', 'Escuque'],
+  },
+  {
+    name: 'Yaracuy',
+    capital: 'San Felipe',
+    type: 'state',
+    cities: ['San Felipe', 'Yaritagua', 'Nirgua', 'Chivacoa', 'Cocorote'],
+  },
+  {
+    name: 'Zulia',
+    capital: 'Maracaibo',
+    type: 'state',
+    cities: ['Maracaibo', 'Cabimas', 'Ciudad Ojeda', 'Machiques', 'Santa Rita'],
+  },
+  {
+    name: 'Distrito Capital',
+    capital: 'Caracas',
+    type: 'district',
+    cities: ['Caracas', 'Libertador', 'Santa Rosalía', 'El Valle', 'La Vega'],
+  },
+  {
+    name: 'Dependencias Federales',
+    capital: 'Gran Roque',
+    type: 'federal',
+    cities: ['Gran Roque', 'Cayo de Agua', 'Dos Mosquises', 'Crasquí', 'Francisquí'],
+  },
 ];
+
+/** Las cinco ciudades de referencia de una entidad. */
+export function citiesOfState(name: string): string[] {
+  return VENEZUELA_STATES.find((item) => item.name === name)?.cities ?? [];
+}
 
 /** Tipo de esquema correcto para una entidad (Distrito Capital no es un estado). */
 export function stateEntityType(name: string): 'State' | 'AdministrativeArea' {

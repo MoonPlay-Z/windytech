@@ -3,6 +3,7 @@ import test, { describe } from 'node:test';
 import {
   CITIES,
   VENEZUELA_STATES,
+  citiesOfState,
   cityBySlug,
   stateEntityType,
 } from '../data/ciudades';
@@ -29,6 +30,21 @@ describe('entidades federales de Venezuela', () => {
     assert.equal(stateEntityType('Distrito Capital'), 'AdministrativeArea');
     assert.equal(stateEntityType('Dependencias Federales'), 'AdministrativeArea');
     assert.equal(stateEntityType('Portuguesa'), 'State');
+  });
+
+  test('cada entidad tiene cinco ciudades y la capital entre ellas', () => {
+    for (const entity of VENEZUELA_STATES) {
+      assert.equal(entity.cities.length, 5, entity.name);
+      assert.ok(entity.cities.includes(entity.capital), entity.name);
+      assert.equal(new Set(entity.cities).size, 5, entity.name);
+    }
+  });
+
+  test('Portuguesa incluye Acarigua y Agua Blanca', () => {
+    const cities = citiesOfState('Portuguesa');
+    assert.ok(cities.includes('Acarigua'));
+    assert.ok(cities.includes('Agua Blanca'));
+    assert.equal(cities.length, 5);
   });
 });
 
