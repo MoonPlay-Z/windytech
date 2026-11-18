@@ -32,7 +32,7 @@ const links = shareLinks({ url, title, text, campaign });
 const id = `share-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<div class:list={['share-menu', `share-menu--${variant}`]} data-share-menu>
+<div class:list={['share-menu', variant === 'detail' && 'share-menu--detail']} data-share-menu>
   <button
     type="button"
     class="share-menu-trigger"

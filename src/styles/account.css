@@ -548,6 +548,7 @@
   list-style: none;
 }
 
+.tracking-notice,
 .tracking-notice-list li {
   display: grid;
   gap: 3px;

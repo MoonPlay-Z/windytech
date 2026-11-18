@@ -11,6 +11,7 @@ npm run dev        # dev server → http://localhost:4321
 npm run build      # astro build && tsx scripts/generate-sitemap.ts
 npm run preview
 npm run check      # astro check (types + Astro templates) — the only typecheck step
+npm run css:audit  # node scripts/audit-css.mjs — clases CSS huérfanas / sin estilo
 npm test           # tsx --test src/lib/*.test.ts (node:test runner)
 npm run test:pricing  # single file: src/lib/pricing.test.ts
 npx tsx --test src/lib/<name>.test.ts   # single lib test, e.g. src/lib/security.test.ts

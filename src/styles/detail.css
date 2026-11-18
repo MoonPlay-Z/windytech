@@ -368,11 +368,6 @@
   font-weight: 700;
 }
 
-.product-price--detail .product-price-note {
-  color: var(--muted);
-  font-size: 12px;
-}
-
 .product-availability-note {
   margin: 0;
 }
@@ -435,6 +430,11 @@
   font-family: var(--font-display);
   font-weight: 700;
   white-space: nowrap;
+}
+
+.variant-out {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .product-specs {

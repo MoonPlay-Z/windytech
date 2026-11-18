@@ -12,6 +12,7 @@
     "build": "astro build && tsx scripts/generate-sitemap.ts",
     "preview": "astro preview",
     "check": "astro check",
+    "css:audit": "node scripts/audit-css.mjs",
     "sitemap": "tsx scripts/generate-sitemap.ts",
     "seo:check": "node scripts/check-seo.mjs",
     "indexnow": "node scripts/indexnow.mjs",

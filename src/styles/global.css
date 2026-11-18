@@ -131,11 +131,6 @@ ol {
   color: var(--navy);
 }
 
-section[id],
-article[id] {
-  scroll-margin-top: 96px;
-}
-
 /* El atributo `hidden` gana siempre: sin esto, cualquier clase con `display`
    (por ejemplo .cart-layout) deja visible un bloque que el JS marcó como
    oculto y aparecen dos estados a la vez. */
@@ -146,18 +141,6 @@ article[id] {
 :focus-visible {
   outline: 3px solid var(--mint);
   outline-offset: 3px;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* Las secciones con ancla (#contacto, #servicios...) no deben quedar tapadas
@@ -594,26 +577,6 @@ section[id],
   align-items: center;
   gap: 12px;
   flex: none;
-}
-
-.lang-switch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 42px;
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--navy);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.lang-switch:hover {
-  border-color: var(--mint);
-  background: var(--mint-soft);
 }
 
 .menu-toggle {
@@ -1143,14 +1106,6 @@ section[id],
   color: #fff;
 }
 
-.quick-wa {
-  color: #1faa53;
-}
-
-.quick-link.is-primary .quick-wa {
-  color: #25d366;
-}
-
 .panel-footer {
   display: flex;
   flex-wrap: wrap;
@@ -1223,13 +1178,6 @@ section[id],
   background: var(--bg);
 }
 
-.card--dark {
-  background: var(--navy);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 18px 40px rgba(14, 34, 52, 0.25);
-}
-
 .card h3 {
   color: var(--navy);
   font-size: 22px;
@@ -1241,14 +1189,6 @@ section[id],
   color: var(--muted);
   font-size: 16px;
   line-height: 1.6;
-}
-
-.card--dark h3 {
-  color: #fff;
-}
-
-.card--dark p {
-  color: var(--ice);
 }
 
 .card .btn {
@@ -1265,11 +1205,6 @@ section[id],
   color: #086363;
   font-size: 13px;
   font-weight: 600;
-}
-
-.card--dark .tag {
-  background: var(--mint);
-  color: var(--navy);
 }
 
 .icon-badge {
@@ -1318,12 +1253,6 @@ section[id],
   background: linear-gradient(135deg, #7f93a8, #0e2234);
   color: #fff;
   box-shadow: 0 10px 24px rgba(14, 34, 52, 0.28);
-}
-
-.icon-badge--card {
-  background: linear-gradient(135deg, var(--mint), var(--mint-2));
-  color: var(--navy);
-  box-shadow: 0 10px 24px rgba(61, 220, 181, 0.3);
 }
 
 .icon-badge--light {
@@ -2696,7 +2625,7 @@ a.contact-card:hover {
    sobrescribe (ver admin.css) para usar otro tipo de transición. */
 :root {
   --wt-page-out-name: wt-page-turn-out;
-  --wt-page-in-name: none;
+  --wt-page-in-name: wt-page-in;
   --wt-page-out-origin: left center;
   --wt-page-shadow: 40px 0 80px rgba(10, 30, 45, 0.32);
   --wt-page-out-z: 2;
@@ -2741,6 +2670,18 @@ html[data-astro-transition='back'] {
   100% {
     opacity: 0;
     transform: perspective(1800px) rotateY(22deg) translateX(112%);
+  }
+}
+
+/* La página entrante aparece con un fundido corto en lugar de hacerlo de golpe. */
+@keyframes wt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.997);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -3003,6 +2944,11 @@ html[data-astro-transition='back'] {
   background: var(--bg);
 }
 
+/* Variante en línea: sin el borde de tarjeta de .share-box--card. */
+.share-box--inline {
+  margin-top: 0;
+}
+
 .share-box-label {
   margin: 0;
   color: var(--navy);
@@ -3028,14 +2974,6 @@ html[data-astro-transition='back'] {
 .plans-share .share-box-label {
   color: var(--muted);
   text-align: center;
-}
-
-.plan-link--share {
-  border: 0;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3128,12 +3066,64 @@ html[data-astro-transition='back'] {
   justify-content: center;
 }
 
-/* Insignia de novedades en la cabecera */
-.notifications-link {
-  position: relative;
+/* Selector de moneda de exhibición (catálogo y carrito) */
+.currency-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
 }
 
-.nav-badge {
+.currency-switch button {
+  min-width: 44px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.currency-switch button[aria-pressed='true'] {
+  background: var(--mint-soft);
+  color: #086363;
+}
+
+.currency-switch button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.currency-note {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Iconos de la cabecera (novedades y carrito) */
+.notifications-link,
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+}
+
+.notifications-link:hover,
+.cart-link:hover {
+  color: var(--teal-dark);
+}
+
+.nav-badge,
+.cart-count {
   position: absolute;
   top: -6px;
   right: -8px;
@@ -3580,6 +3570,10 @@ html[data-astro-transition='back'] {
   grid-template-columns: minmax(0, 1fr) 210px;
   gap: 20px;
   padding: 22px;
+}
+
+.search-preview__text {
+  min-width: 0;
 }
 
 .search-preview__crumb {

@@ -343,7 +343,6 @@
   background: #fbfdfe;
 }
 
-.uploader-label,
 .uploader-alt {
   display: grid;
   gap: 4px;
@@ -737,6 +736,11 @@
   font-weight: 700;
 }
 
+.admin-stat--products .admin-stat-icon {
+  background: #e7f7f3;
+  color: #0b7a7a;
+}
+
 .admin-stat--quotes .admin-stat-icon {
   background: #fff3df;
   color: #b56a10;
@@ -960,10 +964,30 @@
 
 
 /* Perfil de administrador */
+.admin-field {
+  display: grid;
+  gap: 6px;
+}
+
 .admin-field-hint {
   margin-top: 4px;
   font-size: 11px;
   color: var(--muted);
+}
+
+.admin-field--password {
+  grid-column: 1 / -1;
+}
+
+.admin-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--mint-soft);
+  color: #086363;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .admin-actions {
@@ -1020,9 +1044,11 @@ html.admin-page {
 /* Los pseudo-elementos del menú lateral se fijan: sin fundido ni movimiento.
    (Los selectores de pseudo-elementos de View Transitions no admiten ancestros,
    por eso van sin el prefijo `html.admin-page`.) */
-::view-transition-old(admin-sidebar),
-::view-transition-new(admin-sidebar) {
-  animation: none;
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(admin-sidebar),
+  ::view-transition-new(admin-sidebar) {
+    animation: none;
+  }
 }
 
 @keyframes wt-admin-out {
@@ -1417,6 +1443,13 @@ html.admin-page {
   box-shadow: 0 5px 18px rgba(14, 34, 52, 0.035);
 }
 
+.orders-search,
+.orders-status-filter,
+.orders-date-filter {
+  display: block;
+  min-width: 0;
+}
+
 .orders-filters input,
 .orders-filters select {
   width: 100%;
@@ -1494,6 +1527,10 @@ html.admin-page {
 
 .orders-number-cell {
   width: 105px;
+}
+
+.orders-products-cell {
+  min-width: 190px;
 }
 
 .orders-number-cell > strong,
